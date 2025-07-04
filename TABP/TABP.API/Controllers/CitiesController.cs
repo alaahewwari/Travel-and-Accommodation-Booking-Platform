@@ -2,11 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
-using TABP.API.Contracts.City;
+using TABP.API.Contracts.Cities;
 using TABP.API.Mapping;
 using TABP.Application.Cities.Commands.Delete;
+using TABP.Application.Cities.Common;
 using TABP.Application.Cities.Queries.GetAll;
 using TABP.Application.Cities.Queries.GetById;
+using TABP.Application.Cities.Queries.GetTrending;
+using TABP.Application.Hotels.Common;
 namespace TABP.API.Controllers
 {
     [ApiController]
@@ -14,7 +17,12 @@ namespace TABP.API.Controllers
     public class CitiesController(ISender mediator, CityMapper mapper) : ControllerBase
     {
         [HttpPost(ApiRoutes.Cities.Create)]
-        public async Task<IActionResult> Create([FromBody] CreateCityRequest request, CancellationToken cancellationToken)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<CityResponse>> Create([FromBody] CreateCityRequest request, CancellationToken cancellationToken)
         {
             var command = mapper.ToCommand(request);
             var result = await mediator.Send(command, cancellationToken);
@@ -22,10 +30,15 @@ namespace TABP.API.Controllers
             {
                 return BadRequest(result.Error.Description);
             }
-            return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+            return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
         }
         [HttpGet(ApiRoutes.Cities.GetById)]
-        public async Task<IActionResult> GetById([FromRoute] int id, CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(CityResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<CityResponse>> GetById([FromRoute] int id, CancellationToken cancellationToken)
         {
             var result = await mediator.Send(new GetCityByIdQuery(id), cancellationToken);
             if (result.IsFailure)
@@ -35,15 +48,25 @@ namespace TABP.API.Controllers
             return Ok(result.Value);
         }
         [HttpGet(ApiRoutes.Cities.GetAll)]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(IEnumerable<CityResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<CityResponse>>> GetAll(CancellationToken cancellationToken)
         {
             var result = await mediator.Send(new GetAllCitiesQuery(), cancellationToken);
             return Ok(result.Value);
         }
         [HttpPut(ApiRoutes.Cities.Update)]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCityRequest request, CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(CityResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<CityResponse>> Update([FromRoute] int id, [FromBody] UpdateCityRequest request, CancellationToken cancellationToken)
         {
-            var command = mapper.ToCommand(request,id);
+            var command = mapper.ToCommand(request, id);
             var result = await mediator.Send(command, cancellationToken);
             if (result.IsFailure)
             {
@@ -52,7 +75,12 @@ namespace TABP.API.Controllers
             return Ok(result.Value);
         }
         [HttpDelete(ApiRoutes.Cities.Delete)]
-        public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
             var result = await mediator.Send(new DeleteCityCommand(id), cancellationToken);
             if (result.IsFailure)
@@ -60,6 +88,18 @@ namespace TABP.API.Controllers
                 return NotFound(result.Error.Description);
             }
             return NoContent();
+        }
+        [HttpGet(ApiRoutes.Cities.GetTrending)]
+        [ProducesResponseType(typeof(IEnumerable<CityResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<CityResponse>>> GetTrending([FromQuery] TrendingCitiesRequest request, CancellationToken cancellationToken = default)
+        {
+            var query = new GetTrendingCitiesQuery(request.Count);
+            var result = await mediator.Send(query, cancellationToken);
+            if (result.IsFailure)
+                return BadRequest(result.Error.Description);
+            return Ok(result.Value);
         }
     }
 }
