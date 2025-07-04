@@ -1,5 +1,5 @@
 ﻿using Riok.Mapperly.Abstractions;
-using TABP.API.Contracts.City;
+using TABP.API.Contracts.Cities;
 using TABP.Application.Cities.Commands.Create;
 using TABP.Application.Cities.Commands.Update;
 namespace TABP.API.Mapping
