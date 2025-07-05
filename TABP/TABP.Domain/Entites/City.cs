@@ -10,5 +10,6 @@ namespace TABP.Domain.Entites
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public ICollection<Hotel> Hotels { get; set; } = [];
+        public ICollection<CityImage> CityImages { get; set; } = [];
     }
 }
