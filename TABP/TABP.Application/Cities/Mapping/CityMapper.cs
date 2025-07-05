@@ -10,6 +10,8 @@ namespace TABP.Application.Cities.Mapping
     {
         protected partial City ToCityDomainInternal(CreateCityCommand command);
         protected partial City ToCityDomainInternal(UpdateCityCommand command);
+        public partial CityForManagementResponse ToCityForManagementResponse(CityWithHotelCount city);
+        public partial CityResponse ToCityResponse(City city);
         public City ToCityDomain(CreateCityCommand command)
         {
             var city = ToCityDomainInternal(command);
