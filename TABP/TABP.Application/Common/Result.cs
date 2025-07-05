@@ -1,5 +1,4 @@
-﻿using TABP.Application.Common.Errors;
-namespace TABP.Application.Common
+﻿namespace TABP.Application.Common
 {
     public class Result
     {
