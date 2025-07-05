@@ -16,7 +16,6 @@ namespace TABP.Application.Cities.Commands.Update
                 return Result<CityResponse>.Failure(CityErrors.CityNotFound);
             }
             var cityModel = mapper.ToCityDomain(request);
-            cityModel.UpdatedAt = DateTime.UtcNow;
             var updatedCity = await cityRepository.UpdateCityAsync(cityModel, cancellationToken);
             var city = mapper.ToCityResponse(updatedCity!);
             return Result<CityResponse>.Success(city);
