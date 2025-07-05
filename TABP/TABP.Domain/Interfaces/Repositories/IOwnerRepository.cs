@@ -1,5 +1,4 @@
 ﻿using TABP.Domain.Entites;
-
 namespace TABP.Domain.Interfaces.Repositories
 {
     public interface IOwnerRepository
