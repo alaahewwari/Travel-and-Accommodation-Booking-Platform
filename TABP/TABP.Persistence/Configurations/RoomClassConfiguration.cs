@@ -19,10 +19,10 @@ namespace TABP.Persistence.Configurations
             builder.Property(rc => rc.CreatedAt).IsRequired();
             builder.HasOne(rc => rc.Hotel)
                    .WithMany(h => h.RoomClasses)
-                   .HasForeignKey(ForeignKeys.HotelId);
+                   .HasForeignKey(rc => rc.HotelId);
             builder.HasOne(rc => rc.Discount)
                    .WithMany()
-                   .HasForeignKey(ForeignKeys.DiscountId)
+                   .HasForeignKey(rc => rc.DiscountId)
                    .IsRequired(false);
         }
     }

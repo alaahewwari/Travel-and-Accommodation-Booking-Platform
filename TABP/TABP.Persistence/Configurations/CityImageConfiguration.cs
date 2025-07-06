@@ -9,9 +9,9 @@ namespace TABP.Persistence.Configurations
         public override void Configure(EntityTypeBuilder<CityImage> builder)
         {
             base.Configure(builder);
-            builder.HasOne(i => i.City)
-                   .WithMany(c => c.CityImages)
-                   .HasForeignKey(ForeignKeys.CityId);
+            builder.HasOne(c => c.City)
+                   .WithMany()
+                   .HasForeignKey(c => c.CityId);
         }
     }
 }

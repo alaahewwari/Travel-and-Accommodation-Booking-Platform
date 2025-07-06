@@ -22,7 +22,7 @@ namespace TABP.Persistence.Configurations
                    .IsRequired();
             builder.HasMany(d => d.RoomClasses)
                    .WithOne()
-                   .HasForeignKey(ForeignKeys.DiscountId)
+                   .HasForeignKey(d => d.DiscountId)
                    .IsRequired(false)
                    .OnDelete(DeleteBehavior.SetNull);
             builder.HasQueryFilter(d => !d.IsDeleted);

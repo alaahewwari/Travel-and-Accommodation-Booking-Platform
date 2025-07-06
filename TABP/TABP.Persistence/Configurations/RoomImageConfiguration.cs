@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TABP.Domain.Entites;
-using TABP.Persistence.Constants;
 using TABP.Persistence.Common;
 namespace TABP.Persistence.Configurations
 {
@@ -11,7 +10,7 @@ namespace TABP.Persistence.Configurations
             base.Configure(builder);
             builder.HasOne(i => i.RoomClass)
                    .WithMany(r => r.RoomImages)
-                   .HasForeignKey(ForeignKeys.RoomClassId);
+                   .HasForeignKey(ri => ri.RoomClassId);
         }
     }
 }
