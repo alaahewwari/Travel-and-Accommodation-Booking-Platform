@@ -1,6 +1,6 @@
 ﻿namespace TABP.Domain.Enums
 {
-    public enum RoomType
+    public enum RoomType: byte
     {
         Budget = 1,
         Standard = 2,
