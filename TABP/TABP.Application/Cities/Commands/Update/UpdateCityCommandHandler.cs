@@ -1,11 +1,12 @@
 ﻿using MediatR;
 using TABP.Application.Cities.Common;
-using TABP.Application.Cities.Mapping;
+using TABP.Application.Cities.Mapper;
 using TABP.Application.Common;
 using TABP.Domain.Interfaces.Repositories;
 namespace TABP.Application.Cities.Commands.Update
 {
-    public class UpdateCityCommandHandler(ICityRepository cityRepository, CityMapper mapper)
+    public class UpdateCityCommandHandler(
+        ICityRepository cityRepository)
         : IRequestHandler<UpdateCityCommand, Result<CityResponse>>
     {
         public async Task<Result<CityResponse>> Handle(UpdateCityCommand request, CancellationToken cancellationToken)
@@ -15,9 +16,13 @@ namespace TABP.Application.Cities.Commands.Update
             {
                 return Result<CityResponse>.Failure(CityErrors.CityNotFound);
             }
-            var cityModel = mapper.ToCityDomain(request);
+            var cityModel = request.ToCityDomain();
             var updatedCity = await cityRepository.UpdateCityAsync(cityModel, cancellationToken);
-            var city = mapper.ToCityResponse(updatedCity!);
+            if (updatedCity is null)
+            {
+                return Result<CityResponse>.Failure(CityErrors.NotModified);
+            }
+            var city = updatedCity.ToCityResponse();
             return Result<CityResponse>.Success(city);
         }
     }
