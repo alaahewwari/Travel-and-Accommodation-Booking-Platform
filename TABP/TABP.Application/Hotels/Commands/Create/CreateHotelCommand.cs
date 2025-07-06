@@ -13,5 +13,5 @@ namespace TABP.Application.Hotels.Commands.Create
     double LocationLongitude,
     int CityId,
     long OwnerId
-    ):IRequest<Result<long>>;
+    ):IRequest<Result<HotelResponse>>;
 }
