@@ -15,8 +15,8 @@ namespace TABP.Domain.Entites
         public DateTime? UpdatedAt { get; set; }
         public int CityId { get; set; }
         public long OwnerId { get; set; }
-        public City City { get; set; }
-        public Owner Owner { get; set; }
+        public City City { get; set; } = null!;
+        public Owner Owner { get; set; }= null!;
         public ICollection<RoomClass> RoomClasses { get; set; } = [];
         public ICollection<HotelImage> HotelImages { get; set; } = [];
         public ICollection<Amenity> Amenities { get; set; } = [];
