@@ -21,9 +21,9 @@ namespace TABP.Persistence.Repositories
             await context.SaveChangesAsync(cancellationToken);
             return true;
         }
-        public async Task<IEnumerable<CityWithHotelCount>> GetAllCitiesAsync(CancellationToken cancellationToken)
+        public async Task<IEnumerable<CityForManagement>> GetAllCitiesAsync(CancellationToken cancellationToken)
         {
-            var cities = await context.Cities.Select(c => new CityWithHotelCount
+            var cities = await context.Cities.Select(c => new CityForManagement
             (
               c.Id,
               c.Name,
@@ -32,13 +32,15 @@ namespace TABP.Persistence.Repositories
               c.CreatedAt,
               c.UpdatedAt,
               c.Hotels.Count()
-            )).ToListAsync(cancellationToken);
+            )).AsNoTracking()
+            .ToListAsync(cancellationToken);
             return cities;
         }
         public async Task<City?> GetCityByIdAsync(int cityId, CancellationToken cancellationToken)
         {
             return await context.Cities
                 .Include(c => c.CityImages)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == cityId, cancellationToken);
         }
         public async Task<City?> UpdateCityAsync(City city, CancellationToken cancellationToken)
