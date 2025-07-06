@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using TABP.Application.Common;
-using TABP.Application.Users.Login.Common;
-namespace TABP.Application.Users.Login.Commands
+using TABP.Application.Users.Common;
+
+namespace TABP.Application.Users.Commands.Login
 {
     public record LoginUserCommand(string Username, string Password) : IRequest<Result<LoginUserResponse>>;
 }

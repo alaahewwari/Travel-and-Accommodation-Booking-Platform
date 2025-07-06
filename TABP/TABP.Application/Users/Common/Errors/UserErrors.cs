@@ -1,7 +1,8 @@
-﻿using TABP.Application.Common.Errors;
-namespace TABP.Application.Users.Login.Errors
+﻿using TABP.Application.Common;
+
+namespace TABP.Application.Users.Common.Errors
 {
-    public static class LoginUserErrors
+    public static class UserErrors
     {
         public static readonly Error InvalidCredentials = new(
             Code: "Login.InvalidCredentials",
@@ -9,7 +10,7 @@ namespace TABP.Application.Users.Login.Errors
         );
         public static readonly Error UserNotFound = new(
             Code: "Login.UserNotFound",
-            Description: "User with this username does not exist."
+            Description: "User does not exist."
         );
         public static readonly Error AccountLocked = new(
             Code: "Login.AccountLocked",
