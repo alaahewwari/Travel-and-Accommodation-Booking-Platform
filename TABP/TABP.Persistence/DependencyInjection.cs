@@ -20,6 +20,7 @@ namespace TABP.Persistence
             services.AddScoped<ICityRepository, CityRepository>();
             services.AddScoped<IHotelRepository, HotelRepository>();
             services.AddScoped<IOwnerRepository, OwnerRepository>();
+            services.AddScoped<IRoomClassRepository, RoomClassRepository>();
             return services;
         }
     }
