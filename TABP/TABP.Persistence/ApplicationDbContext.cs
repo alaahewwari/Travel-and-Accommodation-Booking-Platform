@@ -17,7 +17,6 @@ namespace TABP.Persistence
         public DbSet<HotelImage> HotelImages { get; set; }
         public DbSet<RoomImage> RoomImages { get; set; }
         public DbSet<CityImage> CityImages { get; set; }
-        public DbSet<CartItem> CartItems { get; set; }
         public DbSet<RoomClass> RoomClasses { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
