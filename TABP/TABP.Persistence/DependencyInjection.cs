@@ -23,6 +23,7 @@ namespace TABP.Persistence
             services.AddScoped<IRoomClassRepository, RoomClassRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();
             services.AddScoped<IDiscountRespository, DiscountRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
             return services;
         }
     }
