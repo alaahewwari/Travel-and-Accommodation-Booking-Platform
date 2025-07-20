@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Sieve.Models;
 using TABP.API.Common;
 using TABP.API.Contracts.Hotels;
 using TABP.API.Mapping;
@@ -9,6 +10,7 @@ using TABP.Application.Hotels.Common;
 using TABP.Application.Hotels.Queries.GetAll;
 using TABP.Application.Hotels.Queries.GetById;
 using TABP.Application.Hotels.Queries.GetFeaturedDeals;
+using static TABP.API.Common.ApiRoutes;
 namespace TABP.API.Controllers
 {
     /// <summary>
@@ -135,6 +137,23 @@ namespace TABP.API.Controllers
             if (result.IsFailure)
                 return BadRequest(result.Error);
             return Ok(result.Value);
+        }
+        /// <summary>
+        /// Searches for hotels based on filters, sorts, dates, guests, and pagination.
+        /// Returns results with pagination metadata in the response headers.
+        /// </summary>
+        /// <param name="request">Query parameters including filters, page, size, etc.</param>
+        /// <param name="cancellationToken">Token to cancel the request if needed.</param>
+        /// <returns>A list of matching hotels with pagination info in headers.</returns>
+        [HttpGet(ApiRoutes.Hotels.Search)]
+        public async Task<ActionResult<IEnumerable<HotelResponse>>> Search([FromQuery] SearchHotelsRequest request, CancellationToken cancellationToken)
+        {
+            var query = request.ToQuery();
+            var result = await mediator.Send(query, cancellationToken);
+            if (result.IsFailure)
+                return BadRequest(result.Error);
+            Response.Headers.Append("X-Pagination", result.Value.PaginationMetadata.Build());
+            return Ok(result.Value.Items);
         }
     }
 }
