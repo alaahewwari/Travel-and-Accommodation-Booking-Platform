@@ -1,5 +1,5 @@
 ﻿using TABP.Domain.Common;
-namespace TABP.Domain.Entites
+namespace TABP.Domain.Entities
 {
     public class User : SoftDeletable
     {
@@ -14,6 +14,5 @@ namespace TABP.Domain.Entites
         public int RoleId { get; set; }
         public Role Role { get; set; } = null!;
         public ICollection<Review> Reviews { get; set; } = [];
-        public ICollection<CartItem> CartItems { get; set; } = [];
     }
 }

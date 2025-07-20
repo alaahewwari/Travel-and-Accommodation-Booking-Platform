@@ -1,6 +1,6 @@
 ﻿using TABP.Domain.Common;
 using TABP.Domain.Enums;
-namespace TABP.Domain.Entites
+namespace TABP.Domain.Entities
 {
     public class RoomClass : SoftDeletable
     {

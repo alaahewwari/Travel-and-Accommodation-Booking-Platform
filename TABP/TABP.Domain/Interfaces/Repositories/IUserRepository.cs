@@ -1,4 +1,4 @@
-﻿using TABP.Domain.Entites;
+﻿using TABP.Domain.Entities;
 namespace TABP.Domain.Interfaces.Repositories
 {
     public interface IUserRepository

@@ -2,12 +2,12 @@
 using TABP.Application.Rooms.Commands.Create;
 using TABP.Application.Rooms.Commands.Update;
 using TABP.Application.Rooms.Common;
-using TABP.Domain.Entites;
+using TABP.Domain.Entities;
 using TABP.Domain.Models;
 namespace TABP.Application.Rooms.Mapper
 {
     [Mapper]
-    public static partial class RoomMapper
+    public static partial class RoleMapper
     {
         public static partial RoomForManagementResponse ToRoomForManagementResponse(this RoomForManagement Room);
         public static Room ToRoomDomain(this CreateRoomCommand command)

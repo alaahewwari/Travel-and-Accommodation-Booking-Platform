@@ -1,5 +1,5 @@
 ﻿using TABP.Domain.Common;
-namespace TABP.Domain.Entites
+namespace TABP.Domain.Entities
 {
     public class Room: SoftDeletable
     {
@@ -9,6 +9,5 @@ namespace TABP.Domain.Entites
         public DateTime? UpdatedAt { get; set; }
         public long RoomClassId { get; set; }
         public RoomClass RoomClass { get; set; } = null!;
-        public ICollection<CartItem> CartItems { get; set; } = [];
     }
 }
