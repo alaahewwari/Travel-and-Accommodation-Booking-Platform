@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using TABP.Domain.Entites;
+using TABP.Domain.Entities;
 namespace TABP.Persistence
 {
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
