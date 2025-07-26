@@ -16,8 +16,12 @@ namespace TABP.Persistence.Configurations
             builder.Property(r => r.CreatedAt)
                    .IsRequired();
             builder.HasOne(r => r.RoomClass)
-               .WithMany()
-               .HasForeignKey(r=>r.RoomClassId);
+               .WithMany(rc => rc.Rooms)
+               .HasForeignKey(r => r.RoomClassId)
+               .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(r => r.Hotel)
+               .WithMany(h => h.Rooms)
+               .HasForeignKey(r => r.HotelId);
             builder.HasQueryFilter(r => !r.IsDeleted);
         }
     }

@@ -21,7 +21,7 @@ namespace TABP.Persistence.Configurations
             builder.Property(d => d.UpdatedAt)
                    .IsRequired();
             builder.HasMany(d => d.RoomClasses)
-                   .WithOne()
+                   .WithOne(rc => rc.Discount)
                    .HasForeignKey(d => d.DiscountId)
                    .IsRequired(false)
                    .OnDelete(DeleteBehavior.SetNull);

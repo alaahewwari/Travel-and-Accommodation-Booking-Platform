@@ -17,11 +17,11 @@ namespace TABP.Persistence.Configurations
             builder.Property(r => r.CreatedAt)
                    .IsRequired();
             builder.HasOne(r => r.User)
-                   .WithMany()
+                   .WithMany(u => u.Reviews)
                    .HasForeignKey(r => r.UserId)
                    .OnDelete(DeleteBehavior.Cascade);
             builder.HasOne(r => r.Hotel)
-                   .WithMany()
+                   .WithMany(h => h.Reviews)
                    .HasForeignKey(r => r.HotelId)
                    .OnDelete(DeleteBehavior.Cascade);
         }
