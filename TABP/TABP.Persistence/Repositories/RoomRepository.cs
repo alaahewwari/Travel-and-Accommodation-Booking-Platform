@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
-using TABP.Domain.Models;
+using TABP.Domain.Models.Room;
+using TABP.Persistence.Context;
 namespace TABP.Persistence.Repositories
 {
     public class RoomRepository(ApplicationDbContext context) : IRoomRepository
@@ -61,6 +63,22 @@ namespace TABP.Persistence.Repositories
             var room = await context.Rooms.Where(r => r.RoomClass.Hotel == hotel)
                 .FirstOrDefaultAsync(cancellationToken);
             return room;
+        }
+        public async Task<Room?> GetRoomWithClassByIdAsync(long id, CancellationToken cancellationToken)
+        {
+            return await context.Rooms
+                .Include(r => r.RoomClass)
+                .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
+        }
+        public async Task<IEnumerable<Room>> GetRoomsByIdsAsync(IEnumerable<long> roomIds,long HotelId, CancellationToken cancellationToken)
+        {
+            var idList = roomIds?.Distinct().ToList() ?? new List<long>();
+            if (!idList.Any())
+                return [];
+            return await context.Rooms
+                .Include(r=> r.RoomClass)
+                .Where(r => idList.Contains(r.Id) && r.HotelId == HotelId)
+                .ToListAsync();
         }
     }
 }
