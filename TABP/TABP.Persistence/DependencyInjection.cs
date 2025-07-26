@@ -24,6 +24,8 @@ namespace TABP.Persistence
             services.AddScoped<IRoomRepository, RoomRepository>();
             services.AddScoped<IDiscountRespository, DiscountRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
+            services.AddScoped<IBookingRepository, BookingRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             return services;
         }
     }
