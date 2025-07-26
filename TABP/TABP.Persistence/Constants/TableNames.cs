@@ -18,5 +18,7 @@
         public const string CartItems = "CartItems";
         public const string RoomClasses = "RoomClasses";
         public const string RoomClassAmenities = "RoomClassAmenities";
+        public const string Bookings = "Bookings";
+        public const string Invoices = "Invoices";
     }
 }
