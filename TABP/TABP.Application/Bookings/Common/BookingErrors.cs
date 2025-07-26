@@ -1,0 +1,39 @@
+﻿using TABP.Application.Common;
+namespace TABP.Application.Bookings.Common
+{
+    public static class BookingErrors
+    {
+        public static readonly Error BookingNotFound = new(
+            Code: "Booking.NotFound",
+            Description: "Booking with this ID does not exist."
+        );
+        public static readonly Error BookingAlreadyExists = new(
+            Code: "Booking.AlreadyExists",
+            Description: "Booking with this name already exists."
+        );
+        public static readonly Error InvalidBookingData = new(
+            Code: "Booking.InvalidData",
+            Description: "The provided Booking data is invalid."
+        );
+        public static readonly Error InvalidBookingDates = new(
+            Code: "Booking.InvalidDates",
+            Description: "Check-in date must be before check-out date."
+        );
+        public static readonly Error BookingOverlap = new(
+            Code: "Booking.Overlap",
+            Description: "The booking dates overlap with an existing booking for the same room."
+        );
+        public static readonly Error BookingAlreadyExist = new(
+            Code: "Booking.AlreadyExist",
+            Description: "A booking with the same details already exists."
+        );
+        public static readonly Error UnauthorizedAccess = new(
+            Code: "Booking.UnauthorizedAccess",
+            Description: "You do not have permission to access this booking."
+        );
+        public static readonly Error CancellationNotAllowed = new(
+            Code: "Booking.CancellationNotAllowed",
+            Description: "You cannot cancel a booking that has already started."
+        );
+    }
+}
