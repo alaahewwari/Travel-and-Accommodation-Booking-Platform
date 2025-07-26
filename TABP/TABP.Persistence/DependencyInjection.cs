@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TABP.Domain.Interfaces.Repositories;
+using TABP.Persistence.Context;
 using TABP.Persistence.Interceptors;
 using TABP.Persistence.Repositories;
 namespace TABP.Persistence
@@ -13,8 +14,8 @@ namespace TABP.Persistence
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
-                                optionsBuilder => optionsBuilder.EnableRetryOnFailure(3))
-                                .AddInterceptors(new SoftDeleteInterceptor());
+                    optionsBuilder => optionsBuilder.EnableRetryOnFailure(3))
+                    .AddInterceptors(new SoftDeleteInterceptor());
             });
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
