@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TABP.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -216,8 +216,9 @@ namespace TABP.Persistence.Migrations
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Type = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<byte>(type: "tinyint", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BriefDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PricePerNight = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     AdultsCapacity = table.Column<int>(type: "int", nullable: false),
                     ChildrenCapacity = table.Column<int>(type: "int", nullable: false),
@@ -225,7 +226,8 @@ namespace TABP.Persistence.Migrations
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     HotelId = table.Column<long>(type: "bigint", nullable: false),
                     DiscountId = table.Column<int>(type: "int", nullable: true),
-                    DiscountId1 = table.Column<int>(type: "int", nullable: true)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -237,16 +239,49 @@ namespace TABP.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_RoomClasses_Discounts_DiscountId1",
-                        column: x => x.DiscountId1,
-                        principalTable: "Discounts",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_RoomClasses_Hotels_HotelId",
                         column: x => x.HotelId,
                         principalTable: "Hotels",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Bookings",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    CheckInDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CheckOutDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaymentMethod = table.Column<int>(type: "int", nullable: false),
+                    GuestRemarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RoomId = table.Column<long>(type: "bigint", nullable: false),
+                    UserId = table.Column<long>(type: "bigint", nullable: false),
+                    HotelId = table.Column<long>(type: "bigint", nullable: false),
+                    InvoiceId = table.Column<long>(type: "bigint", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Hotels_HotelId",
+                        column: x => x.HotelId,
+                        principalTable: "Hotels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -260,9 +295,7 @@ namespace TABP.Persistence.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserId = table.Column<long>(type: "bigint", nullable: false),
-                    HotelId = table.Column<long>(type: "bigint", nullable: false),
-                    HotelId1 = table.Column<long>(type: "bigint", nullable: true),
-                    UserId1 = table.Column<long>(type: "bigint", nullable: true)
+                    HotelId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -274,21 +307,11 @@ namespace TABP.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Reviews_Hotels_HotelId1",
-                        column: x => x.HotelId1,
-                        principalTable: "Hotels",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Reviews_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Reviews_Users_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -346,6 +369,7 @@ namespace TABP.Persistence.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     RoomClassId = table.Column<long>(type: "bigint", nullable: false),
+                    HotelId = table.Column<long>(type: "bigint", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -353,37 +377,62 @@ namespace TABP.Persistence.Migrations
                 {
                     table.PrimaryKey("PK_Rooms", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Rooms_Hotels_HotelId",
+                        column: x => x.HotelId,
+                        principalTable: "Hotels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Rooms_RoomClasses_RoomClassId",
                         column: x => x.RoomClassId,
                         principalTable: "RoomClasses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Invoices",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    InvoiceNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IssueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    BookingId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Invoices_Bookings_BookingId",
+                        column: x => x.BookingId,
+                        principalTable: "Bookings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "CartItems",
+                name: "BookingRoom",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<long>(type: "bigint", nullable: false),
-                    RoomId = table.Column<long>(type: "bigint", nullable: false),
-                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ToDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    BookingsId = table.Column<long>(type: "bigint", nullable: false),
+                    RoomsId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CartItems", x => x.Id);
+                    table.PrimaryKey("PK_BookingRoom", x => new { x.BookingsId, x.RoomsId });
                     table.ForeignKey(
-                        name: "FK_CartItems_Rooms_RoomId",
-                        column: x => x.RoomId,
-                        principalTable: "Rooms",
+                        name: "FK_BookingRoom_Bookings_BookingsId",
+                        column: x => x.BookingsId,
+                        principalTable: "Bookings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CartItems_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
+                        name: "FK_BookingRoom_Rooms_RoomsId",
+                        column: x => x.RoomsId,
+                        principalTable: "Rooms",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -394,13 +443,18 @@ namespace TABP.Persistence.Migrations
                 column: "HotelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartItems_RoomId",
-                table: "CartItems",
-                column: "RoomId");
+                name: "IX_BookingRoom_RoomsId",
+                table: "BookingRoom",
+                column: "RoomsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartItems_UserId",
-                table: "CartItems",
+                name: "IX_Bookings_HotelId",
+                table: "Bookings",
+                column: "HotelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Bookings_UserId",
+                table: "Bookings",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -424,24 +478,20 @@ namespace TABP.Persistence.Migrations
                 column: "OwnerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Invoices_BookingId",
+                table: "Invoices",
+                column: "BookingId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reviews_HotelId",
                 table: "Reviews",
                 column: "HotelId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Reviews_HotelId1",
-                table: "Reviews",
-                column: "HotelId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Reviews_UserId",
                 table: "Reviews",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Reviews_UserId1",
-                table: "Reviews",
-                column: "UserId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoomClassAmenities_RoomClassesId",
@@ -454,11 +504,6 @@ namespace TABP.Persistence.Migrations
                 column: "DiscountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RoomClasses_DiscountId1",
-                table: "RoomClasses",
-                column: "DiscountId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RoomClasses_HotelId",
                 table: "RoomClasses",
                 column: "HotelId");
@@ -467,6 +512,11 @@ namespace TABP.Persistence.Migrations
                 name: "IX_RoomImages_RoomClassId",
                 table: "RoomImages",
                 column: "RoomClassId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Rooms_HotelId",
+                table: "Rooms",
+                column: "HotelId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Rooms_RoomClassId",
@@ -495,13 +545,16 @@ namespace TABP.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "CartItems");
+                name: "BookingRoom");
 
             migrationBuilder.DropTable(
                 name: "CityImages");
 
             migrationBuilder.DropTable(
                 name: "HotelImages");
+
+            migrationBuilder.DropTable(
+                name: "Invoices");
 
             migrationBuilder.DropTable(
                 name: "Reviews");
@@ -516,7 +569,7 @@ namespace TABP.Persistence.Migrations
                 name: "Rooms");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Bookings");
 
             migrationBuilder.DropTable(
                 name: "Amenities");
@@ -525,13 +578,16 @@ namespace TABP.Persistence.Migrations
                 name: "RoomClasses");
 
             migrationBuilder.DropTable(
-                name: "Roles");
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Discounts");
 
             migrationBuilder.DropTable(
                 name: "Hotels");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Cities");

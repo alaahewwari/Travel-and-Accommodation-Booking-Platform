@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TABP.Persistence.Context;
 
@@ -11,9 +12,11 @@ using TABP.Persistence.Context;
 namespace TABP.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250724112720_SeedingData")]
+    partial class SeedingData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,11 +114,17 @@ namespace TABP.Persistence.Migrations
                     b.Property<long>("HotelId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("InvoiceId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
+
+                    b.Property<long>("RoomId")
+                        .HasColumnType("bigint");
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
@@ -136,6 +145,93 @@ namespace TABP.Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Bookings", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            CheckInDate = new DateTime(2025, 7, 25, 0, 0, 0, 0, DateTimeKind.Local),
+                            CheckOutDate = new DateTime(2025, 7, 27, 0, 0, 0, 0, DateTimeKind.Local),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GuestRemarks = "Remark 1",
+                            HotelId = 1L,
+                            IsDeleted = false,
+                            PaymentMethod = 1,
+                            RoomId = 1L,
+                            Status = (byte)0,
+                            TotalPrice = 100m,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 1L
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            CheckInDate = new DateTime(2025, 7, 26, 0, 0, 0, 0, DateTimeKind.Local),
+                            CheckOutDate = new DateTime(2025, 7, 28, 0, 0, 0, 0, DateTimeKind.Local),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GuestRemarks = "Remark 2",
+                            HotelId = 2L,
+                            IsDeleted = false,
+                            PaymentMethod = 0,
+                            RoomId = 2L,
+                            Status = (byte)0,
+                            TotalPrice = 200m,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 2L
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            CheckInDate = new DateTime(2025, 7, 27, 0, 0, 0, 0, DateTimeKind.Local),
+                            CheckOutDate = new DateTime(2025, 7, 29, 0, 0, 0, 0, DateTimeKind.Local),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GuestRemarks = "Remark 3",
+                            HotelId = 3L,
+                            IsDeleted = false,
+                            PaymentMethod = 1,
+                            RoomId = 3L,
+                            Status = (byte)0,
+                            TotalPrice = 300m,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 3L
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            CheckInDate = new DateTime(2025, 7, 28, 0, 0, 0, 0, DateTimeKind.Local),
+                            CheckOutDate = new DateTime(2025, 7, 30, 0, 0, 0, 0, DateTimeKind.Local),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GuestRemarks = "Remark 4",
+                            HotelId = 4L,
+                            IsDeleted = false,
+                            PaymentMethod = 0,
+                            RoomId = 4L,
+                            Status = (byte)0,
+                            TotalPrice = 400m,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 4L
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            CheckInDate = new DateTime(2025, 7, 29, 0, 0, 0, 0, DateTimeKind.Local),
+                            CheckOutDate = new DateTime(2025, 7, 31, 0, 0, 0, 0, DateTimeKind.Local),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            GuestRemarks = "Remark 5",
+                            HotelId = 5L,
+                            IsDeleted = false,
+                            PaymentMethod = 1,
+                            RoomId = 5L,
+                            Status = (byte)0,
+                            TotalPrice = 500m,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UserId = 5L
+                        });
                 });
 
             modelBuilder.Entity("TABP.Domain.Entities.City", b =>
@@ -561,6 +657,53 @@ namespace TABP.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Invoices", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            BookingId = 1L,
+                            InvoiceNumber = "INV001",
+                            IssueDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 0,
+                            TotalAmount = 100m
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            BookingId = 2L,
+                            InvoiceNumber = "INV002",
+                            IssueDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 0,
+                            TotalAmount = 200m
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            BookingId = 3L,
+                            InvoiceNumber = "INV003",
+                            IssueDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 0,
+                            TotalAmount = 300m
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            BookingId = 4L,
+                            InvoiceNumber = "INV004",
+                            IssueDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 0,
+                            TotalAmount = 400m
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            BookingId = 5L,
+                            InvoiceNumber = "INV005",
+                            IssueDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Status = 0,
+                            TotalAmount = 500m
+                        });
                 });
 
             modelBuilder.Entity("TABP.Domain.Entities.Owner", b =>
