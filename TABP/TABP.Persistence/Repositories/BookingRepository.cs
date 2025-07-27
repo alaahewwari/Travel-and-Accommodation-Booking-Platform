@@ -21,10 +21,7 @@ namespace TABP.Persistence.Repositories
         public async Task DeleteAsync(long id, CancellationToken cancellationToken)
         {
             var booking = await GetByIdAsync(id, cancellationToken);
-            if (booking is not null)
-            {
-                context.Bookings.Remove(booking);
-            }
+            booking.Status = BookingStatus.Cancelled;
             await context.SaveChangesAsync(cancellationToken);
         }
         public async Task<PagedResult<Booking>> GetBookingsAsync(long userId, SieveModel sieveModel, CancellationToken cancellationToken)
