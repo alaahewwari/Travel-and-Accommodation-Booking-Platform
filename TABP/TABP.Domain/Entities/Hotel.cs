@@ -22,5 +22,6 @@ namespace TABP.Domain.Entities
         public ICollection<Amenity> Amenities { get; set; } = [];
         public ICollection<Review> Reviews { get; set; } = [];
         public ICollection<Room> Rooms { get; set; } = [];
+        public ICollection<Booking> Bookings { get; set; } = [];
     }
 }
