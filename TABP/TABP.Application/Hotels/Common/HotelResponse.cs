@@ -1,4 +1,4 @@
-namespace TABP.Application.Hotels.Common
+﻿namespace TABP.Application.Hotels.Common
 {
     public record HotelResponse(
         long Id,

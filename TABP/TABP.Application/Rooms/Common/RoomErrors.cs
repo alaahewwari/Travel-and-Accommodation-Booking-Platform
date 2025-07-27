@@ -18,5 +18,13 @@ namespace TABP.Application.Rooms.Common
             Code: "Room.InvalidData",
             Description: "The provided Room data is invalid."
         );
+        public static readonly Error RoomDoesNotBelongToHotel = new(
+            Code: "Room.DoesNotBelongToHotel",
+            Description: "The specified room does not belong to the provided hotel."
+        );
+        public static readonly Error RoomsNotFound = new(
+            Code: "Rooms.NotFound",
+            Description: "One or more rooms with the provided IDs do not exist."
+        );
     }
 }

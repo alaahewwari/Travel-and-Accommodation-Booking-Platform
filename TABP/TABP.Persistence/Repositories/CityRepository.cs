@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
-using TABP.Domain.Models;
+using TABP.Domain.Models.City;
+using TABP.Persistence.Context;
 namespace TABP.Persistence.Repositories
 {
     public class CityRepository(ApplicationDbContext context) : ICityRepository
@@ -51,7 +52,7 @@ namespace TABP.Persistence.Repositories
                     .SetProperty(c => c.Name, city.Name)
                     .SetProperty(c => c.Country, city.Country)
                     .SetProperty(c => c.PostOffice, city.PostOffice)
-                    .SetProperty(c => c.UpdatedAt, DateTime.UtcNow)
+                    .SetProperty(c => c.UpdatedAt, DateTime.UtcNow),cancellationToken
                 );
             if (updatedCount == 0)
                 return null;
@@ -59,7 +60,14 @@ namespace TABP.Persistence.Repositories
         }
         public async Task<IEnumerable<City>> GetMostBookedCitiesAsync(int count, CancellationToken cancellationToken)
         {
-            return new List<City>(); // Placeholder for actual implementation
+            var cities = await context.Cities
+                .Include(c => c.Hotels)
+                .ThenInclude(r => r.Bookings)
+                .AsNoTracking()
+                .OrderByDescending(c => c.Hotels.Sum(r => r.Bookings.Count))
+                .Take(count)
+                .ToListAsync(cancellationToken);
+            return cities;
         }
     }
 }

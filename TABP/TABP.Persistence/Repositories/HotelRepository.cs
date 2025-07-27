@@ -5,6 +5,8 @@ using TABP.Domain.Entities;
 using TABP.Domain.Enums;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Models;
+using TABP.Domain.Models.Hotel;
+using TABP.Persistence.Context;
 namespace TABP.Persistence.Repositories
 {
     public class HotelRepository(ApplicationDbContext context, SieveProcessor sieveProcessor) : IHotelRepository
@@ -18,6 +20,7 @@ namespace TABP.Persistence.Repositories
         public async Task<Hotel?> GetHotelByIdAsync(long id, CancellationToken cancellationToken)
         {
             return await context.Hotels
+                .AsNoTracking()
                 .FirstOrDefaultAsync(h => h.Id == id, cancellationToken);
         }
         public async Task<IEnumerable<HotelForManagement>> GetAllHotelsAsync(CancellationToken cancellationToken)
