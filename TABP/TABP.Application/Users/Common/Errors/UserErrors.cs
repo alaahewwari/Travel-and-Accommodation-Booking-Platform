@@ -1,5 +1,4 @@
 ﻿using TABP.Application.Common;
-
 namespace TABP.Application.Users.Common.Errors
 {
     public static class UserErrors
@@ -15,6 +14,10 @@ namespace TABP.Application.Users.Common.Errors
         public static readonly Error AccountLocked = new(
             Code: "Login.AccountLocked",
             Description: "This account is locked. Contact support."
+        );
+        public static readonly Error UserAlreadyExist = new(
+            Code: "User.AlreadyExists",
+            Description: "A user with the provided email already exists. Please use a different email or try logging in."
         );
     }
 }
