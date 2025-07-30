@@ -1,4 +1,4 @@
-﻿namespace TABP.Domain.Common
+﻿namespace TABP.Domain.Entities.Common
 {
     public abstract class SoftDeletable
     {

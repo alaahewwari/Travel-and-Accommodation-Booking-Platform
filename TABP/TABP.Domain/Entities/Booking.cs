@@ -1,4 +1,4 @@
-﻿using TABP.Domain.Common;
+﻿using TABP.Domain.Entities.Common;
 using TABP.Domain.Enums;
 namespace TABP.Domain.Entities
 {

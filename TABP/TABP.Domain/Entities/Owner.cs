@@ -1,4 +1,4 @@
-﻿using TABP.Domain.Common;
+﻿using TABP.Domain.Entities.Common;
 namespace TABP.Domain.Entities
 {
     public class Owner : SoftDeletable
