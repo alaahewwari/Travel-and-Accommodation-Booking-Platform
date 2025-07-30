@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TABP.Persistence.Context;
 
@@ -11,9 +12,11 @@ using TABP.Persistence.Context;
 namespace TABP.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250728072926_ModifyImageModels")]
+    partial class ModifyImageModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,8 +27,8 @@ namespace TABP.Persistence.Migrations
 
             modelBuilder.Entity("AmenityRoomClass", b =>
                 {
-                    b.Property<long>("AmenitiesId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("AmenitiesId")
+                        .HasColumnType("int");
 
                     b.Property<long>("RoomClassesId")
                         .HasColumnType("bigint");
@@ -54,14 +57,11 @@ namespace TABP.Persistence.Migrations
 
             modelBuilder.Entity("TABP.Domain.Entities.Amenity", b =>
                 {
-                    b.Property<long>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                        .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("DeletedOn")
                         .HasColumnType("datetime2");
@@ -80,9 +80,6 @@ namespace TABP.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
