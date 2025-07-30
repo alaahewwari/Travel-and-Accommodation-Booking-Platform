@@ -5,7 +5,8 @@
         public const string Base = "api/[controller]";
         public static class Identity
         {
-            public const string Login = Base;
+            public const string Login = Base + "/login";
+            public const string Register = Base + "/register";
         }
         public static class Cities
         {
@@ -15,6 +16,7 @@
             public const string Update = Base + "/{id}";
             public const string Delete = Base + "/{id}";
             public const string GetTrending = Base + "/trending";
+            public const string SetThumbnail = Base + "/{id}/thumbnail";
         }
         public static class Owners
         {
@@ -33,6 +35,8 @@
             public const string Delete = Base + "/{id}";
             public const string GetFeaturedDeals = Base + "/featured-deals";
             public const string Search = Base + "/search";
+            public const string SetThumbnail = Base + "/{id}/thumbnail";
+            public const string AddToGallery = Base + "/{id}/gallery";
         }
         public static class Rooms
         {
@@ -49,6 +53,8 @@
             public const string Create = Base;
             public const string Update = Base + "/{id}";
             public const string Delete = Base + "/{id}";
+            public const string SetThumbnail = Base + "/{id}/thumbnail";
+            public const string AddToGallery = Base + "/{id}/gallery";
         }
         public static class Discounts
         {
@@ -64,6 +70,22 @@
             public const string Create = Base;
             public const string Update = Base + "/{id}";
             public const string Delete = Base + "/{id}";
+        }
+        public static class Bookings
+        {
+            public const string GetById = Base + "/{id}";
+            public const string GetAll = Base;
+            public const string Create = Base;
+            public const string Delete = Base + "/{id}";
+            public const string GetInvoiceAsPdf = Base + "/{id}/invoice";
+        }
+        public static class Amenities
+        {
+            public const string GetById = Base + "/{id}";
+            public const string GetAll = Base;
+            public const string Create = Base;
+            public const string Update = Base + "/{id}";
+            public const string AssignToRoomClass = Base + "/{id}/assign";
         }
     }
 }
