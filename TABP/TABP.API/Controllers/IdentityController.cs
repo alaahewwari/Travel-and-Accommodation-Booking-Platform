@@ -40,6 +40,7 @@ namespace TABP.API.Controllers
         /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
         /// <returns>Created response</returns>
         [HttpPost(ApiRoutes.Identity.Register)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Register([FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
