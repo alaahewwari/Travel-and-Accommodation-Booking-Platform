@@ -26,5 +26,9 @@ namespace TABP.Application.Rooms.Common
             Code: "Rooms.NotFound",
             Description: "One or more rooms with the provided IDs do not exist."
         );
+        public static readonly Error UploadFailed = new(
+            Code: "Room.ThumbnailUploadFailed",
+            Description: "Failed to upload the image."
+        );
     }
 }
