@@ -6,7 +6,7 @@ namespace TABP.API.Contracts.Bookings
         IList<long> RoomIds,
         long HotelId,
         DateTime CheckInDate,
-        DateTime CheckoutDate,
+        DateTime CheckOutDate,
         PaymentMethod PaymentMethod,
         string? GuestRemarks
         );
