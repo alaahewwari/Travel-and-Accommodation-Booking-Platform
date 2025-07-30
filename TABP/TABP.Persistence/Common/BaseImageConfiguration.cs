@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TABP.Domain.Common;
+using TABP.Domain.Entities.Common;
 namespace TABP.Persistence.Common
 {
     public abstract class BaseImageConfiguration<TImage> : IEntityTypeConfiguration<TImage>

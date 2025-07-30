@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TABP.Domain.Entities;
-using TABP.Persistence.Constants;
+using TABP.Domain.Constants;
 namespace TABP.Persistence.Configurations
 {
     public class UserConfiguration: IEntityTypeConfiguration<User>
