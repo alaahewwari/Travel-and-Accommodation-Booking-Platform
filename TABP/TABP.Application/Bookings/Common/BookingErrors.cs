@@ -35,5 +35,13 @@ namespace TABP.Application.Bookings.Common
             Code: "Booking.CancellationNotAllowed",
             Description: "You cannot cancel a booking that has already started."
         );
+        public static readonly Error BookingCreationFailed = new(
+            Code: "Booking.CreationFailed",
+            Description: "An error occurred while creating the booking."
+        );
+        public static readonly Error UnexpectedError = new(
+            Code: "Booking.UnexpectedError",
+            Description: "An unexpected error occurred while processing the booking."
+        );
     }
 }
