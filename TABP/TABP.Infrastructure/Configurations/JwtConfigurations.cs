@@ -1,4 +1,4 @@
-﻿namespace TABP.Infrastructure.Common
+﻿namespace TABP.Infrastructure.Configurations
 {
     public class JwtConfigurations
     {
