@@ -20,14 +20,20 @@ namespace TABP.Application.Users.Commands.Register
                 return Result.Failure(RoleErrors.RoleNotFound);
             }
             var existingUser = await userRepository.GetUserByEmailAsync(request.Email,cancellationToken);
-            if (existingUser is null)
+            if (existingUser is not null)
             {
                 return Result.Failure(UserErrors.UserAlreadyExist);
             }
             var user = request.ToUserDomain();
-            (user.PasswordHash,user.Salt) = passwordHasher.HashPassword(request.Password);
+            user.RoleId = role.Id;
+            user.Username = GenerateUsername();
+            (user.PasswordHash, user.Salt) = passwordHasher.HashPassword(request.Password);
             var createdUser= await userRepository.CreateAsync(user, cancellationToken);
             return Result.Success();
+        }
+        private static string GenerateUsername()
+        {
+            return $"user_{Guid.NewGuid().ToString("N")[..8]}";
         }
     }
 }
