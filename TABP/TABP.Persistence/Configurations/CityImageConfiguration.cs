@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TABP.Domain.Entities;
-using TABP.Persistence.Common;
 using TABP.Domain.Constants;
 namespace TABP.Persistence.Configurations
 {

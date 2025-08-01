@@ -89,7 +89,7 @@ namespace TABP.Persistence.Repositories
                     h.BriefDescription,
                     h.HotelImages
                         .Where(i => i.ImageType == ImageType.Thumbnail)
-            .           Select(i => i.ImageUrl)
+            .Select(i => i.ImageUrl)
                         .FirstOrDefault()!,
                     h.RoomClasses.Any() ? h.RoomClasses.Min(rc => rc.PricePerNight) : 0
                 ))
@@ -113,6 +113,16 @@ namespace TABP.Persistence.Repositories
                 Items = items,
                 PaginationMetadata = metadata
             };
+        }
+        public async Task<IEnumerable<Hotel>> GetRecentlyVisitedHotelsAsync(long userId, int count, CancellationToken cancellationToken)
+        {
+            return await context.Bookings
+                .Where(b => b.UserId == userId && b.Status == BookingStatus.Completed)
+                .OrderByDescending(b => b.CheckOutDate)
+                .Select(b => b.Hotel)
+                .Distinct()
+                .Take(count)
+                .ToListAsync(cancellationToken);
         }
     }
 }

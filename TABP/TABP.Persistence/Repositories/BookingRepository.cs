@@ -64,18 +64,6 @@ namespace TABP.Persistence.Repositories
                 .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
             return booking;
         }
-        public async Task<IEnumerable<Booking?>> GetRecentBookingsInDifferentHotelsByGuestId(long userId, int count, CancellationToken cancellationToken)
-        {
-            var bookings = await context.Bookings
-                .Where(b => b.UserId == userId)
-                .Include(b => b.Hotel)
-                .AsNoTracking()
-                .GroupBy(b => b.HotelId)
-                .Select(g => g.OrderByDescending(b => b.CreatedAt).First())
-                .Take(count)
-                .ToListAsync(cancellationToken);
-            return bookings;
-        }
         public async Task<bool> CheckBookingOverlapAsync(
             IEnumerable<long> roomIds,
             DateTime checkIn,
