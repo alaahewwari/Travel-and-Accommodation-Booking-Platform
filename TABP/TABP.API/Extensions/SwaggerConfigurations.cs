@@ -1,5 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 using System.Reflection;
+using TABP.API.Helpers;
 namespace TABP.API.Configurations
 {
     public static class SwaggerConfigurations
@@ -10,6 +11,7 @@ namespace TABP.API.Configurations
             {
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, "TABP.API.xml");
                 options.IncludeXmlComments(xmlPath);
+                options.SchemaFilter<EnumSchemaFilter>();
                 options.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "TABP API",
