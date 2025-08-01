@@ -1,6 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
-
 namespace TABP.API.Helpers
 {
     public class EnumSchemaFilter : ISchemaFilter
