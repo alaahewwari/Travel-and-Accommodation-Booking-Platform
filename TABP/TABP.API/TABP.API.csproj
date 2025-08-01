@@ -6,6 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>de3b2132-14a6-45b0-ba57-9688388affd9</UserSecretsId>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	  <GenerateProgramFile>false</GenerateProgramFile>
   </PropertyGroup>
 
   <ItemGroup>
