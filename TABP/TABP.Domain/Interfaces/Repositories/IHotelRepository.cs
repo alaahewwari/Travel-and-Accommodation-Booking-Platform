@@ -13,5 +13,6 @@ namespace TABP.Domain.Interfaces.Repositories
         Task<bool> DeleteHotelAsync(long hotelId, CancellationToken cancellationToken);
         Task<bool> GetHotelByLocationAsync(double latitude, double longitude, CancellationToken cancellationToken);
         Task<PagedResult<HotelSearchResultResponse>> SearchAsync(HotelSearchParameters parameters,SieveModel sieveModel, CancellationToken cancellationToken);
+        Task<IEnumerable<Hotel>> GetRecentlyVisitedHotelsAsync(long userId, int count, CancellationToken cancellationToken);
     }
 }
