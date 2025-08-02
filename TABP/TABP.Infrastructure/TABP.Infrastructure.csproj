@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TABP.Application\TABP.Application.csproj" />
+    <ProjectReference Include="..\TABP.Domain\TABP.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

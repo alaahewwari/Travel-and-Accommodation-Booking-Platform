@@ -2,11 +2,12 @@
 {
     public class SmtpSettings
     {
-        public string Host { get; set; }
+        public const string SectionName = "Smtp";
+        public string Host { get; set; } = string.Empty;
         public int Port { get; set; }
-        public string User { get; set; }
-        public string Password { get; set; }
-        public string SenderEmail { get; set; }
-        public string SenderName { get; set; }
+        public string User { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+        public string SenderEmail { get; set; } = string.Empty;
+        public string SenderName { get; set; } = string.Empty;
     }
 }
