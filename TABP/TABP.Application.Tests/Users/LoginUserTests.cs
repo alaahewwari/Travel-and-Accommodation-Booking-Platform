@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Moq;
 using TABP.Application.Users.Commands.Login;
+using TABP.Application.Users.Common.Errors;
 using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
@@ -59,8 +60,8 @@ namespace TABP.Application.Tests.Users
             //assert
             result.IsSuccess.Should().BeFalse();
             result.Error.Should().NotBeNull();
-            result.Error.Code.Should().Be("Login.InvalidCredentials");
-            result.Error.Description.Should().Be("The username or password is incorrect.");
+            result.Error.Code.Should().Be(UserErrors.InvalidCredentials.Code);
+            result.Error.Description.Should().Be(UserErrors.InvalidCredentials.Description);
         }
     }
 }

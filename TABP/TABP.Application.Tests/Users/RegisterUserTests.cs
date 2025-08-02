@@ -78,7 +78,7 @@ public class RegisterUserTests
     {
         // Arrange
         var command = _fixture.Create<RegisterUserCommand>();
-        _roleRepositoryMock.Setup(r => r.GetRoleByNameAsync(command.RoleName, It.IsAny<CancellationToken>()))
+        _roleRepositoryMock.Setup(r => r.GetRoleByNameAsync(command.RoleName, It.IsAny<CancellationToken>()))!
                            .ReturnsAsync((Role?)null);
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
