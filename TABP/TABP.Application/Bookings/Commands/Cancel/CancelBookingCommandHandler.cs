@@ -3,13 +3,13 @@ using TABP.Application.Bookings.Common;
 using TABP.Application.Common;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
-namespace TABP.Application.Bookings.Commands.Delete
+namespace TABP.Application.Bookings.Commands.Cancel
 {
-    public class DeleteBookingCommandHandler(
+    public class CancelBookingCommandHandler(
         IBookingRepository bookingRepository,
-        IUserContext userContext) : IRequestHandler<DeleteBookingCommand, Result>
+        IUserContext userContext) : IRequestHandler<CancelBookingCommand, Result>
     {
-        public async Task<Result> Handle(DeleteBookingCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(CancelBookingCommand request, CancellationToken cancellationToken)
         {
             var booking = await bookingRepository.GetByIdAsync(request.Id, cancellationToken);
             if (booking is null)
@@ -24,7 +24,7 @@ namespace TABP.Application.Bookings.Commands.Delete
             {
                 return Result.Failure(BookingErrors.CancellationNotAllowed);
             }
-            await bookingRepository.DeleteAsync(request.Id, cancellationToken);
+            await bookingRepository.CancelAsync(booking, cancellationToken);
             return Result.Success();
         }
     }

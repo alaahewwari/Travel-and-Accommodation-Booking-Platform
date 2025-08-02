@@ -8,7 +8,7 @@ namespace TABP.Application.Amenities.Mapper
     [Mapper]
     public static partial class AmenityMapper
     {
-        public static partial AmenityResponse ToAmenityResponse(this Amenity Amenity);
+        public static partial AmenityResponse ToAmenityResponse(this Amenity amenity);
         public static partial Amenity ToAmenityDomain(this CreateAmenityCommand command);
         public static partial Amenity ToAmenityDomain(this UpdateAmenityCommand command);
     }
