@@ -1,12 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Discounts;
-using TABP.API.Mapping;
+using TABP.API.Mappers;
 using TABP.Application.Discounts.Commands.Delete;
 using TABP.Application.Discounts.Common;
-using TABP.Application.Discounts.Queries.GetByRoomClass;
 namespace TABP.API.Controllers
 {
     /// <summary>
@@ -20,6 +18,7 @@ namespace TABP.API.Controllers
         /// Adds a discount to a specific room class.
         /// </summary>
         /// <param name="request">The discount details including room class ID, amount, and duration.</param>
+        /// <param name="roomClassId">Room class ID to which the discount will be applied.</param>
         /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
         /// <returns>The created discount record, or an error response if the operation fails.</returns>
         [HttpPost(ApiRoutes.Discounts.Create)]
@@ -39,29 +38,6 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error);
             return Created(string.Empty, result.Value);
         }
-        /// <summary>
-        /// Retrieves all active discounts for a specific hotel.
-        /// </summary>
-        /// <param name="hotelId">The ID of the hotel to fetch discounts for.</param>
-        /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
-        /// <returns>A list of room class discounts associated with the hotel.</returns>
-        [HttpGet(ApiRoutes.Discounts.GetByRoomClass)]
-        [ProducesResponseType(typeof(IEnumerable<DiscountResponse>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<DiscountResponse>>> GetByRoomClass(
-            [FromRoute] long roomClassId,
-            CancellationToken cancellationToken)
-        {
-            var query = new GetDiscountByRoomClassQuery(roomClassId);
-            var result = await mediator.Send(query, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return Ok(result.Value);
-        }
-
         /// <summary>
         /// Deletes a room class discount by its ID.
         /// </summary>

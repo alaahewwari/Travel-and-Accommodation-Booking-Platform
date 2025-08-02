@@ -1,11 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sieve.Models;
 using TABP.API.Common;
 using TABP.API.Contracts.Bookings;
-using TABP.API.Mapping;
-using TABP.Application.Bookings.Commands.Delete;
+using TABP.API.Mappers;
+using TABP.Application.Bookings.Commands.Cancel;
 using TABP.Application.Bookings.Common;
 using TABP.Application.Bookings.Queries.GetById;
 namespace TABP.API.Controllers
@@ -35,17 +34,18 @@ namespace TABP.API.Controllers
             return CreatedAtAction(nameof(GetBookingById), new { id = result.Value.Id }, result.Value);
         }
         /// <summary>
-        /// Deletes a booking by its ID.
+        /// Cancels a booking by updating its status to Cancelled.
+        /// This is a soft delete - the booking record remains in the database.
         /// </summary>
-        /// <param name="id">The booking ID.</param>
+        /// <param name="id">The booking ID to cancel.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>No content on successful deletion.</returns>
-        [HttpDelete(ApiRoutes.Bookings.Delete)]
+        /// <returns>No content on successful cancellation.</returns>
+        [HttpPatch(ApiRoutes.Bookings.Cancel)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken cancellationToken)
+        public async Task<IActionResult> Cancel([FromRoute] long id, CancellationToken cancellationToken)
         {
-            var command = new DeleteBookingCommand(id);
+            var command = new CancelBookingCommand(id);
             var result = await mediator.Send(command, cancellationToken);
             if (result.IsFailure)
                 return NotFound(result.Error);
@@ -57,7 +57,7 @@ namespace TABP.API.Controllers
         /// <param name="id">The booking ID.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>PDF file stream if successful.</returns>
-        [HttpGet(ApiRoutes.Bookings.GetInvoiceAsPdf)]
+        [HttpGet(ApiRoutes.Bookings.GetInvoicePdf)]
         [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetInvoiceAsPdf([FromRoute] long id, CancellationToken cancellationToken)

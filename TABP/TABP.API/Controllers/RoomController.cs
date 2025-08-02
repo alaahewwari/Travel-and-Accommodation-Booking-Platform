@@ -1,9 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TABP.API.Common;
-using TABP.API.Contracts.Images;
 using TABP.API.Contracts.Rooms;
-using TABP.API.Mapping;
+using TABP.API.Mappers;
 using TABP.Application.Rooms.Commands.Delete;
 using TABP.Application.Rooms.Common;
 using TABP.Application.Rooms.Queries.GetAll;

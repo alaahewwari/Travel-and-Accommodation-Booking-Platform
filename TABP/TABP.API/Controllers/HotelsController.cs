@@ -1,17 +1,14 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching;
-using Sieve.Models;
 using TABP.API.Common;
 using TABP.API.Contracts.Hotels;
 using TABP.API.Contracts.Images;
-using TABP.API.Mapping;
+using TABP.API.Mappers;
 using TABP.Application.Hotels.Commands.Delete;
 using TABP.Application.Hotels.Common;
 using TABP.Application.Hotels.Queries.GetAll;
 using TABP.Application.Hotels.Queries.GetById;
 using TABP.Application.Hotels.Queries.GetFeaturedDeals;
-using static TABP.API.Common.ApiRoutes;
 namespace TABP.API.Controllers
 {
     /// <summary>
