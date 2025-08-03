@@ -14,7 +14,7 @@ namespace TABP.API.Controllers
     /// Handles operations related to room classes, including creation, retrieval, updating, and deletion.
     /// </summary>
     [ApiController]
-    [OutputCache(Duration = 60)]
+    //[OutputCache(Duration = 60)]
     public class RoomClassesController(ISender mediator) : ControllerBase
     {
         /// <summary>
