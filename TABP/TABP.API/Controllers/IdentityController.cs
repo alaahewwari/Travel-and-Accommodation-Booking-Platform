@@ -17,7 +17,7 @@ namespace TABP.API.Controllers
         /// </summary>
         /// <param name="request">The login credentials, including username and password.</param>
         /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
-        /// <returns>A login response containing user info and token, or an error if authentication fails.</returns>
+        /// <returns>A login response containing token, or an error if authentication fails.</returns>
         [HttpPost(ApiRoutes.Identity.Login)]
         [ProducesResponseType(typeof(LoginUserResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -32,6 +32,25 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error);
             }
             return Ok(result.Value);
+        }
+        /// <summary>
+        /// Registers a new user account.
+        /// </summary>
+        /// <param name="request">The registration details including username, email, and password.</param>
+        /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
+        /// <returns>Created response</returns>
+        [HttpPost(ApiRoutes.Identity.Register)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Register([FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
+        {
+            var command = request.ToCommand();
+            var result = await mediator.Send(command, cancellationToken);
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+            return Created();
         }
     }
 }
