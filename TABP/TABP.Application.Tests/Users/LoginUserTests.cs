@@ -1,8 +1,8 @@
 ﻿using AutoFixture;
 using FluentAssertions;
 using Moq;
-using TABP.Application.Users.Login.Commands;
-using TABP.Domain.Entites;
+using TABP.Application.Users.Commands.Login;
+using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
 namespace TABP.Application.Tests.Users
@@ -23,22 +23,21 @@ namespace TABP.Application.Tests.Users
         [Fact]
         public async Task Handle_ValidCredentials_ShouldReturnToken()
         {
-            //arrange 
-            var username = _fixture.Create<string>();
-            var password = _fixture.Create<string>();
-            var user = _fixture.Build<User>()
-                .With(u => u.Username, username)
-                .With(u => u.PasswordHash, password)
-                .Create();
+            _fixture.Behaviors
+            .OfType<ThrowingRecursionBehavior>()
+            .ToList()
+            .ForEach(b => _fixture.Behaviors.Remove(b));
+            _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
+            var user = _fixture.Create<User>();
             var token = _fixture.Create<string>();
             _userRepositoryMock
-                .Setup(repo => repo.AuthenticateUserAsync(username, password, It.IsAny<CancellationToken>()))
+                .Setup(repo => repo.AuthenticateUserAsync(user.Username, user.PasswordHash, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
             _jwtGeneratorMock
                 .Setup(gen => gen.GenerateToken(user))
                 .Returns(token);
             //act
-            var command = new LoginUserCommand(username, password);
+            var command = new LoginUserCommand(user.Username, user.PasswordHash);
             var result = await _handler.Handle(command, CancellationToken.None);
             //assert
             result.IsSuccess.Should().BeTrue();
