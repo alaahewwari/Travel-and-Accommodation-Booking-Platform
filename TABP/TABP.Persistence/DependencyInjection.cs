@@ -28,6 +28,7 @@ namespace TABP.Persistence
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IAmenityRepository, AmenityRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IImageRepository<CityImage>, ImageRepository<CityImage>>();
             services.AddScoped<IImageRepository<HotelImage>, ImageRepository<HotelImage>>();

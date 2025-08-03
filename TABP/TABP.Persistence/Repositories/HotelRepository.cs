@@ -5,6 +5,7 @@ using TABP.Domain.Entities;
 using TABP.Domain.Enums;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Models;
+using TABP.Domain.Models.Common;
 using TABP.Domain.Models.Hotel;
 using TABP.Persistence.Context;
 

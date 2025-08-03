@@ -21,6 +21,7 @@ namespace TABP.Persistence.Context
         public DbSet<RoomClass> RoomClasses { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Payment> Payments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
