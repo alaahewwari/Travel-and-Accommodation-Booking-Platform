@@ -51,7 +51,7 @@ jobs:
         with:
           app-name: 'TABP-App'
           slot-name: 'Production'
-          package: .
-
+          package: ${{env.DOTNET_ROOT}}/myapp
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC6FF4270B744819BF8C6E9B49267054 }}
+
 
