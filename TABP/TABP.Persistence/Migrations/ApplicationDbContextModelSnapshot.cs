@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using TABP.Persistence;
+using TABP.Persistence.Context;
 
 #nullable disable
 
@@ -17,7 +17,7 @@ namespace TABP.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.6")
+                .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -37,7 +37,22 @@ namespace TABP.Persistence.Migrations
                     b.ToTable("RoomClassAmenities", (string)null);
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Amenity", b =>
+            modelBuilder.Entity("BookingRoom", b =>
+                {
+                    b.Property<long>("BookingsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RoomsId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("BookingsId", "RoomsId");
+
+                    b.HasIndex("RoomsId");
+
+                    b.ToTable("BookingRoom");
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.Amenity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,7 +85,60 @@ namespace TABP.Persistence.Migrations
                     b.ToTable("Amenities", (string)null);
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.City", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Booking", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CheckInDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CheckOutDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GuestRemarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("HotelId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("tinyint");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Bookings", (string)null);
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.City", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -114,61 +182,61 @@ namespace TABP.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            Country = "Country1",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Country = "USA",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
-                            Name = "City1",
-                            PostOffice = "PO1",
-                            UpdatedAt = new DateTime(2023, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Name = "New York",
+                            PostOffice = "10001",
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 2,
-                            Country = "Country2",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Country = "France",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
-                            Name = "City2",
-                            PostOffice = "PO2",
-                            UpdatedAt = new DateTime(2023, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Name = "Paris",
+                            PostOffice = "75001",
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 3,
-                            Country = "Country3",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Country = "Japan",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
-                            Name = "City3",
-                            PostOffice = "PO3",
-                            UpdatedAt = new DateTime(2023, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Name = "Tokyo",
+                            PostOffice = "10000",
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 4,
-                            Country = "Country4",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Country = "Germany",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
-                            Name = "City4",
-                            PostOffice = "PO4",
-                            UpdatedAt = new DateTime(2023, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Name = "Berlin",
+                            PostOffice = "10115",
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 5,
-                            Country = "Country5",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Country = "Australia",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
-                            Name = "City5",
-                            PostOffice = "PO5",
-                            UpdatedAt = new DateTime(2023, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                            Name = "Sydney",
+                            PostOffice = "2000",
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.CityImage", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.CityImage", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -177,9 +245,6 @@ namespace TABP.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<int>("CityId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CityId1")
                         .HasColumnType("int");
 
                     b.Property<int>("ImageType")
@@ -194,12 +259,10 @@ namespace TABP.Persistence.Migrations
 
                     b.HasIndex("CityId");
 
-                    b.HasIndex("CityId1");
-
                     b.ToTable("CityImages");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Discount", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Discount", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -231,9 +294,66 @@ namespace TABP.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Discounts", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 12, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Percentage = 10,
+                            StartDate = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 12, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Percentage = 15,
+                            StartDate = new DateTime(2025, 1, 2, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 12, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Percentage = 20,
+                            StartDate = new DateTime(2025, 1, 3, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 12, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Percentage = 25,
+                            StartDate = new DateTime(2025, 1, 4, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndDate = new DateTime(2025, 12, 6, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            IsDeleted = false,
+                            Percentage = 52,
+                            StartDate = new DateTime(2025, 1, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
+                        });
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Hotel", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Hotel", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -252,9 +372,6 @@ namespace TABP.Persistence.Migrations
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("CityId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("CityId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -284,9 +401,6 @@ namespace TABP.Persistence.Migrations
                     b.Property<long>("OwnerId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("OwnerId1")
-                        .HasColumnType("bigint");
-
                     b.Property<byte>("StarRating")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint")
@@ -299,11 +413,7 @@ namespace TABP.Persistence.Migrations
 
                     b.HasIndex("CityId");
 
-                    b.HasIndex("CityId1");
-
                     b.HasIndex("OwnerId");
-
-                    b.HasIndex("OwnerId1");
 
                     b.ToTable("Hotels", (string)null);
 
@@ -311,86 +421,91 @@ namespace TABP.Persistence.Migrations
                         new
                         {
                             Id = 1L,
-                            Address = "Address 1",
-                            BriefDescription = "Brief Desc",
+                            Address = "Address 0",
+                            BriefDescription = "Brief 0",
                             CityId = 1,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Desc",
+                            Description = "Desc 0",
                             IsDeleted = false,
-                            LocationLatitude = 48.850000000000001,
-                            LocationLongitude = 2.3500000000000001,
-                            Name = "Hotel1",
+                            LocationLatitude = 40.0,
+                            LocationLongitude = -74.0,
+                            Name = "Hotel A",
                             OwnerId = 1L,
-                            StarRating = (byte)4
+                            StarRating = (byte)1,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 2L,
-                            Address = "Address 2",
-                            BriefDescription = "Brief Desc",
+                            Address = "Address 1",
+                            BriefDescription = "Brief 1",
                             CityId = 2,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Desc",
+                            Description = "Desc 1",
                             IsDeleted = false,
-                            LocationLatitude = 48.859999999999999,
-                            LocationLongitude = 2.3599999999999999,
-                            Name = "Hotel2",
+                            LocationLatitude = 41.0,
+                            LocationLongitude = -75.0,
+                            Name = "Hotel B",
                             OwnerId = 2L,
-                            StarRating = (byte)3
+                            StarRating = (byte)2,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 3L,
-                            Address = "Address 3",
-                            BriefDescription = "Brief Desc",
+                            Address = "Address 2",
+                            BriefDescription = "Brief 2",
                             CityId = 3,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Desc",
+                            Description = "Desc 2",
                             IsDeleted = false,
-                            LocationLatitude = 48.869999999999997,
-                            LocationLongitude = 2.3700000000000001,
-                            Name = "Hotel3",
+                            LocationLatitude = 42.0,
+                            LocationLongitude = -76.0,
+                            Name = "Hotel C",
                             OwnerId = 3L,
-                            StarRating = (byte)5
+                            StarRating = (byte)3,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 4L,
-                            Address = "Address 4",
-                            BriefDescription = "Brief Desc",
+                            Address = "Address 3",
+                            BriefDescription = "Brief 3",
                             CityId = 4,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Desc",
+                            Description = "Desc 3",
                             IsDeleted = false,
-                            LocationLatitude = 48.880000000000003,
-                            LocationLongitude = 2.3799999999999999,
-                            Name = "Hotel4",
+                            LocationLatitude = 43.0,
+                            LocationLongitude = -77.0,
+                            Name = "Hotel D",
                             OwnerId = 4L,
-                            StarRating = (byte)4
+                            StarRating = (byte)4,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 5L,
-                            Address = "Address 5",
-                            BriefDescription = "Brief Desc",
+                            Address = "Address 4",
+                            BriefDescription = "Brief 4",
                             CityId = 5,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Desc",
+                            Description = "Desc 4",
                             IsDeleted = false,
-                            LocationLatitude = 48.890000000000001,
-                            LocationLongitude = 2.3900000000000001,
-                            Name = "Hotel5",
+                            LocationLatitude = 44.0,
+                            LocationLongitude = -78.0,
+                            Name = "Hotel E",
                             OwnerId = 5L,
-                            StarRating = (byte)3
+                            StarRating = (byte)5,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.HotelImage", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.HotelImage", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -399,9 +514,6 @@ namespace TABP.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<long>("HotelId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("HotelId1")
                         .HasColumnType("bigint");
 
                     b.Property<int>("ImageType")
@@ -416,12 +528,42 @@ namespace TABP.Persistence.Migrations
 
                     b.HasIndex("HotelId");
 
-                    b.HasIndex("HotelId1");
-
                     b.ToTable("HotelImages");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Owner", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Invoice", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("BookingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("InvoiceNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("IssueDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
+
+                    b.ToTable("Invoices", (string)null);
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.Owner", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -456,50 +598,50 @@ namespace TABP.Persistence.Migrations
                         {
                             Id = 1L,
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FirstName = "Owner1",
+                            FirstName = "John",
                             IsDeleted = false,
-                            LastName = "OwnerLast1",
-                            PhoneNumber = "0123456780"
+                            LastName = "Doe",
+                            PhoneNumber = "1234567890"
                         },
                         new
                         {
                             Id = 2L,
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FirstName = "Owner2",
+                            FirstName = "Jane",
                             IsDeleted = false,
-                            LastName = "OwnerLast2",
-                            PhoneNumber = "0123456781"
+                            LastName = "Smith",
+                            PhoneNumber = "2345678901"
                         },
                         new
                         {
                             Id = 3L,
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FirstName = "Owner3",
+                            FirstName = "Alice",
                             IsDeleted = false,
-                            LastName = "OwnerLast3",
-                            PhoneNumber = "0123456782"
+                            LastName = "Johnson",
+                            PhoneNumber = "3456789012"
                         },
                         new
                         {
                             Id = 4L,
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FirstName = "Owner4",
+                            FirstName = "Bob",
                             IsDeleted = false,
-                            LastName = "OwnerLast4",
-                            PhoneNumber = "0123456783"
+                            LastName = "Brown",
+                            PhoneNumber = "4567890123"
                         },
                         new
                         {
                             Id = 5L,
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            FirstName = "Owner5",
+                            FirstName = "Charlie",
                             IsDeleted = false,
-                            LastName = "OwnerLast5",
-                            PhoneNumber = "0123456784"
+                            LastName = "Davis",
+                            PhoneNumber = "5678901234"
                         });
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Review", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Review", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -517,9 +659,6 @@ namespace TABP.Persistence.Migrations
                     b.Property<long>("HotelId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("HotelId1")
-                        .HasColumnType("bigint");
-
                     b.Property<int>("Rating")
                         .HasColumnType("int");
 
@@ -529,70 +668,16 @@ namespace TABP.Persistence.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("UserId1")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
 
                     b.HasIndex("HotelId");
 
-                    b.HasIndex("HotelId1");
-
                     b.HasIndex("UserId");
 
-                    b.HasIndex("UserId1");
-
                     b.ToTable("Reviews", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Comment = "Great",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            HotelId = 1L,
-                            Rating = 5,
-                            UserId = 1L
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            Comment = "Good",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            HotelId = 2L,
-                            Rating = 4,
-                            UserId = 2L
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            Comment = "Okay",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            HotelId = 3L,
-                            Rating = 3,
-                            UserId = 3L
-                        },
-                        new
-                        {
-                            Id = 4L,
-                            Comment = "Bad",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            HotelId = 4L,
-                            Rating = 2,
-                            UserId = 4L
-                        },
-                        new
-                        {
-                            Id = 5L,
-                            Comment = "Terrible",
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            HotelId = 5L,
-                            Rating = 1,
-                            UserId = 5L
-                        });
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Role", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -627,32 +712,11 @@ namespace TABP.Persistence.Migrations
                             Id = 2,
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             IsDeleted = false,
-                            Name = "Owner"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            Name = "Customer"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
-                            Name = "Manager"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsDeleted = false,
                             Name = "Guest"
                         });
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Room", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Room", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -666,6 +730,9 @@ namespace TABP.Persistence.Migrations
                     b.Property<DateTime>("DeletedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<long>("HotelId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -677,17 +744,14 @@ namespace TABP.Persistence.Migrations
                     b.Property<long>("RoomClassId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("RoomClassId1")
-                        .HasColumnType("bigint");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomClassId");
+                    b.HasIndex("HotelId");
 
-                    b.HasIndex("RoomClassId1");
+                    b.HasIndex("RoomClassId");
 
                     b.ToTable("Rooms", (string)null);
 
@@ -695,51 +759,61 @@ namespace TABP.Persistence.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HotelId = 1L,
                             IsDeleted = false,
-                            Number = "Room1",
-                            RoomClassId = 1L
+                            Number = "R001",
+                            RoomClassId = 1L,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 2L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HotelId = 2L,
                             IsDeleted = false,
-                            Number = "Room2",
-                            RoomClassId = 2L
+                            Number = "R002",
+                            RoomClassId = 2L,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 3L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HotelId = 3L,
                             IsDeleted = false,
-                            Number = "Room3",
-                            RoomClassId = 3L
+                            Number = "R003",
+                            RoomClassId = 3L,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 4L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HotelId = 4L,
                             IsDeleted = false,
-                            Number = "Room4",
-                            RoomClassId = 4L
+                            Number = "R004",
+                            RoomClassId = 4L,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 5L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            HotelId = 5L,
                             IsDeleted = false,
-                            Number = "Room5",
-                            RoomClassId = 5L
+                            Number = "R005",
+                            RoomClassId = 5L,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.RoomClass", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.RoomClass", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -769,9 +843,6 @@ namespace TABP.Persistence.Migrations
                     b.Property<int?>("DiscountId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("DiscountId1")
-                        .HasColumnType("int");
-
                     b.Property<long>("HotelId")
                         .HasColumnType("bigint");
 
@@ -791,8 +862,6 @@ namespace TABP.Persistence.Migrations
 
                     b.HasIndex("DiscountId");
 
-                    b.HasIndex("DiscountId1");
-
                     b.HasIndex("HotelId");
 
                     b.ToTable("RoomClasses", (string)null);
@@ -802,75 +871,80 @@ namespace TABP.Persistence.Migrations
                         {
                             Id = 1L,
                             AdultsCapacity = 2,
-                            BriefDescription = "Brief Room",
-                            ChildrenCapacity = 1,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            BriefDescription = "Brief class 0",
+                            ChildrenCapacity = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Room Desc",
+                            Description = "Room class 0",
                             HotelId = 1L,
                             IsDeleted = false,
                             PricePerNight = 100m,
-                            Type = (byte)0
+                            Type = (byte)1,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 2L,
                             AdultsCapacity = 2,
-                            BriefDescription = "Brief Room",
-                            ChildrenCapacity = 1,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            BriefDescription = "Brief class 1",
+                            ChildrenCapacity = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Room Desc",
+                            Description = "Room class 1",
                             HotelId = 2L,
                             IsDeleted = false,
-                            PricePerNight = 150m,
-                            Type = (byte)0
+                            PricePerNight = 110m,
+                            Type = (byte)2,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 3L,
                             AdultsCapacity = 2,
-                            BriefDescription = "Brief Room",
-                            ChildrenCapacity = 1,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            BriefDescription = "Brief class 2",
+                            ChildrenCapacity = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Room Desc",
+                            Description = "Room class 2",
                             HotelId = 3L,
                             IsDeleted = false,
-                            PricePerNight = 200m,
-                            Type = (byte)0
+                            PricePerNight = 120m,
+                            Type = (byte)3,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 4L,
                             AdultsCapacity = 2,
-                            BriefDescription = "Brief Room",
-                            ChildrenCapacity = 1,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            BriefDescription = "Brief class 3",
+                            ChildrenCapacity = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Room Desc",
+                            Description = "Room class 3",
                             HotelId = 4L,
                             IsDeleted = false,
-                            PricePerNight = 250m,
-                            Type = (byte)0
+                            PricePerNight = 130m,
+                            Type = (byte)4,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         },
                         new
                         {
                             Id = 5L,
                             AdultsCapacity = 2,
-                            BriefDescription = "Brief Room",
-                            ChildrenCapacity = 1,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            BriefDescription = "Brief class 4",
+                            ChildrenCapacity = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Full Room Desc",
+                            Description = "Room class 4",
                             HotelId = 5L,
                             IsDeleted = false,
-                            PricePerNight = 300m,
-                            Type = (byte)0
+                            PricePerNight = 140m,
+                            Type = (byte)5,
+                            UpdatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)
                         });
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.RoomImage", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.RoomImage", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -896,7 +970,7 @@ namespace TABP.Persistence.Migrations
                     b.ToTable("RoomImages");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.User", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.User", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -960,208 +1034,229 @@ namespace TABP.Persistence.Migrations
                         new
                         {
                             Id = 1L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "user1@example.com",
-                            FirstName = "User1",
+                            Email = "john@example.com",
+                            FirstName = "John",
                             IsDeleted = false,
-                            LastName = "Surname1",
-                            PasswordHash = "hashed_pwd",
+                            LastName = "Doe",
+                            PasswordHash = "hashed_password_1",
                             RoleId = 1,
-                            Salt = "salt",
-                            Username = "user1"
+                            Salt = "salt1",
+                            Username = "johndoe"
                         },
                         new
                         {
                             Id = 2L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "user2@example.com",
-                            FirstName = "User2",
+                            Email = "jane@example.com",
+                            FirstName = "Jane",
                             IsDeleted = false,
-                            LastName = "Surname2",
-                            PasswordHash = "hashed_pwd",
+                            LastName = "Smith",
+                            PasswordHash = "hashed_password_2",
                             RoleId = 2,
-                            Salt = "salt",
-                            Username = "user2"
+                            Salt = "salt2",
+                            Username = "janesmith"
                         },
                         new
                         {
                             Id = 3L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "user3@example.com",
-                            FirstName = "User3",
+                            Email = "alice@example.com",
+                            FirstName = "Alice",
                             IsDeleted = false,
-                            LastName = "Surname3",
-                            PasswordHash = "hashed_pwd",
-                            RoleId = 3,
-                            Salt = "salt",
-                            Username = "user3"
+                            LastName = "Johnson",
+                            PasswordHash = "hashed_password_3",
+                            RoleId = 2,
+                            Salt = "salt3",
+                            Username = "alicej"
                         },
                         new
                         {
                             Id = 4L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "user4@example.com",
-                            FirstName = "User4",
+                            Email = "bob@example.com",
+                            FirstName = "Bob",
                             IsDeleted = false,
-                            LastName = "Surname4",
-                            PasswordHash = "hashed_pwd",
-                            RoleId = 4,
-                            Salt = "salt",
-                            Username = "user4"
+                            LastName = "Brown",
+                            PasswordHash = "hashed_password_4",
+                            RoleId = 2,
+                            Salt = "salt4",
+                            Username = "bobb"
                         },
                         new
                         {
                             Id = 5L,
-                            CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             DeletedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Email = "user5@example.com",
-                            FirstName = "User5",
+                            Email = "charlie@example.com",
+                            FirstName = "Charlie",
                             IsDeleted = false,
-                            LastName = "Surname5",
-                            PasswordHash = "hashed_pwd",
-                            RoleId = 5,
-                            Salt = "salt",
-                            Username = "user5"
+                            LastName = "Davis",
+                            PasswordHash = "hashed_password_5",
+                            RoleId = 2,
+                            Salt = "salt5",
+                            Username = "charlied"
                         });
                 });
 
             modelBuilder.Entity("AmenityRoomClass", b =>
                 {
-                    b.HasOne("TABP.Domain.Entites.Amenity", null)
+                    b.HasOne("TABP.Domain.Entities.Amenity", null)
                         .WithMany()
                         .HasForeignKey("AmenitiesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TABP.Domain.Entites.RoomClass", null)
+                    b.HasOne("TABP.Domain.Entities.RoomClass", null)
                         .WithMany()
                         .HasForeignKey("RoomClassesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Amenity", b =>
+            modelBuilder.Entity("BookingRoom", b =>
                 {
-                    b.HasOne("TABP.Domain.Entites.Hotel", null)
+                    b.HasOne("TABP.Domain.Entities.Booking", null)
+                        .WithMany()
+                        .HasForeignKey("BookingsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TABP.Domain.Entities.Room", null)
+                        .WithMany()
+                        .HasForeignKey("RoomsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.Amenity", b =>
+                {
+                    b.HasOne("TABP.Domain.Entities.Hotel", null)
                         .WithMany("Amenities")
                         .HasForeignKey("HotelId");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.CityImage", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Booking", b =>
                 {
-                    b.HasOne("TABP.Domain.Entites.City", "City")
-                        .WithMany()
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TABP.Domain.Entites.City", null)
-                        .WithMany("CityImages")
-                        .HasForeignKey("CityId1");
-
-                    b.Navigation("City");
-                });
-
-            modelBuilder.Entity("TABP.Domain.Entites.Hotel", b =>
-                {
-                    b.HasOne("TABP.Domain.Entites.City", "City")
-                        .WithMany()
-                        .HasForeignKey("CityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TABP.Domain.Entites.City", null)
-                        .WithMany("Hotels")
-                        .HasForeignKey("CityId1");
-
-                    b.HasOne("TABP.Domain.Entites.Owner", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TABP.Domain.Entites.Owner", null)
-                        .WithMany("Hotels")
-                        .HasForeignKey("OwnerId1");
-
-                    b.Navigation("City");
-
-                    b.Navigation("Owner");
-                });
-
-            modelBuilder.Entity("TABP.Domain.Entites.HotelImage", b =>
-                {
-                    b.HasOne("TABP.Domain.Entites.Hotel", "Hotel")
+                    b.HasOne("TABP.Domain.Entities.Hotel", "Hotel")
                         .WithMany()
                         .HasForeignKey("HotelId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TABP.Domain.Entites.Hotel", null)
-                        .WithMany("HotelImages")
-                        .HasForeignKey("HotelId1");
-
-                    b.Navigation("Hotel");
-                });
-
-            modelBuilder.Entity("TABP.Domain.Entites.Review", b =>
-                {
-                    b.HasOne("TABP.Domain.Entites.Hotel", "Hotel")
-                        .WithMany()
-                        .HasForeignKey("HotelId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TABP.Domain.Entites.Hotel", null)
-                        .WithMany("Reviews")
-                        .HasForeignKey("HotelId1");
-
-                    b.HasOne("TABP.Domain.Entites.User", "User")
-                        .WithMany()
+                    b.HasOne("TABP.Domain.Entities.User", "User")
+                        .WithMany("Bookings")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("TABP.Domain.Entites.User", null)
-                        .WithMany("Reviews")
-                        .HasForeignKey("UserId1");
 
                     b.Navigation("Hotel");
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Room", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.CityImage", b =>
                 {
-                    b.HasOne("TABP.Domain.Entites.RoomClass", "RoomClass")
-                        .WithMany()
-                        .HasForeignKey("RoomClassId")
+                    b.HasOne("TABP.Domain.Entities.City", "City")
+                        .WithMany("CityImages")
+                        .HasForeignKey("CityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TABP.Domain.Entites.RoomClass", null)
+                    b.Navigation("City");
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.Hotel", b =>
+                {
+                    b.HasOne("TABP.Domain.Entities.City", "City")
+                        .WithMany("Hotels")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TABP.Domain.Entities.Owner", "Owner")
+                        .WithMany("Hotels")
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("Owner");
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.HotelImage", b =>
+                {
+                    b.HasOne("TABP.Domain.Entities.Hotel", "Hotel")
+                        .WithMany("HotelImages")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.Invoice", b =>
+                {
+                    b.HasOne("TABP.Domain.Entities.Booking", "Booking")
+                        .WithOne("Invoice")
+                        .HasForeignKey("TABP.Domain.Entities.Invoice", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.Review", b =>
+                {
+                    b.HasOne("TABP.Domain.Entities.Hotel", "Hotel")
+                        .WithMany("Reviews")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TABP.Domain.Entities.User", "User")
+                        .WithMany("Reviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.Room", b =>
+                {
+                    b.HasOne("TABP.Domain.Entities.Hotel", "Hotel")
                         .WithMany("Rooms")
-                        .HasForeignKey("RoomClassId1");
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("TABP.Domain.Entities.RoomClass", "RoomClass")
+                        .WithMany("Rooms")
+                        .HasForeignKey("RoomClassId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
 
                     b.Navigation("RoomClass");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.RoomClass", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.RoomClass", b =>
                 {
-                    b.HasOne("TABP.Domain.Entites.Discount", "Discount")
-                        .WithMany()
+                    b.HasOne("TABP.Domain.Entities.Discount", "Discount")
+                        .WithMany("RoomClasses")
                         .HasForeignKey("DiscountId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TABP.Domain.Entites.Discount", null)
-                        .WithMany("RoomClasses")
-                        .HasForeignKey("DiscountId1");
-
-                    b.HasOne("TABP.Domain.Entites.Hotel", "Hotel")
+                    b.HasOne("TABP.Domain.Entities.Hotel", "Hotel")
                         .WithMany("RoomClasses")
                         .HasForeignKey("HotelId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1172,9 +1267,9 @@ namespace TABP.Persistence.Migrations
                     b.Navigation("Hotel");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.RoomImage", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.RoomImage", b =>
                 {
-                    b.HasOne("TABP.Domain.Entites.RoomClass", "RoomClass")
+                    b.HasOne("TABP.Domain.Entities.RoomClass", "RoomClass")
                         .WithMany("RoomImages")
                         .HasForeignKey("RoomClassId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1183,9 +1278,9 @@ namespace TABP.Persistence.Migrations
                     b.Navigation("RoomClass");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.User", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.User", b =>
                 {
-                    b.HasOne("TABP.Domain.Entites.Role", "Role")
+                    b.HasOne("TABP.Domain.Entities.Role", "Role")
                         .WithMany("Users")
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1194,19 +1289,24 @@ namespace TABP.Persistence.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.City", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Booking", b =>
+                {
+                    b.Navigation("Invoice");
+                });
+
+            modelBuilder.Entity("TABP.Domain.Entities.City", b =>
                 {
                     b.Navigation("CityImages");
 
                     b.Navigation("Hotels");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Discount", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Discount", b =>
                 {
                     b.Navigation("RoomClasses");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Hotel", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Hotel", b =>
                 {
                     b.Navigation("Amenities");
 
@@ -1215,27 +1315,31 @@ namespace TABP.Persistence.Migrations
                     b.Navigation("Reviews");
 
                     b.Navigation("RoomClasses");
+
+                    b.Navigation("Rooms");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Owner", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Owner", b =>
                 {
                     b.Navigation("Hotels");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.Role", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Role", b =>
                 {
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.RoomClass", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.RoomClass", b =>
                 {
                     b.Navigation("RoomImages");
 
                     b.Navigation("Rooms");
                 });
 
-            modelBuilder.Entity("TABP.Domain.Entites.User", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.User", b =>
                 {
+                    b.Navigation("Bookings");
+
                     b.Navigation("Reviews");
                 });
 #pragma warning restore 612, 618

@@ -10,7 +10,7 @@ namespace TABP.Persistence.Configurations
         {
             base.Configure(builder);
             builder.HasOne(i => i.Hotel)
-                   .WithMany()
+                   .WithMany(h => h.HotelImages)
                    .HasForeignKey(i => i.HotelId);
         }
     }

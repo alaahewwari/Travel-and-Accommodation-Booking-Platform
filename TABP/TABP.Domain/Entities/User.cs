@@ -14,5 +14,6 @@ namespace TABP.Domain.Entities
         public int RoleId { get; set; }
         public Role Role { get; set; } = null!;
         public ICollection<Review> Reviews { get; set; } = [];
+        public ICollection<Booking> Bookings { get; set; } = [];
     }
 }

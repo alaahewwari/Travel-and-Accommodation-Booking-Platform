@@ -26,7 +26,7 @@ namespace TABP.Persistence.Configurations
                    .IsRequired();
             builder.HasMany(c => c.Hotels)
                    .WithOne(h => h.City)
-                   .HasForeignKey(c=>c.CityId);
+                   .HasForeignKey(c => c.CityId);
             builder.HasMany(c => c.CityImages)
                    .WithOne(i => i.City)
                    .HasForeignKey(c => c.CityId);

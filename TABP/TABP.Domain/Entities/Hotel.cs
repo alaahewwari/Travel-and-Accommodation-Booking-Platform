@@ -16,10 +16,11 @@ namespace TABP.Domain.Entities
         public int CityId { get; set; }
         public long OwnerId { get; set; }
         public City City { get; set; } = null!;
-        public Owner Owner { get; set; }= null!;
+        public Owner Owner { get; set; } = null!;
         public ICollection<RoomClass> RoomClasses { get; set; } = [];
         public ICollection<HotelImage> HotelImages { get; set; } = [];
         public ICollection<Amenity> Amenities { get; set; } = [];
         public ICollection<Review> Reviews { get; set; } = [];
+        public ICollection<Room> Rooms { get; set; } = [];
     }
 }
