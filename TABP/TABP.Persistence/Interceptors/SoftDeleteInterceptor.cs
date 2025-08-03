@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using TABP.Domain.Common;
 using TABP.Domain.Entities;
+using TABP.Domain.Entities.Common;
 namespace TABP.Persistence.Interceptors
 {
     public sealed class SoftDeleteInterceptor : SaveChangesInterceptor

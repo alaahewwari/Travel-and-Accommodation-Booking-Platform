@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using Sieve.Models;
 using TABP.API.Common;
 using TABP.API.Contracts.Hotels;
+using TABP.API.Contracts.Images;
 using TABP.API.Mapping;
 using TABP.Application.Hotels.Commands.Delete;
 using TABP.Application.Hotels.Common;
@@ -154,6 +155,57 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error);
             Response.Headers.Append("X-Pagination", result.Value.PaginationMetadata.Build());
             return Ok(result.Value.Items);
+        }
+        /// <summary>
+        /// Sets the thumbnail image for a specific hotel by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the hotel to associate the thumbnail with.</param>
+        /// <param name="request">The image upload request containing the file.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>
+        /// Returns <c>201 Created</c> if the thumbnail is successfully set;
+        /// otherwise, returns <c>400 Bad Request</c> with error details.
+        /// </returns>
+        [HttpPost(ApiRoutes.Hotels.SetThumbnail)]
+        public async Task<ActionResult> SetThumbnail([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
+        {
+            if (request.File is null || request.File.Length == 0)
+            {
+                return BadRequest();
+            }
+            using var stream = request.File.OpenReadStream();
+            var command = request.ToHotelThumbnailCommand(id, stream, request.File.FileName);
+            var result = await mediator.Send(command, cancellationToken);
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+            return Created();
+        }
+        /// <summary>
+        /// Adds a new image to the gallery of a specific hotel.
+        /// </summary>
+        /// <param name="id">The ID of the hotel to which the image will be added.</param>
+        /// <param name="request">The image upload request containing the file to add.</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation.</param>
+        /// <returns>Returns 201 Created if the image is successfully added, or 400 BadRequest if the input is invalid or the operation fails.</returns>
+        [HttpPost(ApiRoutes.Hotels.AddToGallery)]
+        public async Task<ActionResult> AddToGallery([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
+        {
+            if (request.File is null || request.File.Length == 0)
+            {
+                return BadRequest("File is missing or empty.");
+            }
+
+            using var stream = request.File.OpenReadStream();
+            var command = request.ToHotelGalleryCommand(id, stream, request.File.FileName);
+            var result = await mediator.Send(command, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+            return Created();
         }
     }
 }

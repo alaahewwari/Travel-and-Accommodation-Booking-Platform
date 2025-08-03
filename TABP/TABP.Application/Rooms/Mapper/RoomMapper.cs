@@ -3,7 +3,10 @@ using TABP.Application.Rooms.Commands.Create;
 using TABP.Application.Rooms.Commands.Update;
 using TABP.Application.Rooms.Common;
 using TABP.Domain.Entities;
+using TABP.Domain.Enums;
 using TABP.Domain.Models.Room;
+using TABP.Application.RoomClasses.Commands.AddToGallery;
+using TABP.Application.RoomClasses.Commands.SetThumbnail;
 namespace TABP.Application.Rooms.Mapper
 {
     [Mapper]

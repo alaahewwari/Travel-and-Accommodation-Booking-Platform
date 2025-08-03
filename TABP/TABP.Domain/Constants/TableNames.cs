@@ -1,4 +1,4 @@
-﻿namespace TABP.Persistence.Constants
+﻿namespace TABP.Domain.Constants
 {
     public static class TableNames
     {

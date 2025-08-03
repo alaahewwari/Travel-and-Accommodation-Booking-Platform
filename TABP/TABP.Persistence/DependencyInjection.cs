@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Persistence.Context;
 using TABP.Persistence.Interceptors;
@@ -26,7 +27,11 @@ namespace TABP.Persistence
             services.AddScoped<IDiscountRespository, DiscountRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             services.AddScoped<IBookingRepository, BookingRepository>();
+            services.AddScoped<IAmenityRepository, AmenityRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IImageRepository<CityImage>, ImageRepository<CityImage>>();
+            services.AddScoped<IImageRepository<HotelImage>, ImageRepository<HotelImage>>();
+            services.AddScoped<IImageRepository<RoomImage>, ImageRepository<RoomImage>>();
             return services;
         }
     }

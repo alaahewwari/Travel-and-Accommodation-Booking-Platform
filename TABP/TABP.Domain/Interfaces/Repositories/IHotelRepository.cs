@@ -1,6 +1,7 @@
 ﻿using Sieve.Models;
 using TABP.Domain.Entities;
 using TABP.Domain.Models;
+using TABP.Domain.Models.Hotel;
 namespace TABP.Domain.Interfaces.Repositories
 {
     public interface IHotelRepository

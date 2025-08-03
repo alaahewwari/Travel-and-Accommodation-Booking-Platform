@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using System.Diagnostics;
 using TABP.API.Common;
 using TABP.API.Contracts.Cities;
+using TABP.API.Contracts.Images;
 using TABP.API.Mapping;
 using TABP.Application.Cities.Commands.Delete;
 using TABP.Application.Cities.Common;
@@ -134,6 +135,32 @@ namespace TABP.API.Controllers
             if (result.IsFailure)
                 return BadRequest(result.Error);
             return Ok(result.Value);
+        }
+        /// <summary>
+        /// Sets the thumbnail image for a specific entity by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the hotel to associate the thumbnail with.</param>
+        /// <param name="request">The image upload request containing the file.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>
+        /// Returns <c>201 Created</c> if the thumbnail is successfully set;
+        /// otherwise, returns <c>400 Bad Request</c> with error details.
+        /// </returns>
+        [HttpPost(ApiRoutes.Cities.SetThumbnail)]
+        public async Task<ActionResult> SetThumbnail([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
+        {
+            if (request.File is null || request.File.Length == 0)
+            {
+                return BadRequest();
+            }
+            using var stream = request.File.OpenReadStream();
+            var command = request.ToCityCommand(id, stream, request.File.FileName);
+            var result = await mediator.Send(command, cancellationToken);
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+            return Created();
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
+using TABP.API.Contracts.Images;
 using TABP.API.Contracts.RoomClasses;
 using TABP.API.Mapping;
 using TABP.Application.RoomClasses.Commands.Delete;
@@ -118,6 +119,58 @@ namespace TABP.API.Controllers
             if (result.IsFailure)
                 return NotFound(result.Error);
             return NoContent();
+        }
+        /// <summary>
+        /// Sets the thumbnail image for a specific entity by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the room to associate the thumbnail with.</param>
+        /// <param name="request">The image upload request containing the file.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>
+        /// Returns <c>201 Created</c> if the thumbnail is successfully set;
+        /// otherwise, returns <c>400 Bad Request</c> with error details.
+        /// </returns>
+        [HttpPost(ApiRoutes.RoomClasses.SetThumbnail)]
+        public async Task<ActionResult> SetThumbnail([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
+        {
+            if (request.File is null || request.File.Length == 0)
+            {
+                return BadRequest();
+            }
+            using var stream = request.File.OpenReadStream();
+            var command = request.ToRoomThumbnailCommand(id, stream, request.File.FileName);
+            var result = await mediator.Send(command, cancellationToken);
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+            return Created();
+        }
+        /// <summary>
+        /// Adds a new image to the gallery of a specific room.
+        /// </summary>
+        /// <param name="id">The ID of the room class to which the image will be added.</param>
+        /// <param name="request">The image upload request containing the file to add.</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation.</param>
+        /// <returns>Returns 201 Created if the image is successfully added, or 400 BadRequest if the input is invalid or the operation fails.</returns>
+        [HttpPost(ApiRoutes.RoomClasses.AddToGallery)]
+        public async Task<ActionResult> AddToGallery([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
+        {
+            if (request.File is null || request.File.Length == 0)
+            {
+                return BadRequest("File is missing or empty.");
+            }
+
+            using var stream = request.File.OpenReadStream();
+            var command = request.ToRoomGalleryCommand(id, stream, request.File.FileName);
+            var result = await mediator.Send(command, cancellationToken);
+
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+
+            return Created();
         }
     }
 }

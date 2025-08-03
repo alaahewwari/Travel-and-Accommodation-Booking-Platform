@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using CloudinaryDotNet;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Sieve.Services;
 using System.Text;
 using TABP.Domain.Interfaces.Services;
-using TABP.Infrastructure.Common;
 using TABP.Infrastructure.Configurations;
 using TABP.Infrastructure.Services;
 using TABP.Infrastructure.Services.Email;
@@ -48,6 +49,19 @@ namespace TABP.Infrastructure
                 };
             });
             services.AddAuthorization();
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
+            services.Configure<CloudinarySettings>(
+            configuration.GetSection(CloudinarySettings.SectionName));
+            services.AddSingleton<Cloudinary>(provider =>
+            {
+                var cloudinarySettings = provider.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+                var account = new Account(
+                    cloudinarySettings.CloudName,
+                    cloudinarySettings.ApiKey,
+                    cloudinarySettings.ApiSecret
+                );
+                return new Cloudinary(account);
+            });
             return services;
         }
     }

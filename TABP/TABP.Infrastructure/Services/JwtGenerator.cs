@@ -6,7 +6,7 @@ using System.Text;
 using TABP.Domain.Entities;
 using TABP.Domain.Exceptions;
 using TABP.Domain.Interfaces.Services;
-using TABP.Infrastructure.Common;
+using TABP.Infrastructure.Configurations;
 namespace TABP.Infrastructure.Services
 {
     public class JwtGenerator(IOptionsSnapshot<JwtConfigurations> jwtSettings) : IJwtGenerator

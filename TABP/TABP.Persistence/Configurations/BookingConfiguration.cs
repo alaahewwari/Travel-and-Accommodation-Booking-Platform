@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Reflection.Emit;
 using TABP.Domain.Entities;
-using TABP.Persistence.Constants;
+using TABP.Domain.Constants;
 namespace TABP.Persistence.Configurations
 {
     public class BookingConfiguration : IEntityTypeConfiguration<Booking>

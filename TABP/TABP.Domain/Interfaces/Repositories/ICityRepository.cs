@@ -1,5 +1,5 @@
 ﻿using TABP.Domain.Entities;
-using TABP.Domain.Models;
+using TABP.Domain.Models.City;
 namespace TABP.Domain.Interfaces.Repositories
 {
     public interface ICityRepository
