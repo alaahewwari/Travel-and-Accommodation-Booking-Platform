@@ -1,55 +1,31 @@
-name: build and test
+name: .NET CI
 
 on:
   push:
-    branches: ["development"]
+    branches: [ "development" ]
   pull_request:
-    branches: ["development"]
+    branches: [ "development" ]
   workflow_dispatch:
 
 jobs:
   test:
     name: Build and Test
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "9.0.x"
-
-      - name: Restore dependencies
-        run: dotnet restore TABP.sln
-
-      - name: Build solution
-        run: dotnet build TABP.sln --no-restore --configuration Release
-
-      - name: Run unit tests
-        run: |
-          dotnet test tests/TABP.UnitTests/TABP.Application.Tests.csproj --no-build --configuration Release --verbosity normal --logger trx --collect:"XPlat Code Coverage"
-
-      - name: Generate test report
-        uses: dorny/test-reporter@v1
-        if: always()
-        with:
-          name: .NET Tests
-          path: "**/TestResults/*.trx"
-          reporter: dotnet-trx
-          fail-on-error: true
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: "**/TestResults/"
-
-      - name: Upload code coverage
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          file: "**/coverage.cobertura.xml"
-          fail_ci_if_error: false
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+        
+    - name: Restore dependencies
+      run: dotnet restore TABP.sln
+      
+    - name: Build solution
+      run: dotnet build TABP.sln --no-restore --configuration Release
+      
+    - name: Run unit tests
+      run: dotnet test TABP.Application.Tests --no-build --configuration Release --verbosity normal
