@@ -1,4 +1,4 @@
-﻿namespace TABP.Domain.Models
+﻿namespace TABP.Domain.Models.Common
 {
     public record PaginationMetadata(
        int? TotalCount,

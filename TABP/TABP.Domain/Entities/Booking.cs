@@ -8,7 +8,6 @@ namespace TABP.Domain.Entities
         public decimal TotalPrice { get; set; }
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
-        public PaymentMethod PaymentMethod { get; set; }
         public string? GuestRemarks { get; set; }
         public BookingStatus Status { get; set; } = BookingStatus.Pending;
         public DateTime CreatedAt { get; set; }
