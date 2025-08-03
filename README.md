@@ -280,7 +280,6 @@ All API endpoints return consistent error responses:
 
 ```json
 {
-  "type": "Validation",
   "code": "Resource.NotFound",
   "description": "Detailed error description."
 }
@@ -344,24 +343,46 @@ on:
 
 ## 💾 Database Schema
 
+**Database Name:** `TravelBookingDb`
+
+**Initialization Script:** See [`file.sql`](file.sql) for the full database creation script.
+
 ### Core Entities
-- **Users**: Authentication and user management
-- **Hotels**: Hotel information and metadata
-- **Rooms**: Room details and availability
-- **Bookings**: Reservation management
-- **Payments**: Payment processing and tracking
-- **Cities**: Location and geographic data
-- **Amenities**: Hotel and room features
+
+* **Users**: Authentication and user management
+* **Roles**: User roles and permissions
+* **Owners**: Hotel owner profiles
+* **Cities**: Geographic locations and destinations
+* **Hotels**: Accommodation properties
+* **RoomClasses**: Definitions of room types (e.g., Deluxe, Suite)
+* **Rooms**: Individual room instances with availability
+* **Amenities**: Features and services (e.g., Wi-Fi, Pool)
+* **Discounts**: Promotional pricing for room classes
+* **Bookings**: Reservation records
+* **Payments**: Payment transactions and receipts
+* **HotelImages**: Thumbnail images for hotels
+* **HotelGallery**: Gallery images for hotels
+* **RoomClassImages**: Gallery images for room classes
+* **RoomGallery**: Gallery images for rooms
+* **RoomClassAmenities**: Join table linking room classes to amenities
+* **RoomClassDiscounts**: Join table linking room classes to discounts
 
 ### Key Relationships
-- Users → Bookings (One-to-Many)
-- Hotels → Rooms (One-to-Many)
-- Bookings → Payments (One-to-One)
-- Cities → Hotels (One-to-Many)
 
-## 🚀 Frontend Integration
+* **Users → Bookings** (One-to-Many)
+* **Users ↔ Roles** (Many-to-Many via `UserRoles`)
+* **Owners → Hotels** (One-to-Many)
+* **Cities → Hotels** (One-to-Many)
+* **Hotels → Rooms** (One-to-Many)
+* **RoomClasses → Rooms** (One-to-Many)
+* **RoomClasses ↔ Amenities** (Many-to-Many via `RoomClassAmenities`)
+* **RoomClasses ↔ Discounts** (One-to-Many via `RoomClassDiscounts`)
+* **Bookings → Payments** (One-to-One)
+* **Hotels ↔ HotelImages** (One-to-Many)
+* **Hotels ↔ HotelGallery** (One-to-Many)
+* **Rooms ↔ RoomGallery** (One-to-Many)
+* **RoomClasses ↔ RoomClassImages** (One-to-Many)
 
-This API is designed to serve any frontend application (React, Angular, Vue, Mobile apps, etc.)
 
 ### Authentication Flow
 1. **Register/Login** → Get JWT token
