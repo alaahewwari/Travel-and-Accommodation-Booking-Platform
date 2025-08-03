@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using TABP.API.Contracts.User;
+using TABP.API.Contracts.Users;
 namespace TABP.API.Validators.Users
 {
     public class LoginRequestValidator : AbstractValidator<LoginUserRequest>

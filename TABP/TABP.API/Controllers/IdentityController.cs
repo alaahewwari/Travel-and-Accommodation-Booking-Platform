@@ -1,18 +1,20 @@
-﻿using FluentValidation;
-using MediatR;
-using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TABP.API.Common;
-using TABP.API.Contracts.User;
+using TABP.API.Contracts.Users;
 using TABP.API.Mapping;
+using TABP.Application.Users.Common;
 namespace TABP.API.Controllers
 {
-    [Route(ApiRoutes.Base)]
     [ApiController]
     public class IdentityController(ISender mediator, IdentityMapper mapper) : ControllerBase
     {
         [HttpPost(ApiRoutes.Identity.Login)]
-        public async Task<IActionResult> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
+        [ProducesResponseType(typeof(LoginUserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<LoginUserResponse>> Login([FromBody] LoginUserRequest request, CancellationToken cancellationToken)
         {
             var command = mapper.ToCommand(request);
             var result = await mediator.Send(command, cancellationToken);
@@ -21,13 +23,6 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error.Description);
             }
             return Ok(result.Value);
-        }
-        [HttpGet("test")]
-        [Authorize]
-        [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Client)] //not work with authorize because auth adds Cache-Control: no-store).
-        public IActionResult Test()
-        {
-            return Ok("Test successful!");
         }
     }
 }

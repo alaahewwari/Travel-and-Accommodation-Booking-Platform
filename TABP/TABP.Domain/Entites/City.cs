@@ -9,5 +9,6 @@ namespace TABP.Domain.Entites
         public string PostOffice { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public ICollection<Hotel> Hotels { get; set; } = [];
     }
 }
