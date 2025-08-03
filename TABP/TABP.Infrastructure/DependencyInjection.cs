@@ -22,10 +22,16 @@ namespace TABP.Infrastructure
             AddJwtAuthentication(services, configuration);
             AddPdfServices(services, configuration);
             AddCloudinaryServices(services, configuration);
+            AddStripeConfiguration(services, configuration);
             services.AddScoped<IPasswordHasher, PasswordHasher>();
             services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddTransient<IInvoiceTemplateBuilder, InvoiceTemplateBuilder>();
             return services;
+        }
+        private static void AddStripeConfiguration(IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<StripeSettings>(configuration.GetSection(StripeSettings.SectionName));
+            services.AddScoped<IPaymentService, StripePaymentService>();
         }
         private static void AddSieveServices(IServiceCollection services)
         {
