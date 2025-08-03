@@ -4,6 +4,8 @@ using System.Net.Mime;
 using TABP.Application.Bookings.Common;
 using TABP.Application.Bookings.Mapper;
 using TABP.Application.Common;
+using TABP.Application.Hotels.Common;
+using TABP.Application.Rooms.Common;
 using TABP.Application.Users.Common.Errors;
 using TABP.Domain.Entities;
 using TABP.Domain.Enums;
@@ -39,9 +41,15 @@ namespace TABP.Application.Bookings.Commands.Create
                 var roomNumbers = rooms.Select(r => r.Number).ToList();
                 return Result<BookingCreationResponse>.Success(createdBooking.ToBookingCreationResponse(existingHotel, roomNumbers));
             }
-            catch (EntityNotFoundException)
+            catch (EntityNotFoundException ex)
             {
-                return Result<BookingCreationResponse>.Failure(UserErrors.UserNotFound);
+                return ex.EntityType switch
+                {
+                    "User" => Result<BookingCreationResponse>.Failure(UserErrors.UserNotFound),
+                    "Hotel" => Result<BookingCreationResponse>.Failure(HotelErrors.HotelNotFound),
+                    "Rooms" => Result<BookingCreationResponse>.Failure(RoomErrors.RoomNotFound),
+                    _ => Result<BookingCreationResponse>.Failure(BookingErrors.UnexpectedError)
+                };
             }
             catch (InvalidBookingDatesException)
             {

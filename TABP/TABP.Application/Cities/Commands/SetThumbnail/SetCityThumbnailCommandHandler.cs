@@ -13,24 +13,24 @@ namespace TABP.Application.Cities.Commands.SetThumbnail
         IImageRepository<CityImage> imageRepository,
         ICityRepository cityRepository,
         ICloudinaryService cloudinaryService,
-        IUnitOfWork unitOfWork) : IRequestHandler<SetCityThumbnailCommand, Result>
+        IUnitOfWork unitOfWork) : IRequestHandler<SetCityThumbnailCommand, Result<string>>
     {
-        public async Task<Result> Handle(SetCityThumbnailCommand request, CancellationToken cancellationToken)
+        public async Task<Result<string>> Handle(SetCityThumbnailCommand request, CancellationToken cancellationToken)
         {
             var existingCity = await cityRepository.GetCityByIdAsync(request.CityId, cancellationToken);
             if (existingCity is null)
             {
-                return Result.Failure(CityErrors.CityNotFound);
+                return Result<string>.Failure(CityErrors.CityNotFound);
             }
             var existingThumbnail = await imageRepository.ExistsAsync(request.CityId, ImageType.Thumbnail, cancellationToken);
             if (existingThumbnail)
             {
                 await imageRepository.DeleteAsync(request.CityId,ImageType.Thumbnail, cancellationToken);
             }
-            string? imageUrl = null;
+            string imageUrl = null!;
             await unitOfWork.ExecuteResilientTransactionAsync(async cancellationToken =>
             {
-                var imageUrl = await cloudinaryService.UploadImageAsync(request.FileStream, request.FileName, "cities", cancellationToken);
+                imageUrl = await cloudinaryService.UploadImageAsync(request.FileStream, request.FileName, "cities", cancellationToken);
                 var cityImage = request.ToCityImageDomain(imageUrl, ImageType.Thumbnail);
                 await imageRepository.CreateAsync(cityImage, cancellationToken);
             }, cancellationToken);

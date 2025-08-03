@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using TABP.Domain.Entities;
-using TABP.Persistence.Common;
 namespace TABP.Persistence.Configurations
 {
     public class RoomImageConfiguration : BaseImageConfiguration<RoomImage>
