@@ -21,10 +21,7 @@ namespace TABP.Persistence.Repositories
         public async Task DeleteAsync(long id, CancellationToken cancellationToken)
         {
             var booking = await GetByIdAsync(id, cancellationToken);
-            if (booking is not null)
-            {
-                context.Bookings.Remove(booking);
-            }
+            booking.Status = BookingStatus.Cancelled;
             await context.SaveChangesAsync(cancellationToken);
         }
         public async Task<PagedResult<Booking>> GetBookingsAsync(long userId, SieveModel sieveModel, CancellationToken cancellationToken)
@@ -67,9 +64,17 @@ namespace TABP.Persistence.Repositories
                 .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
             return booking;
         }
-        public Task<IEnumerable<Booking>> GetRecentBookingsInDifferentHotelsByGuestId(long guestId, int count, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Booking?>> GetRecentBookingsInDifferentHotelsByGuestId(long userId, int count, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var bookings = await context.Bookings
+                .Where(b => b.UserId == userId)
+                .Include(b => b.Hotel)
+                .AsNoTracking()
+                .GroupBy(b => b.HotelId)
+                .Select(g => g.OrderByDescending(b => b.CreatedAt).First())
+                .Take(count)
+                .ToListAsync(cancellationToken);
+            return bookings;
         }
         public async Task<bool> CheckBookingOverlapAsync(
             IEnumerable<long> roomIds,

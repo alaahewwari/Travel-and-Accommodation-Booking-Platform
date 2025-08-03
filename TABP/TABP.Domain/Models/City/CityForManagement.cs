@@ -1,4 +1,4 @@
-﻿namespace TABP.Domain.Models
+﻿namespace TABP.Domain.Models.City
 {
     public record CityForManagement(
         int Id,

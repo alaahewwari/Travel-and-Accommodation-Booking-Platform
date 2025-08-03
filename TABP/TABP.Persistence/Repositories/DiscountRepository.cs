@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
+using TABP.Persistence.Context;
 namespace TABP.Persistence.Repositories
 {
     public class DiscountRepository(ApplicationDbContext context) : IDiscountRespository

@@ -35,15 +35,11 @@ namespace TABP.API.Controllers
         public async Task<ActionResult<CityResponse>> Create([FromBody] CreateCityRequest request, CancellationToken cancellationToken)
         {
             var command = request.ToCommand();
-            var sw = Stopwatch.StartNew();
             var result = await mediator.Send(command, cancellationToken);
-            sw.Stop();
-            Console.WriteLine($"⏱ Service execution time: {sw.ElapsedMilliseconds} ms");
             if (result.IsFailure)
                 return BadRequest(result.Error);
             return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
         }
-
         /// <summary>
         /// Retrieves a specific city by its ID.
         /// </summary>
@@ -63,7 +59,6 @@ namespace TABP.API.Controllers
                 return NotFound(result.Error);
             return Ok(result.Value);
         }
-
         /// <summary>
         /// Retrieves all cities.
         /// </summary>
@@ -80,7 +75,6 @@ namespace TABP.API.Controllers
             var result = await mediator.Send(query, cancellationToken);
             return Ok(result.Value);
         }
-
         /// <summary>
         /// Updates an existing city.
         /// </summary>
@@ -103,7 +97,6 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error);
             return Ok(result.Value);
         }
-
         /// <summary>
         /// Deletes a city by its ID.
         /// </summary>
@@ -124,7 +117,6 @@ namespace TABP.API.Controllers
                 return NotFound(result.Error);
             return NoContent();
         }
-
         /// <summary>
         /// Retrieves a list of trending cities.
         /// </summary>
@@ -135,7 +127,7 @@ namespace TABP.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<CityResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<CityResponse>>> GetTrending([FromQuery] TrendingCitiesRequest request, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<IEnumerable<CityResponse>>> GetTrending([FromQuery] GetTrendingCitiesRequest request, CancellationToken cancellationToken = default)
         {
             var query = new GetTrendingCitiesQuery(request.Count);
             var result = await mediator.Send(query, cancellationToken);

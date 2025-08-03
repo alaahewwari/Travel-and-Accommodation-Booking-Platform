@@ -1,4 +1,4 @@
-﻿namespace TABP.Domain.Models
+﻿namespace TABP.Domain.Models.Hotel
 {
     public record FeaturedealsHotels(
         long HotelId,

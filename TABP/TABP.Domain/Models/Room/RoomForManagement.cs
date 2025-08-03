@@ -1,4 +1,4 @@
-﻿namespace TABP.Domain.Models
+﻿namespace TABP.Domain.Models.Room
 {
     public record RoomForManagement(
         long Id,
