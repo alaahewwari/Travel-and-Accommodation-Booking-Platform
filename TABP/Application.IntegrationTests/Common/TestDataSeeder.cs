@@ -169,7 +169,6 @@ namespace Application.IntegrationTests.Common
                 HotelId = hotelId,
                 CheckInDate = checkInDate,
                 CheckOutDate = checkOutDate,
-                PaymentMethod = paymentMethod,
                 GuestRemarks = "Test booking",
                 Status = BookingStatus.Pending,
                 TotalPrice = 0m, // Will be calculated
