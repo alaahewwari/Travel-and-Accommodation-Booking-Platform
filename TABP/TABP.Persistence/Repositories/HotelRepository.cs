@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TABP.Domain.Entites;
+using Sieve.Models;
+using Sieve.Services;
 using TABP.Domain.Entities;
+using TABP.Domain.Enums;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Models;
 namespace TABP.Persistence.Repositories
 {
-    public class HotelRepository(ApplicationDbContext context) : IHotelRepository
+    public class HotelRepository(ApplicationDbContext context, SieveProcessor sieveProcessor) : IHotelRepository
     {
         public async Task<Hotel> CreateHotelAsync(Hotel hotel, CancellationToken cancellationToken)
         {
@@ -64,6 +66,50 @@ namespace TABP.Persistence.Repositories
         {
             return await context.Hotels
                 .AnyAsync(h => h.LocationLatitude == latitude && h.LocationLongitude == longitude, cancellationToken);
+        }
+        public async Task<PagedResult<HotelSearchResultResponse>> SearchAsync(HotelSearchParameters parameters, SieveModel sieveModel, CancellationToken cancellationToken)
+        {
+            var query = context.Hotels.AsQueryable();
+            query = query
+                .Where(h =>
+                        h.RoomClasses.Any(rc =>
+                        rc.AdultsCapacity >= parameters.Adults &&
+                        rc.ChildrenCapacity >= parameters.Children));
+            var filteredQuery = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
+            var pagedQuery = sieveProcessor.Apply(sieveModel, query, applyPagination: true);
+            var items = await pagedQuery
+                .Select(h => new HotelSearchResultResponse(
+                    h.Id,
+                    h.Name,
+                    h.StarRating,
+                    h.Reviews,
+                    h.BriefDescription,
+                    h.HotelImages
+                        .Where(i => i.ImageType == ImageType.Thumbnail)
+            .           Select(i => i.ImageUrl)
+                        .FirstOrDefault()!,
+                    h.RoomClasses.Any() ? h.RoomClasses.Min(rc => rc.PricePerNight) : 0
+                ))
+                .ToListAsync(cancellationToken);
+            var totalCount = await pagedQuery.CountAsync();
+            var totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.GetValueOrDefault(10));
+            if (sieveModel.Page.GetValueOrDefault() <= 1)
+            {
+                totalCount = await filteredQuery.CountAsync(cancellationToken);
+                totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.GetValueOrDefault(10));
+            }
+            var metadata = new PaginationMetadata
+            (
+                    totalCount,
+                    totalPages,
+                    sieveModel.Page.GetValueOrDefault(1),
+                    sieveModel.PageSize.GetValueOrDefault(10)
+            );
+            return new PagedResult<HotelSearchResultResponse>
+            {
+                Items = items,
+                PaginationMetadata = metadata
+            };
         }
     }
 }

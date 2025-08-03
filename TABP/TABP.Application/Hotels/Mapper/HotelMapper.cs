@@ -1,8 +1,11 @@
 ﻿using Riok.Mapperly.Abstractions;
+using Sieve.Models;
 using TABP.Application.Hotels.Commands.Create;
 using TABP.Application.Hotels.Commands.Update;
 using TABP.Application.Hotels.Common;
-using TABP.Domain.Entites;
+using TABP.Application.Hotels.Queries.Search;
+using TABP.Domain.Application.Common;
+using TABP.Domain.Entities;
 using TABP.Domain.Models;
 namespace TABP.Application.Hotels.Mapper
 {
@@ -26,5 +29,8 @@ namespace TABP.Application.Hotels.Mapper
         }
         private static partial Hotel ToHotelDomainInternal(CreateHotelCommand command);
         private static partial Hotel ToHotelDomainInternal(UpdateHotelCommand command);
+        public static partial SieveModel ToSieveModel(this SearchHotelsQuery searchHotelsQuery);
+        public static partial HotelSearchParameters ToSearchParameters(this SearchHotelsQuery query);
+        public static partial HotelPaginationResult ToHotelPaginationResult(this PagedResult<HotelSearchResultResponse> hotels);
     }
 }

@@ -1,5 +1,3 @@
-﻿using TABP.Domain.Entites;
-
 namespace TABP.Application.Hotels.Common
 {
     public record HotelResponse(
