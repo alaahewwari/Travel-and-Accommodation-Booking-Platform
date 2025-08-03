@@ -1,4 +1,4 @@
-﻿using TABP.Domain.Models;
+﻿using TABP.Domain.Models.Common;
 using TABP.Domain.Models.Hotel;
 namespace TABP.Domain.Application.Common
 {

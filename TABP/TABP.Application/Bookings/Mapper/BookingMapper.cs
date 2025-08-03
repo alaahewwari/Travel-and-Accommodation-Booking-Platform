@@ -4,7 +4,7 @@ using TABP.Application.Bookings.Commands.Create;
 using TABP.Application.Bookings.Common;
 using TABP.Application.Bookings.Queries.GetById;
 using TABP.Domain.Entities;
-using TABP.Domain.Models;
+using TABP.Domain.Models.Common;
 namespace TABP.Application.Bookings.Mapper
 {
     [Mapper]

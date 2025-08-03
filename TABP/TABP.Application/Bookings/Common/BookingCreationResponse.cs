@@ -9,5 +9,6 @@
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
         public DateTime CreatedAt { get; set; }
+        public PaymentInfo PaymentInfo { get; set; } = null!;
     }
 }
