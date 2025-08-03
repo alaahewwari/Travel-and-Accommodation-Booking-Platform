@@ -32,6 +32,7 @@
             public const string Update = Base + "/{id}";
             public const string Delete = Base + "/{id}";
             public const string GetFeaturedDeals = Base + "/featured-deals";
+            public const string Search = Base + "/search";
         }
         public static class Rooms
         {
@@ -51,9 +52,17 @@
         }
         public static class Discounts
         {
-            public const string GetByRoomClass ="api/room-classes/{roomClassId}/discounts";
+            public const string GetByRoomClass = "api/room-classes/{roomClassId}/discounts";
             public const string GetAll = Base;
             public const string Create = "api/room-classes/{roomClassId}/discounts";
+            public const string Delete = Base + "/{id}";
+        }
+        public static class Roles
+        {
+            public const string GetAll = Base;
+            public const string GetById = Base + "/{id}";
+            public const string Create = Base;
+            public const string Update = Base + "/{id}";
             public const string Delete = Base + "/{id}";
         }
     }

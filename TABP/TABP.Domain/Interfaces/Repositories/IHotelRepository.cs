@@ -1,4 +1,5 @@
-﻿using TABP.Domain.Entites;
+﻿using Sieve.Models;
+using TABP.Domain.Entities;
 using TABP.Domain.Models;
 namespace TABP.Domain.Interfaces.Repositories
 {
@@ -10,5 +11,6 @@ namespace TABP.Domain.Interfaces.Repositories
         Task<Hotel?> UpdateHotelAsync(Hotel hotel, CancellationToken cancellationToken);
         Task<bool> DeleteHotelAsync(long hotelId, CancellationToken cancellationToken);
         Task<bool> GetHotelByLocationAsync(double latitude, double longitude, CancellationToken cancellationToken);
+        Task<PagedResult<HotelSearchResultResponse>> SearchAsync(HotelSearchParameters parameters,SieveModel sieveModel, CancellationToken cancellationToken);
     }
 }

@@ -2,7 +2,7 @@
 using TABP.API.Contracts.Discounts;
 using TABP.Application.Discounts.Commands.Create;
 using TABP.Application.Discounts.Common;
-using TABP.Domain.Entites;
+using TABP.Domain.Entities;
 namespace TABP.API.Mapping
 {
     [Mapper]

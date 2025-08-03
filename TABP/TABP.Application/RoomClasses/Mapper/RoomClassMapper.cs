@@ -4,7 +4,7 @@ using TABP.Application.Hotels.Common;
 using TABP.Application.RoomClasses.Commands.Create;
 using TABP.Application.RoomClasses.Commands.Update;
 using TABP.Application.RoomClasses.Common;
-using TABP.Domain.Entites;
+using TABP.Domain.Entities;
 using TABP.Domain.Models;
 namespace TABP.Application.RoomClasses.Mapper
 {

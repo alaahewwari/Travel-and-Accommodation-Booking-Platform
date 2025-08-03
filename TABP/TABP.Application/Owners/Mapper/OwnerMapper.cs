@@ -2,7 +2,7 @@
 using TABP.Application.Owners.Commands.Create;
 using TABP.Application.Owners.Commands.Update;
 using TABP.Application.Owners.Common;
-using TABP.Domain.Entites;
+using TABP.Domain.Entities;
 namespace TABP.Application.Owners.Mapper
 {
     [Mapper]

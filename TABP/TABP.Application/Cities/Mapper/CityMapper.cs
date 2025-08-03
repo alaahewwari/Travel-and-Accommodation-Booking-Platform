@@ -2,7 +2,7 @@
 using TABP.Application.Cities.Commands.Create;
 using TABP.Application.Cities.Commands.Update;
 using TABP.Application.Cities.Common;
-using TABP.Domain.Entites;
+using TABP.Domain.Entities;
 using TABP.Domain.Models;
 namespace TABP.Application.Cities.Mapper
 {

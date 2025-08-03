@@ -3,7 +3,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using TABP.Domain.Entites;
+using TABP.Domain.Entities;
+using TABP.Domain.Exceptions;
 using TABP.Domain.Interfaces.Services;
 using TABP.Infrastructure.Common;
 namespace TABP.Infrastructure.Services
@@ -12,6 +13,12 @@ namespace TABP.Infrastructure.Services
     {
         public string GenerateToken(User user)
         {
+            if (string.IsNullOrWhiteSpace(jwtSettings.Value.Key))
+                throw new JwtConfigurationException(JwtConfigurationException.MissingSigningKey);
+            if (string.IsNullOrWhiteSpace(user.Username) || string.IsNullOrWhiteSpace(user.Email))
+                throw new InvalidUserClaimException(InvalidUserClaimException.MissingUserFields);
+            if (!double.TryParse(jwtSettings.Value.ExpiresInMinutes.ToString(), out var minutes))
+                throw new JwtConfigurationException(JwtConfigurationException.InvalidExpiration);
             var authClaims = GetClaims(user);
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Value.Key));
             var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
