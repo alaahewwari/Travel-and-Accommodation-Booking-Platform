@@ -1,11 +1,19 @@
-﻿using TABP.Domain.Interfaces.Services;
+﻿using Microsoft.Extensions.Options;
+using TABP.Domain.Interfaces.Services;
+using TABP.Infrastructure.Configurations;
 namespace TABP.Infrastructure.Services
 {
     public class PdfService : IPdfService
     {
+        private readonly IOptionsMonitor<IronPdfConfiguration> _configs;
+        public PdfService(IOptionsMonitor<IronPdfConfiguration> optionsMonitor)
+        {
+            _configs = optionsMonitor;
+        }
         public async Task<byte[]> GenerateBookingInvoicePdf(string Html)
         {
-            IronPdf.License.LicenseKey = "IRONSUITE.ALAAHEWWARI.OUTLOOK.COM.3717-A28D764DF3-AV4OSEYZTPMS6GTB-UGW6PZ3AQHQ5-C2DVGSLFRZNT-2BGWNBOVUJE4-DU6FSL22JNFE-UGYFF2MJHBQ5-FV44MK-TYIEFYT6ODSQEA-DEPLOYMENT.TRIAL-DTXVLI.TRIAL.EXPIRES.24.AUG.2025";
+            var licenseKey = _configs.CurrentValue.LicenseKey;
+            IronPdf.License.LicenseKey = licenseKey;
             var renderer = new ChromePdfRenderer();
             var pdf = await renderer.RenderHtmlAsPdfAsync(Html);
             pdf.SaveAs("html_saved.pdf");

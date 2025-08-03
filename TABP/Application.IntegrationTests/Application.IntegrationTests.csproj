@@ -6,7 +6,9 @@
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>  
 	  <IsTestProject>true</IsTestProject>
-
+	  <CollectCoverage>true</CollectCoverage>
+	  <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+	  <CoverletOutput>$(OutputPath)coverage.xml</CoverletOutput>
   </PropertyGroup>
 
   <ItemGroup>

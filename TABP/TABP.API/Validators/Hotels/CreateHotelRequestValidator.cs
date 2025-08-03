@@ -2,8 +2,15 @@
 using TABP.API.Contracts.Hotels;
 namespace TABP.API.Validators.Hotels
 {
+    /// <summary>
+    /// Validator for hotel creation requests to ensure valid hotel information and location data.
+    /// Validates hotel details, address information, geographic coordinates, and entity references.
+    /// </summary>
     public class CreateHotelRequestValidator : AbstractValidator<CreateHotelRequest>
     {
+        /// <summary>
+        /// Initializes validation rules for hotel creation including name, address, coordinate, and reference validation.
+        /// </summary>
         public CreateHotelRequestValidator()
         {
             RuleFor(x => x.Name)

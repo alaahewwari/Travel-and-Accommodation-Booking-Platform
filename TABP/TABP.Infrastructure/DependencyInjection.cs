@@ -17,16 +17,31 @@ namespace TABP.Infrastructure
     {
         public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
+            AddSieveServices(services);
+            AddEmailServices(services, configuration);
+            AddJwtAuthentication(services, configuration);
+            AddPdfServices(services, configuration);
+            AddCloudinaryServices(services, configuration);
+            services.AddScoped<IPasswordHasher, PasswordHasher>();
+            services.AddScoped<IJwtGenerator, JwtGenerator>();
+            services.AddTransient<IInvoiceTemplateBuilder, InvoiceTemplateBuilder>();
+            return services;
+        }
+        private static void AddSieveServices(IServiceCollection services)
+        {
             services.AddScoped<SieveProcessor>();
             services.AddScoped<SieveProcessor, HotelSieveProcessor>();
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
-            services.Configure<SmtpSettings>(
-            configuration.GetSection("Smtp"));
+        }
+        private static void AddEmailServices(IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<SmtpSettings>(configuration.GetSection(SmtpSettings.SectionName));
             services.AddTransient<IEmailService, SmtpEmailService>();
-            services.AddScoped<IJwtGenerator, JwtGenerator>();
             services.AddTransient<IEmailMessageBuilder, EmailMessageBuilder>();
-            services.AddTransient<IPdfService,PdfService>();
-            services.AddTransient<IInvoiceTemplateBuilder, InvoiceTemplateBuilder>();
+        }
+        private static void AddJwtAuthentication(IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtConfig = configuration.GetSection("Jwt").Get<JwtConfigurations>();
+            var key = Encoding.UTF8.GetBytes(jwtConfig!.Key);
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -35,8 +50,6 @@ namespace TABP.Infrastructure
             })
             .AddJwtBearer(options =>
             {
-                var jwtConfig = configuration.GetSection("Jwt").Get<JwtConfigurations>();
-                var key = Encoding.UTF8.GetBytes(jwtConfig!.Key);
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -45,24 +58,26 @@ namespace TABP.Infrastructure
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtConfig.Issuer,
                     ValidAudience = jwtConfig.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
             });
             services.AddAuthorization();
+        }
+        private static void AddPdfServices(IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<IronPdfConfiguration>(configuration.GetSection(IronPdfConfiguration.SectionName));
+            services.AddScoped<IPdfService, PdfService>();
+        }
+        private static void AddCloudinaryServices(IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<CloudinarySettings>(configuration.GetSection(CloudinarySettings.SectionName));
             services.AddScoped<ICloudinaryService, CloudinaryService>();
-            services.Configure<CloudinarySettings>(
-            configuration.GetSection(CloudinarySettings.SectionName));
-            services.AddSingleton<Cloudinary>(provider =>
+            services.AddSingleton(provider =>
             {
-                var cloudinarySettings = provider.GetRequiredService<IOptions<CloudinarySettings>>().Value;
-                var account = new Account(
-                    cloudinarySettings.CloudName,
-                    cloudinarySettings.ApiKey,
-                    cloudinarySettings.ApiSecret
-                );
+                var settings = provider.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+                var account = new Account(settings.CloudName, settings.ApiKey, settings.ApiSecret);
                 return new Cloudinary(account);
             });
-            return services;
         }
     }
 }

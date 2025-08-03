@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using TABP.API.Common;
 using TABP.API.Contracts.Rules;
-using TABP.API.Mapping;
+using TABP.API.Mappers;
 using TABP.Application.Roles.Common;
 using TABP.Application.Rules.Commands.Delete;
 using TABP.Application.Rules.Queries.GetAll;

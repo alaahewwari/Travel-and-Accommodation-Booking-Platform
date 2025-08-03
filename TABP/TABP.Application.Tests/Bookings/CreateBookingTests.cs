@@ -4,6 +4,8 @@ using Moq;
 using System.Net.Mail;
 using TABP.Application.Bookings.Commands.Create;
 using TABP.Application.Bookings.Common;
+using TABP.Application.Hotels.Common;
+using TABP.Application.Rooms.Common;
 using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
@@ -50,11 +52,40 @@ namespace TABP.Application.Tests.Bookings
             _fixture.Behaviors.Add(new OmitOnRecursionBehavior());
         }
         [Fact]
+        public async Task Handle_HotelNotFound_ShouldReturnFailure()
+        {
+            var command = _fixture.Create<CreateBookingCommand>();
+            _userRepoMock.Setup(r => r.GetUserByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_fixture.Create<User>());
+            _hotelRepoMock.Setup(r => r.GetHotelByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Hotel?)null);
+            var result = await _handler.Handle(command, default);
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(HotelErrors.HotelNotFound.Code);
+        }
+        [Fact]
+        public async Task Handle_SomeRoomsNotFound_ShouldReturnFailure()
+        {
+            var requestedRoomIds = new List<long> { 1, 2, 3 };
+            var foundRooms = _fixture.CreateMany<Room>(2).ToList();
+            var command = _fixture.Build<CreateBookingCommand>()
+                .With(c => c.RoomIds, requestedRoomIds)
+                .Create();
+            _userRepoMock.Setup(r => r.GetUserByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_fixture.Create<User>());
+            _hotelRepoMock.Setup(r => r.GetHotelByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_fixture.Create<Hotel>());
+            _roomRepoMock.Setup(r => r.GetRoomsByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(foundRooms);
+            var result = await _handler.Handle(command, default);
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(RoomErrors.RoomNotFound.Code);
+        }
+        [Fact]
         public async Task Handle_ValidRequest_ShouldReturnSuccess()
         {
             var rooms = _fixture.CreateMany<Room>(2).ToList();
             var roomIds = rooms.Select(r => r.Id).ToList();
-            // Arrange
             var command = _fixture.Build<CreateBookingCommand>()
                 .With(c => c.CheckInDate, DateTime.Today)
                 .With(c => c.CheckOutDate, DateTime.Today.AddDays(2))
@@ -84,9 +115,7 @@ namespace TABP.Application.Tests.Bookings
                 .ReturnsAsync(new byte[10]);
             _messageBuilderMock.Setup(x => x.BuildBookingConfirmation(It.IsAny<Attachment>(), It.IsAny<User>()))
                 .Returns(new EmailMessage());
-            // Act
             var result = await _handler.Handle(command, default);
-            // Assert
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().NotBeNull();
         }
@@ -105,7 +134,6 @@ namespace TABP.Application.Tests.Bookings
         {
             var rooms = _fixture.CreateMany<Room>(2).ToList();
             var roomIds = rooms.Select(r => r.Id).ToList();
-            // Arrange
             var command = _fixture.Build<CreateBookingCommand>()
                 .With(c => c.CheckInDate, DateTime.Today.AddDays(2))
                 .With(c => c.CheckOutDate, DateTime.Today)
@@ -126,7 +154,6 @@ namespace TABP.Application.Tests.Bookings
         {
             var rooms = _fixture.CreateMany<Room>(2).ToList();
             var roomIds = rooms.Select(r => r.Id).ToList();
-            // Arrange
             var command = _fixture.Build<CreateBookingCommand>()
                 .With(c => c.CheckInDate, DateTime.Today)
                 .With(c => c.CheckOutDate, DateTime.Today.AddDays(2))
@@ -145,6 +172,117 @@ namespace TABP.Application.Tests.Bookings
             var result = await _handler.Handle(command, default);
             result.IsFailure.Should().BeTrue();
             result.Error.Code.Should().Be("Booking.Overlap");
+        }
+        [Fact]
+        public async Task Handle_WhenCreateAsyncThrows_ShouldReturnBookingCreationFailed()
+        {
+            var command = _fixture.Build<CreateBookingCommand>()
+                .With(c => c.CheckInDate, DateTime.Today)
+                .With(c => c.CheckOutDate, DateTime.Today.AddDays(2))
+                .With(c => c.RoomIds, new List<long> { 1, 2 })
+                .Create();
+            var user = _fixture.Create<User>();
+            var hotel = _fixture.Create<Hotel>();
+            var rooms = _fixture.CreateMany<Room>(2).ToList();
+            _userRepoMock.Setup(x => x.GetUserByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(user);
+            _hotelRepoMock.Setup(x => x.GetHotelByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(hotel);
+            _roomRepoMock.Setup(x => x.GetRoomsByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(rooms);
+            _bookingRepoMock.Setup(x => x.CheckBookingOverlapAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+            _pricingServiceMock.Setup(x => x.CalculateTotalPrice(It.IsAny<IEnumerable<Room>>(), It.IsAny<int>()))
+                .Returns(200m);
+            _bookingRepoMock.Setup(x => x.CreateAsync(It.IsAny<Booking>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new Exception("Unexpected DB failure"));
+            _unitOfWorkMock.Setup(x => x.ExecuteResilientTransactionAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+                .Returns<Func<CancellationToken, Task>, CancellationToken>((func, ct) => func(ct));
+            var result = await _handler.Handle(command, default);
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(BookingErrors.BookingCreationFailed.Code);
+        }
+        [Fact]
+        public async Task Handle_InvoiceHtmlGenerationFails_ShouldReturnFailure()
+        {
+            var rooms = _fixture.CreateMany<Room>(2).ToList();
+            var command = SetupValidCommand(rooms);
+            SetupValidMocks(rooms);
+            _invoiceTemplateMock.Setup(x => x.BuildHtmlAsync(It.IsAny<Booking>(), It.IsAny<Hotel>(), It.IsAny<User>()))
+                .ThrowsAsync(new Exception("HTML generation failed"));
+            var result = await _handler.Handle(command, default);
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(BookingErrors.BookingCreationFailed.Code);
+        }
+        [Fact]
+        public async Task Handle_PdfGenerationFails_ShouldReturnFailure()
+        {
+            var rooms = _fixture.CreateMany<Room>(2).ToList();
+            var command = SetupValidCommand(rooms);
+            SetupValidMocks(rooms);
+            _invoiceTemplateMock.Setup(x => x.BuildHtmlAsync(It.IsAny<Booking>(), It.IsAny<Hotel>(), It.IsAny<User>()))
+                .ReturnsAsync("<html>invoice</html>");
+            _pdfServiceMock.Setup(x => x.GenerateBookingInvoicePdf(It.IsAny<string>()))
+                .ThrowsAsync(new Exception("PDF generation failed"));
+            var result = await _handler.Handle(command, default);
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(BookingErrors.BookingCreationFailed.Code);
+        }
+        [Fact]
+        public async Task Handle_EmailSendingFails_ShouldReturnFailure()
+        {
+            var rooms = _fixture.CreateMany<Room>(2).ToList();
+            var command = SetupValidCommand(rooms);
+            SetupValidMocks(rooms);
+            _emailServiceMock.Setup(x => x.SendEmailAsync(It.IsAny<EmailMessage>()))
+                .ThrowsAsync(new Exception("Email sending failed"));
+            var result = await _handler.Handle(command, default);
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(BookingErrors.BookingCreationFailed.Code);
+        }
+        [Fact]
+        public async Task Handle_UnexpectedError_ShouldReturnUnexpectedError()
+        {
+            var command = _fixture.Create<CreateBookingCommand>();
+            _userRepoMock.Setup(r => r.GetUserByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new InvalidOperationException("Unexpected error"));
+            var result = await _handler.Handle(command, default);
+            result.IsFailure.Should().BeTrue();
+            result.Error.Code.Should().Be(BookingErrors.UnexpectedError.Code);
+        }
+        private CreateBookingCommand SetupValidCommand(List<Room> rooms)
+        {
+            return _fixture.Build<CreateBookingCommand>()
+                .With(c => c.CheckInDate, DateTime.Today)
+                .With(c => c.CheckOutDate, DateTime.Today.AddDays(2))
+                .With(c => c.RoomIds, rooms.Select(r => r.Id).ToList())
+                .Create();
+        }
+        private void SetupValidMocks(List<Room> rooms)
+        {
+            var user = _fixture.Create<User>();
+            var hotel = _fixture.Create<Hotel>();
+            var booking = _fixture.Build<Booking>().With(b => b.Invoice, new Invoice()).Create();
+            _userRepoMock.Setup(r => r.GetUserByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(user);
+            _hotelRepoMock.Setup(r => r.GetHotelByIdAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(hotel);
+            _roomRepoMock.Setup(r => r.GetRoomsByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<long>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(rooms);
+            _bookingRepoMock.Setup(r => r.CheckBookingOverlapAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(false);
+            _pricingServiceMock.Setup(p => p.CalculateTotalPrice(It.IsAny<IEnumerable<Room>>(), It.IsAny<int>()))
+                .Returns(200m);
+            _bookingRepoMock.Setup(r => r.CreateAsync(It.IsAny<Booking>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(booking);
+            _unitOfWorkMock.Setup(u => u.ExecuteResilientTransactionAsync(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+                .Returns<Func<CancellationToken, Task>, CancellationToken>((func, ct) => func(ct));
+            _invoiceTemplateMock.Setup(x => x.BuildHtmlAsync(It.IsAny<Booking>(), It.IsAny<Hotel>(), It.IsAny<User>()))
+                .ReturnsAsync("<html>invoice</html>");
+            _pdfServiceMock.Setup(x => x.GenerateBookingInvoicePdf(It.IsAny<string>()))
+                .ReturnsAsync(new byte[10]);
+            _messageBuilderMock.Setup(x => x.BuildBookingConfirmation(It.IsAny<Attachment>(), It.IsAny<User>()))
+                .Returns(new EmailMessage());
         }
     }
 }

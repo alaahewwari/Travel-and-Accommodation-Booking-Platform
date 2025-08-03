@@ -6,20 +6,44 @@ using TABP.Domain.Models.Hotel;
 using TABP.Persistence.Context;
 namespace TABP.Persistence.Repositories
 {
+    /// <summary>
+    /// Entity Framework implementation of the room class repository for room class data access operations.
+    /// Provides concrete implementation of room class CRUD operations, discount management, and amenity assignments using Entity Framework Core.
+    /// </summary>
+    /// <param name="context">The Entity Framework database context for room class operations.</param>
     public class RoomClassRepository(ApplicationDbContext context) : IRoomClassRepository
     {
+        /// <inheritdoc />
+        public async Task<Discount?> GetDiscountByRoomClassAsync(long roomClassId, CancellationToken cancellationToken)
+        {
+            return await context.RoomClasses
+                    .AsNoTracking()
+                    .Where(rc => rc.Id == roomClassId && rc.Discount != null && rc.Discount.EndDate > DateTime.UtcNow)
+                    .Select(rc => rc.Discount)
+                    .FirstOrDefaultAsync(cancellationToken);
+        }
+        /// <inheritdoc />
+        public Task AssignAmenityToRoomClassAsync(Amenity amenity, RoomClass roomClass, CancellationToken cancellationToken)
+        {
+            amenity.RoomClasses.Add(roomClass);
+            context.Amenities.Update(amenity);
+            return context.SaveChangesAsync(cancellationToken);
+        }
+        /// <inheritdoc />
         public async Task<RoomClass> CreateRoomClassAsync(RoomClass roomClass, CancellationToken cancellationToken)
         {
             var created = await context.RoomClasses.AddAsync(roomClass, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
             return created.Entity;
         }
+        /// <inheritdoc />
         public async Task<RoomClass?> GetRoomClassByIdAsync(long id, CancellationToken cancellationToken)
         {
             return await context.RoomClasses
                 .AsNoTracking()
                 .FirstOrDefaultAsync(rc => rc.Id == id, cancellationToken);
         }
+        /// <inheritdoc />
         public async Task<RoomClass?> UpdateRoomClassAsync(RoomClass roomClass, CancellationToken cancellationToken)
         {
             var updated = await context.RoomClasses
@@ -33,12 +57,13 @@ namespace TABP.Persistence.Repositories
             if (updated == 0) return null;
             return await GetRoomClassByIdAsync(roomClass.Id, cancellationToken);
         }
-        public async Task DeleteRoomClassAsync(long id, CancellationToken cancellationToken)
+        /// <inheritdoc />
+        public async Task DeleteRoomClassAsync(RoomClass roomClass, CancellationToken cancellationToken)
         {
-            var roomClass = await GetRoomClassByIdAsync(id, cancellationToken);
             context.RoomClasses.Remove(roomClass);
             await context.SaveChangesAsync(cancellationToken);
         }
+        /// <inheritdoc />
         public async Task<IEnumerable<RoomClass>> GetAllRoomClassesAsync(CancellationToken cancellationToken)
         {
             var roomClasses = await context.RoomClasses
@@ -46,6 +71,7 @@ namespace TABP.Persistence.Repositories
                 .ToListAsync(cancellationToken);
             return roomClasses;
         }
+        /// <inheritdoc />
         public async Task<IEnumerable<FeaturedealsHotels>> GetFeaturedDealsInHotelsAsync(int count, CancellationToken cancellationToken)
         {
             var hotels = await context.RoomClasses

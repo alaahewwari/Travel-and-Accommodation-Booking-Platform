@@ -99,7 +99,7 @@ namespace TABP.Application.Bookings.Commands.Create
         }
         private static void ValidateBookingDates(DateTime checkInDate, DateTime checkOutDate)
         {
-            if (checkInDate >= checkOutDate)
+            if (checkInDate >= checkOutDate || checkInDate < DateTime.UtcNow)
             {
                 throw new InvalidBookingDatesException(checkInDate, checkOutDate);
             }

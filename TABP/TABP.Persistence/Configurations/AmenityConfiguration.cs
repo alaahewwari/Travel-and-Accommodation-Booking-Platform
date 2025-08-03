@@ -11,7 +11,7 @@ namespace TABP.Persistence.Configurations
             builder.ToTable(TableNames.Amenities);
             builder.HasKey(a => a.Id);
             builder.Property(a => a.Name).IsRequired().HasMaxLength(100);
-            builder.Property(a => a.Description).IsRequired();
+            builder.Property(a => a.Description).IsRequired().HasMaxLength(500);
             builder.HasMany(a => a.RoomClasses)
                    .WithMany(rc => rc.Amenities)
                    .UsingEntity(j => j.ToTable(TableNames.RoomClassAmenities));

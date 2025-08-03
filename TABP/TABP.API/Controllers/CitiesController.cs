@@ -5,7 +5,7 @@ using System.Diagnostics;
 using TABP.API.Common;
 using TABP.API.Contracts.Cities;
 using TABP.API.Contracts.Images;
-using TABP.API.Mapping;
+using TABP.API.Mappers;
 using TABP.Application.Cities.Commands.Delete;
 using TABP.Application.Cities.Common;
 using TABP.Application.Cities.Queries.GetAll;

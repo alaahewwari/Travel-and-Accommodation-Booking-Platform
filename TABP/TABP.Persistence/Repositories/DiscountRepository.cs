@@ -4,9 +4,15 @@ using TABP.Domain.Interfaces.Repositories;
 using TABP.Persistence.Context;
 namespace TABP.Persistence.Repositories
 {
-    public class DiscountRepository(ApplicationDbContext context) : IDiscountRespository
+    /// <summary>
+    /// Entity Framework implementation of the discount repository for discount data access operations.
+    /// Provides concrete implementation of discount CRUD operations and room class assignment management using Entity Framework Core.
+    /// </summary>
+    /// <param name="context">The Entity Framework database context for discount operations.</param>
+    public class DiscountRepository(ApplicationDbContext context) : IDiscountRepository
     {
-        public async Task<Discount> CreateAndAssignDiscountAsync(Discount discount,RoomClass roomClass, CancellationToken cancellationToken)
+        /// <inheritdoc />
+        public async Task<Discount> CreateAndAssignDiscountAsync(Discount discount, RoomClass roomClass, CancellationToken cancellationToken)
         {
             roomClass.Discount = discount;
             discount.RoomClasses.Add(roomClass);
@@ -14,9 +20,10 @@ namespace TABP.Persistence.Repositories
             await context.SaveChangesAsync(cancellationToken);
             return discount;
         }
+        /// <inheritdoc />
         public async Task<bool> DeleteDiscountAsync(int id, CancellationToken cancellationToken)
         {
-            var discount = await context.Discounts.FindAsync(id);
+            var discount = await context.Discounts.FindAsync([id], cancellationToken);
             if (discount == null)
             {
                 return false;
@@ -25,18 +32,11 @@ namespace TABP.Persistence.Repositories
             await context.SaveChangesAsync(cancellationToken);
             return true;
         }
+        /// <inheritdoc />
         public async Task<Discount?> GetDiscountByIdAsync(int id, CancellationToken cancellationToken)
         {
             var discount = await context.Discounts.AsNoTracking()
-                .FirstOrDefaultAsync(d => d.Id == id);
-            return discount;
-        }
-        public async Task<Discount?> GetDiscountByRoomClassAsync(long roomClassId, CancellationToken cancellationToken)
-        {
-            var discount = await context.Discounts
-                .Where(d => d.RoomClasses.Any(rc => rc.Id == roomClassId) && d.EndDate > DateTime.UtcNow)
-                .AsNoTracking()
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
             return discount;
         }
     }

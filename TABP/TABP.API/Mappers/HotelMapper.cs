@@ -6,10 +6,10 @@ using TABP.Application.Hotels.Commands.Create;
 using TABP.Application.Hotels.Commands.SetThumbnail;
 using TABP.Application.Hotels.Commands.Update;
 using TABP.Application.Hotels.Queries.Search;
-namespace TABP.API.Mapping
+namespace TABP.API.Mappers
 {
     [Mapper]
-    public static partial class HotelMapping
+    public static partial class HotelMapper
     {
         public static partial CreateHotelCommand ToCommand(this CreateHotelRequest request);
         public static partial UpdateHotelCommand ToCommand(this UpdateHotelRequest request, long id);

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TABP.API.Common;
 using TABP.API.Contracts.Owners;
-using TABP.API.Mapping;
+using TABP.API.Mappers;
 using TABP.Application.Owners.Commands.Delete;
 using TABP.Application.Owners.Common;
 using TABP.Application.Owners.Queries.GetById;

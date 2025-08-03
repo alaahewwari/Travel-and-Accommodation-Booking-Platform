@@ -2,8 +2,15 @@
 using TABP.API.Contracts.Hotels;
 namespace TABP.API.Validators.Hotels
 {
+    /// <summary>
+    /// Validator for hotel update requests to ensure valid hotel information modifications.
+    /// Validates updated hotel details, address changes, coordinate updates, and entity references.
+    /// </summary>
     public class UpdateHotelRequestValidator : AbstractValidator<UpdateHotelRequest>
     {
+        /// <summary>
+        /// Initializes validation rules for hotel updates including name, address, coordinate, and reference validation.
+        /// </summary>
         public UpdateHotelRequestValidator()
         {
             RuleFor(x => x.Name)

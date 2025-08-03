@@ -1,13 +1,7 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TABP.Application.Common;
 using TABP.Application.RoomClassClasses.Common;
 using TABP.Domain.Interfaces.Repositories;
-
 namespace TABP.Application.RoomClasses.Commands.Delete
 {
     public sealed class DeleteRoomClassCommandHandler(IRoomClassRepository repository)
@@ -20,7 +14,7 @@ namespace TABP.Application.RoomClasses.Commands.Delete
             {
                 return Result.Failure(RoomClassErrors.RoomClassNotFound);
             }
-            await repository.DeleteRoomClassAsync(roomClass.Id, cancellationToken);
+            await repository.DeleteRoomClassAsync(roomClass, cancellationToken);
             return Result.Success();
         }
     }

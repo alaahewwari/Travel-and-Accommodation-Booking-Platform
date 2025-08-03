@@ -7,22 +7,32 @@ using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Models;
 using TABP.Domain.Models.Hotel;
 using TABP.Persistence.Context;
+
 namespace TABP.Persistence.Repositories
 {
+    /// <summary>
+    /// Entity Framework implementation of the hotel repository for hotel data access operations.
+    /// Provides concrete implementation of hotel CRUD operations, advanced search with Sieve processing, and location-based queries using Entity Framework Core.
+    /// </summary>
+    /// <param name="context">The Entity Framework database context for hotel operations.</param>
+    /// <param name="sieveProcessor">The Sieve processor for dynamic filtering, sorting, and pagination operations.</param>
     public class HotelRepository(ApplicationDbContext context, SieveProcessor sieveProcessor) : IHotelRepository
     {
+        /// <inheritdoc />
         public async Task<Hotel> CreateHotelAsync(Hotel hotel, CancellationToken cancellationToken)
         {
             var createdHotel = await context.Hotels.AddAsync(hotel, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
             return createdHotel.Entity;
         }
+        /// <inheritdoc />
         public async Task<Hotel?> GetHotelByIdAsync(long id, CancellationToken cancellationToken)
         {
             return await context.Hotels
                 .AsNoTracking()
                 .FirstOrDefaultAsync(h => h.Id == id, cancellationToken);
         }
+        /// <inheritdoc />
         public async Task<IEnumerable<HotelForManagement>> GetAllHotelsAsync(CancellationToken cancellationToken)
         {
             var hotels = await context.Hotels
@@ -38,6 +48,7 @@ namespace TABP.Persistence.Repositories
                 )).ToListAsync(cancellationToken);
             return hotels;
         }
+        /// <inheritdoc />
         public async Task<Hotel?> UpdateHotelAsync(Hotel hotel, CancellationToken cancellationToken)
         {
             var updatedCount = await context.Hotels
@@ -56,6 +67,7 @@ namespace TABP.Persistence.Repositories
                 return null;
             return await GetHotelByIdAsync(hotel.Id, cancellationToken);
         }
+        /// <inheritdoc />
         public async Task<bool> DeleteHotelAsync(long id, CancellationToken cancellationToken)
         {
             var hotel = await GetHotelByIdAsync(id, cancellationToken);
@@ -65,11 +77,13 @@ namespace TABP.Persistence.Repositories
             await context.SaveChangesAsync(cancellationToken);
             return true;
         }
+        /// <inheritdoc />
         public async Task<bool> GetHotelByLocationAsync(double latitude, double longitude, CancellationToken cancellationToken)
         {
             return await context.Hotels
                 .AnyAsync(h => h.LocationLatitude == latitude && h.LocationLongitude == longitude, cancellationToken);
         }
+        /// <inheritdoc />
         public async Task<PagedResult<HotelSearchResultResponse>> SearchAsync(HotelSearchParameters parameters, SieveModel sieveModel, CancellationToken cancellationToken)
         {
             var query = context.Hotels.AsQueryable();
@@ -114,6 +128,7 @@ namespace TABP.Persistence.Repositories
                 PaginationMetadata = metadata
             };
         }
+        /// <inheritdoc />
         public async Task<IEnumerable<Hotel>> GetRecentlyVisitedHotelsAsync(long userId, int count, CancellationToken cancellationToken)
         {
             return await context.Bookings

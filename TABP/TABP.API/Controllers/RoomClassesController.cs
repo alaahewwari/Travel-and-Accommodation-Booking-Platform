@@ -1,14 +1,17 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
+using TABP.API.Contracts.Amenities;
 using TABP.API.Contracts.Images;
 using TABP.API.Contracts.RoomClasses;
-using TABP.API.Mapping;
+using TABP.API.Mappers;
+using TABP.Application.Discounts.Common;
+using TABP.Application.RoomClasses.Commands.AddAmenityToRoomClass;
 using TABP.Application.RoomClasses.Commands.Delete;
 using TABP.Application.RoomClasses.Common;
 using TABP.Application.RoomClasses.Queries.GetAll;
 using TABP.Application.RoomClasses.Queries.GetById;
+using TABP.Application.RoomClasses.Queries.GetByRoomClass;
 namespace TABP.API.Controllers
 {
     /// <summary>
@@ -171,6 +174,51 @@ namespace TABP.API.Controllers
             }
 
             return Created();
+        }
+        /// <summary>
+        /// Assigns an amenity to a room class.
+        /// </summary>
+        /// <param name="id">The amenity ID.</param>
+        /// <param name="request">The assignment request containing room class ID.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>No content on success.</returns>
+        /// <response code="204">Assignment successful.</response>
+        /// <response code="404">Amenity or room class not found.</response>
+        [HttpPost(ApiRoutes.RoomClasses.AddAmenity)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> AddAmenity(
+            long id,
+            [FromBody] AssignAmenityToRoomClassRequest request,
+            CancellationToken cancellationToken)
+        {
+            var command = new AddAmenityToRoomClassCommand(id, request.AmenityId);
+            var result = await mediator.Send(command, cancellationToken);
+            if (result.IsFailure)
+                return NotFound(result.Error);
+            return NoContent();
+        }
+        /// <summary>
+        /// Retrieves all active discounts for a specific room class.
+        /// </summary>
+        /// <param name="id">The ID of the room class to fetch discounts for.</param>
+        /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
+        /// <returns>A list of room class discounts associated with the room class.</returns>
+        [HttpGet(ApiRoutes.RoomClasses.GetDiscount)]
+        [ProducesResponseType(typeof(DiscountResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<DiscountResponse>> GetDiscount(
+            [FromRoute] long id,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetDiscountByRoomClassQuery(id);
+            var result = await mediator.Send(query, cancellationToken);
+            if (result.IsFailure)
+                return NotFound(result.Error);
+            return Ok(result.Value);
         }
     }
 }

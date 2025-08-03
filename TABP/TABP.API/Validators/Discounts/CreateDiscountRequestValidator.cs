@@ -2,8 +2,15 @@
 using TABP.API.Contracts.Discounts;
 namespace TABP.API.Validators.Discounts
 {
-    public class CreateDiscountRequestValidator:  AbstractValidator<CreateDiscountRequest>
+    /// <summary>
+    /// Validator for discount creation requests to ensure valid discount parameters and date ranges.
+    /// Validates percentage values, date logic, and future date requirements.
+    /// </summary>
+    public class CreateDiscountRequestValidator : AbstractValidator<CreateDiscountRequest>
     {
+        /// <summary>
+        /// Initializes validation rules for discount creation including percentage limits and date range validation.
+        /// </summary>
         public CreateDiscountRequestValidator()
         {
             RuleFor(x => x.Percentage)

@@ -7,7 +7,7 @@ using TABP.Domain.Interfaces.Repositories;
 namespace TABP.Application.Discounts.Commands.Create
 {
     public class CreateDiscountCommandHandler(
-        IDiscountRespository discountRespository,
+        IDiscountRepository discountRespository,
         IRoomClassRepository roomClassRepository
         ) : IRequestHandler<CreateDiscountCommand, Result<DiscountResponse>>
     {

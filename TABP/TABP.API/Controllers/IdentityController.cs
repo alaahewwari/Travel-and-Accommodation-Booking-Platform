@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TABP.API.Common;
 using TABP.API.Contracts.Users;
-using TABP.API.Mapping;
+using TABP.API.Mappers;
 using TABP.Application.Users.Common;
 namespace TABP.API.Controllers
 {
@@ -32,26 +32,6 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error);
             }
             return Ok(result.Value);
-        }
-        /// <summary>
-        /// Registers a new user account.
-        /// </summary>
-        /// <param name="request">The registration details including username, email, and password.</param>
-        /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
-        /// <returns>Created response</returns>
-        [HttpPost(ApiRoutes.Identity.Register)]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Register([FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
-        {
-            var command = request.ToCommand();
-            var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return Created();
         }
     }
 }

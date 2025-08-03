@@ -4,23 +4,31 @@ using TABP.Domain.Interfaces.Repositories;
 using TABP.Persistence.Context;
 namespace TABP.Persistence.Repositories
 {
+    /// <summary>
+    /// Entity Framework implementation of the role repository for role data access operations.
+    /// Provides concrete implementation of role CRUD operations and role-based queries using Entity Framework Core.
+    /// </summary>
+    /// <param name="context">The Entity Framework database context for role operations.</param>
     public class RoleRepository(ApplicationDbContext context) : IRoleRepository
     {
-        public async Task<IEnumerable<Role>> GetAllRolesAsync(CancellationToken token)
+        /// <inheritdoc />
+        public async Task<IEnumerable<Role>> GetAllRolesAsync(CancellationToken cancellationToken)
         {
             return await context.Roles
                 .AsNoTracking()
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
+        /// <inheritdoc />
         public async Task<Role> CreateRoleAsync(Role role, CancellationToken cancellationToken)
         {
-            await context.Roles.AddAsync(role);
+            await context.Roles.AddAsync(role, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
             return role;
         }
+        /// <inheritdoc />
         public async Task<bool> DeleteRoleAsync(long id, CancellationToken cancellationToken)
         {
-            var role = await context.Roles.FindAsync(id);
+            var role = await context.Roles.FindAsync([id], cancellationToken);
             if (role != null)
             {
                 context.Roles.Remove(role);
@@ -28,15 +36,17 @@ namespace TABP.Persistence.Repositories
             }
             return role is not null;
         }
+        /// <inheritdoc />
         public async Task<Role?> GetRoleByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await context.Roles
                 .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
         }
+        /// <inheritdoc />
         public async Task<Role?> UpdateRoleAsync(Role role, CancellationToken cancellationToken)
         {
-            var existing = GetRoleByIdAsync(role.Id, cancellationToken);
+            var existing = await GetRoleByIdAsync(role.Id, cancellationToken);
             if (existing is null)
             {
                 return null;
@@ -49,6 +59,7 @@ namespace TABP.Persistence.Repositories
                 return null;
             return await GetRoleByIdAsync(role.Id, cancellationToken);
         }
+        /// <inheritdoc />
         public async Task<Role?> GetRoleByNameAsync(string name, CancellationToken cancellationToken)
         {
             return await context.Roles

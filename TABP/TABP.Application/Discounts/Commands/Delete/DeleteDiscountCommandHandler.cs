@@ -4,7 +4,7 @@ using TABP.Application.Discounts.Common;
 using TABP.Domain.Interfaces.Repositories;
 namespace TABP.Application.Discounts.Commands.Delete
 {
-    public class DeleteDiscountCommandHandler(IDiscountRespository discountRespository) : IRequestHandler<DeleteDiscountCommand, Result>
+    public class DeleteDiscountCommandHandler(IDiscountRepository discountRespository) : IRequestHandler<DeleteDiscountCommand, Result>
     {
         public async Task<Result> Handle(DeleteDiscountCommand request, CancellationToken cancellationToken)
         {
