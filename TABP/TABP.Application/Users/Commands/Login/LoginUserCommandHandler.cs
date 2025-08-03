@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using TABP.Application.Common;
-using TABP.Application.Users.Login.Common;
-using TABP.Application.Users.Login.Errors;
+using TABP.Application.Users.Common;
+using TABP.Application.Users.Common.Errors;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
-namespace TABP.Application.Users.Login.Commands
+namespace TABP.Application.Users.Commands.Login
 {
     public class LoginUserCommandHandler(IUserRepository userRepository, IJwtGenerator jwtGenerator) : IRequestHandler<LoginUserCommand, Result<LoginUserResponse>>
     {
@@ -13,7 +13,7 @@ namespace TABP.Application.Users.Login.Commands
             var user = await userRepository.AuthenticateUserAsync(request.Username, request.Password, cancellationToken);
             if (user is null)
             {
-                return Result<LoginUserResponse>.Failure(LoginUserErrors.InvalidCredentials);
+                return Result<LoginUserResponse>.Failure(UserErrors.InvalidCredentials);
             }
             var token = jwtGenerator.GenerateToken(user);
             var response = new LoginUserResponse(token);

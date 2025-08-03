@@ -26,10 +26,10 @@ namespace TABP.Persistence.Configurations
                    .IsRequired();
             builder.HasMany(c => c.Hotels)
                    .WithOne(h => h.City)
-                   .HasForeignKey(ForeignKeys.CityId);
+                   .HasForeignKey(c=>c.CityId);
             builder.HasMany(c => c.CityImages)
                    .WithOne(i => i.City)
-                   .HasForeignKey(ForeignKeys.CityId);
+                   .HasForeignKey(c => c.CityId);
             builder.HasQueryFilter(c => !c.IsDeleted);
         }
     }

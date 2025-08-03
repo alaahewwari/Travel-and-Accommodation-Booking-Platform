@@ -2,7 +2,7 @@
 using TABP.Application.Cities.Common;
 using TABP.Application.Common;
 using TABP.Application.Hotels.Common;
-using TABP.Application.Hotels.Mapping;
+using TABP.Application.Hotels.Mapper;
 using TABP.Application.Owners.Common;
 using TABP.Domain.Interfaces.Repositories;
 namespace TABP.Application.Hotels.Commands.Create
@@ -10,29 +10,30 @@ namespace TABP.Application.Hotels.Commands.Create
     public class CreateHotelCommandHandler(
         IHotelRepository hotelRepository,
         ICityRepository cityRepository,
-        IOwnerRepository ownerRepository,
-        HotelMapper mapper) : IRequestHandler<CreateHotelCommand, Result<long>>
+        IOwnerRepository ownerRepository
+        ) : IRequestHandler<CreateHotelCommand, Result<HotelResponse>>
     {
-        public async Task<Result<long>> Handle(CreateHotelCommand request, CancellationToken cancellationToken)
+        public async Task<Result<HotelResponse>> Handle(CreateHotelCommand request, CancellationToken cancellationToken)
         {
             var existingCity = await cityRepository.GetCityByIdAsync(request.CityId, cancellationToken);
             if (existingCity is null)
             { 
-                return Result<long>.Failure(CityErrors.CityNotFound);
+                return Result<HotelResponse>.Failure(CityErrors.CityNotFound);
             }
             var existingOwner = await ownerRepository.GetOwnerByIdAsync(request.OwnerId, cancellationToken);
-            if (existingOwner is not null)
+            if (existingOwner is null)
             {
-                return Result<long>.Failure(OwnerErrors.OwnerNotFound);
+                return Result<HotelResponse>.Failure(OwnerErrors.OwnerNotFound);
             }
             var existingHotel = await hotelRepository.GetHotelByLocationAsync(request.LocationLongitude,request.LocationLatitude, cancellationToken);
-            if (!existingHotel)
+            if (existingHotel)
             {
-                return Result<long>.Failure(HotelErrors.HotelAlreadyExists);
+                return Result<HotelResponse>.Failure(HotelErrors.HotelAlreadyExists);
             }
-            var hotelModel = mapper.ToHotelDomain(request);
+            var hotelModel = request.ToHotelDomain();
             var hotel = await hotelRepository.CreateHotelAsync(hotelModel, cancellationToken);
-            return Result<long>.Success(hotel.Id);
+            var response = hotel.ToHotelResponse();
+            return Result<HotelResponse>.Success(response);
         }
     }
 }

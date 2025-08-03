@@ -1,6 +1,6 @@
 ﻿namespace TABP.Domain.Models
 {
-    public record CityWithHotelCount(
+    public record CityForManagement(
         int Id,
         string Name,
         string Country,

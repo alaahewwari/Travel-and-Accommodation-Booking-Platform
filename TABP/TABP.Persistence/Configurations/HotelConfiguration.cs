@@ -30,20 +30,20 @@ namespace TABP.Persistence.Configurations
             builder.Property(h => h.CreatedAt)
                    .IsRequired();
             builder.HasOne(h => h.City)
-                  .WithMany(c => c.Hotels)
-                  .HasForeignKey(ForeignKeys.CityId);
+                  .WithMany()
+                  .HasForeignKey(h => h.CityId);
             builder.HasOne(h => h.Owner)
-                   .WithMany(o => o.Hotels)
-                   .HasForeignKey(ForeignKeys.OwnerId);
+                   .WithMany()
+                   .HasForeignKey(h => h.OwnerId);
             builder.HasMany(h => h.RoomClasses)
                    .WithOne()
-                   .HasForeignKey(ForeignKeys.HotelId);
+                   .HasForeignKey(h => h.HotelId);
             builder.HasMany(h => h.HotelImages)
-                   .WithOne(i => i.Hotel)
-                   .HasForeignKey(ForeignKeys.HotelId);
+                   .WithOne()
+                   .HasForeignKey(h => h.HotelId);
             builder.HasMany(h => h.Reviews)
-                   .WithOne(r => r.Hotel)
-                   .HasForeignKey(ForeignKeys.HotelId);
+                   .WithOne()
+                   .HasForeignKey(h => h.HotelId);
             builder.HasQueryFilter(h => !h.IsDeleted);
         }
     }

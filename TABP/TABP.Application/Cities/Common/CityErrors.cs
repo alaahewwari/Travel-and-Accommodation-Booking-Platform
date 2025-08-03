@@ -1,5 +1,4 @@
 ﻿using TABP.Application.Common;
-
 namespace TABP.Application.Cities.Common
 {
     public static class CityErrors
@@ -15,6 +14,10 @@ namespace TABP.Application.Cities.Common
         public static readonly Error InvalidCityData = new(
             Code: "City.InvalidData",
             Description: "The provided city data is invalid."
+        );
+        public static readonly Error NotModified = new(
+            Code: "City.NotModified",
+            Description: "The City was not modified."
         );
     }
 }

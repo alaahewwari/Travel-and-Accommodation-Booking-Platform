@@ -1,0 +1,31 @@
+﻿using Riok.Mapperly.Abstractions;
+using TABP.Application.Cities.Commands.Create;
+using TABP.Application.Cities.Commands.Update;
+using TABP.Application.Cities.Common;
+using TABP.Domain.Entites;
+using TABP.Domain.Models;
+namespace TABP.Application.Cities.Mapper
+{
+    [Mapper]
+    public static partial class CityMapper
+    {
+        public static partial TrendingCityResponse ToTrendingCityResponse(this City city);
+        public static partial CityForManagementResponse ToCityForManagementResponse(this CityForManagement city);
+        public static partial CityResponse ToCityResponse(this City city);
+        public static City ToCityDomain(this CreateCityCommand command)
+        {
+            var city = ToCityDomainInternal(command);
+            city.CreatedAt = DateTime.UtcNow;
+            city.UpdatedAt = DateTime.UtcNow;
+            return city;
+        }
+        public static City ToCityDomain(this UpdateCityCommand command)
+        {
+            var city = ToCityDomainInternal(command);
+            city.UpdatedAt = DateTime.UtcNow;
+            return city;
+        }
+        private static partial City ToCityDomainInternal(CreateCityCommand command);
+        private static partial City ToCityDomainInternal(UpdateCityCommand command);
+    }
+}

@@ -15,5 +15,9 @@ namespace TABP.Application.Hotels.Common
             Code: "Hotel.InvalidData",
             Description: "The provided Hotel data is invalid."
         );
+        public static readonly Error NotModified = new(
+            Code: "Hotel.NotModified",
+            Description: "The Hotel was not modified."
+        );
     }
 }

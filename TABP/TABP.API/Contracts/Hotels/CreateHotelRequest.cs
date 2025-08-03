@@ -8,7 +8,7 @@
     byte StarRating,
     double LocationLatitude,
     double LocationLongitude,
-    long CityId,
+    int CityId,
     long OwnerId
     );
 }

@@ -11,6 +11,7 @@ namespace TABP.Domain.Entites
         public string PasswordHash { get; set; } = null!;
         public string Salt { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
+        public int RoleId { get; set; }
         public Role Role { get; set; } = null!;
         public ICollection<Review> Reviews { get; set; } = [];
         public ICollection<CartItem> CartItems { get; set; } = [];

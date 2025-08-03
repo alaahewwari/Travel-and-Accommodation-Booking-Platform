@@ -2,7 +2,7 @@
 using TABP.Application.Cities.Common;
 using TABP.Application.Common;
 using TABP.Application.Hotels.Common;
-using TABP.Application.Hotels.Mapping;
+using TABP.Application.Hotels.Mapper;
 using TABP.Application.Owners.Common;
 using TABP.Domain.Interfaces.Repositories;
 namespace TABP.Application.Hotels.Commands.Update
@@ -10,8 +10,7 @@ namespace TABP.Application.Hotels.Commands.Update
     public class UpdateHotelCommandHandler(
         IHotelRepository HotelRepository,
         ICityRepository cityRepository,
-        IOwnerRepository ownerRepository,
-        HotelMapper mapper)
+        IOwnerRepository ownerRepository)
         : IRequestHandler<UpdateHotelCommand, Result<HotelResponse>>
     {
         public async Task<Result<HotelResponse>> Handle(UpdateHotelCommand request, CancellationToken cancellationToken)
@@ -31,9 +30,9 @@ namespace TABP.Application.Hotels.Commands.Update
             {
                 return Result<HotelResponse>.Failure(OwnerErrors.OwnerNotFound);
             }
-            var hotelModel = mapper.ToHotelDomain(request);
+            var hotelModel = request.ToHotelDomain();
             var updatedHotel = await HotelRepository.UpdateHotelAsync(hotelModel, cancellationToken);
-            var hotel = mapper.ToHotelResponse(updatedHotel!);
+            var hotel = updatedHotel.ToHotelResponse();
             return Result<HotelResponse>.Success(hotel);
         }
     }
