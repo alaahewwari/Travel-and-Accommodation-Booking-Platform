@@ -20,8 +20,6 @@ namespace TABP.API.Validators.Bookings
                 .GreaterThanOrEqualTo(DateTime.Today).WithMessage("Check-in date cannot be in the past.");
             RuleFor(x => x.CheckOutDate)
                 .GreaterThan(x => x.CheckInDate).WithMessage("Check-out date must be after check-in date.");
-            RuleFor(x => x.PaymentMethod)
-                .IsInEnum().WithMessage("Invalid payment method.");
             RuleFor(x => x.GuestRemarks)
                 .MaximumLength(1000).WithMessage("Guest remarks must not exceed 1000 characters.");
             RuleFor(x => (x.CheckOutDate - x.CheckInDate).Days)

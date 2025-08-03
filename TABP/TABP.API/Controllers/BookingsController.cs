@@ -1,12 +1,17 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Stripe;
 using TABP.API.Common;
 using TABP.API.Contracts.Bookings;
 using TABP.API.Mappers;
 using TABP.Application.Bookings.Commands.Cancel;
+using TABP.Application.Bookings.Commands.ConfirmPayment;
 using TABP.Application.Bookings.Common;
 using TABP.Application.Bookings.Queries.GetById;
+using TABP.Domain.Enums;
+using TABP.Domain.Interfaces.Services;
+using TABP.Infrastructure.Configurations;
 namespace TABP.API.Controllers
 {
     /// <summary>
@@ -14,7 +19,7 @@ namespace TABP.API.Controllers
     /// </summary>
     [ApiController]
     [Authorize]
-    public class BookingsController(ISender mediator) : ControllerBase
+    public class BookingsController(ISender mediator, IConfiguration configuration) : ControllerBase
     {
         /// <summary>
         /// Creates a new booking.
@@ -23,15 +28,19 @@ namespace TABP.API.Controllers
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The newly created booking.</returns>
         [HttpPost(ApiRoutes.Bookings.Create)]
-        [ProducesResponseType(typeof(BookingResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BookingCreationResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<BookingResponse>> Create([FromBody] CreateBookingRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<BookingCreationResponse>> Create([FromBody] CreateBookingRequest request, CancellationToken cancellationToken)
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
             if (result.IsFailure)
                 return BadRequest(result.Error);
-            return CreatedAtAction(nameof(GetBookingById), new { id = result.Value.Id }, result.Value);
+            return CreatedAtAction(
+                    nameof(Create),
+                    new { id = result.Value.Id },
+                    result.Value
+            );
         }
         /// <summary>
         /// Cancels a booking by updating its status to Cancelled.
@@ -100,6 +109,17 @@ namespace TABP.API.Controllers
             var result = await mediator.Send(query, cancellationToken);
             Response.Headers.Append("X-Pagination", result.Value.PaginationMetadata.Build());
             return Ok(result.Value.Items);
+        }
+        [HttpPost("confirm-payment")]
+        public async Task<ActionResult> ConfirmPayment([FromBody] ConfirmPaymentRequest request)
+        {
+            var command = new ConfirmPaymentCommand(request.BookingId, request.PaymentIntentId);
+            var result = await mediator.Send(command);
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+            return Created();
         }
     }
 }
