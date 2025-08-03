@@ -10,7 +10,7 @@ namespace TABP.API.Controllers
     /// Handles user authentication, including login functionality.
     /// </summary>
     [ApiController]
-    public class IdentityController(ISender mediator) : ControllerBase
+    public class AuthenticationController(ISender mediator) : ControllerBase
     {
         /// <summary>
         /// Authenticates a user using their credentials and returns an access token upon success.
@@ -18,7 +18,7 @@ namespace TABP.API.Controllers
         /// <param name="request">The login credentials, including username and password.</param>
         /// <param name="cancellationToken">Token to cancel the operation if needed.</param>
         /// <returns>A login response containing token, or an error if authentication fails.</returns>
-        [HttpPost(ApiRoutes.Identity.Login)]
+        [HttpPost(ApiRoutes.Authentication.Login)]
         [ProducesResponseType(typeof(LoginUserResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

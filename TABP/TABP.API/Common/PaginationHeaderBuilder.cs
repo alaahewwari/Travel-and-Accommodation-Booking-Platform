@@ -1,4 +1,4 @@
-﻿using TABP.Domain.Models;
+﻿using TABP.Domain.Models.Common;
 namespace TABP.API.Common
 {
     public static class PaginationHeaderBuilder
