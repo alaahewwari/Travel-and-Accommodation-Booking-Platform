@@ -1,4 +1,4 @@
-﻿namespace TABP.Domain.Entities.Views
+﻿namespace TABP.Domain.Models.Common
 {
     public class InvoiceViewModel
     {

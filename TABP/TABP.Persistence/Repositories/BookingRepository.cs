@@ -4,9 +4,8 @@ using Sieve.Services;
 using TABP.Domain.Entities;
 using TABP.Domain.Enums;
 using TABP.Domain.Interfaces.Repositories;
-using TABP.Domain.Models;
+using TABP.Domain.Models.Common;
 using TABP.Persistence.Context;
-
 namespace TABP.Persistence.Repositories
 {
     /// <summary>
@@ -86,6 +85,12 @@ namespace TABP.Persistence.Repositories
                     b.Rooms.Any(r => roomIds.Contains(r.Id))
                 )
                 .AnyAsync(cancellationToken);
+        }
+        /// <inheritdoc />
+        public async Task UpdateBookingAsync(Booking booking, CancellationToken cancellationToken)
+        {
+            context.Bookings.Update(booking);
+            await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

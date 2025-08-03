@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using TABP.Application.Bookings.Common;
 using TABP.Application.Common;
-using TABP.Domain.Enums;
 namespace TABP.Application.Bookings.Commands.Create
 {
     public record CreateBookingCommand(
@@ -10,6 +9,6 @@ namespace TABP.Application.Bookings.Commands.Create
         DateTime CheckInDate,
         DateTime CheckOutDate,
         string? GuestRemarks,
-        PaymentMethod PaymentMethod
+        string PaymentMethodId
         ) :IRequest<Result<BookingCreationResponse>>;
 }

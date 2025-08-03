@@ -10,7 +10,7 @@ using TABP.Application.Hotels.Queries.Search;
 using TABP.Domain.Application.Common;
 using TABP.Domain.Entities;
 using TABP.Domain.Enums;
-using TABP.Domain.Models;
+using TABP.Domain.Models.Common;
 using TABP.Domain.Models.Hotel;
 namespace TABP.Application.Hotels.Mapper
 {

@@ -43,5 +43,17 @@ namespace TABP.Application.Bookings.Common
             Code: "Booking.UnexpectedError",
             Description: "An unexpected error occurred while processing the booking."
         );
+        public static readonly Error PaymentProcessingFailed = new(
+            Code: "Booking.PaymentProcessingFailed",
+            Description: "An error occurred while processing the payment for the booking."
+        );
+        public static readonly Error PaymentConfirmationFailed = new(
+            Code: "Booking.PaymentConfirmationFailed",
+            Description: "Payment confirmation failed. Please try again or contact support."
+        );
+        public static readonly Error BookingNotPending = new(
+            Code: "Booking.NotPending",
+            Description: "Booking is not in a pending state and cannot be confirmed."
+        );
     }
 }

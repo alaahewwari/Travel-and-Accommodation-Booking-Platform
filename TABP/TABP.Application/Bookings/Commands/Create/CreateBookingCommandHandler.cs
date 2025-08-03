@@ -12,6 +12,7 @@ using TABP.Domain.Enums;
 using TABP.Domain.Exceptions;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
+using TABP.Domain.Models.Payment;
 using TABP.Domain.Services.Booking;
 namespace TABP.Application.Bookings.Commands.Create
 {
@@ -26,7 +27,9 @@ namespace TABP.Application.Bookings.Commands.Create
         IEmailMessageBuilder messageBuilder,
         IPdfService pdfService,
         IInvoiceTemplateBuilder invoiceTemplate,
-        IPricingService pricingService
+        IPricingService pricingService,
+        IPaymentService paymentService,
+        IPaymentRepository paymentRepository
         ) : IRequestHandler<CreateBookingCommand, Result<BookingCreationResponse>>
     {
         public async Task<Result<BookingCreationResponse>> Handle(CreateBookingCommand request, CancellationToken cancellationToken)
@@ -37,9 +40,8 @@ namespace TABP.Application.Bookings.Commands.Create
                 var existingHotel = await ValidateHotelExistsAsync(request.HotelId, cancellationToken);
                 var rooms = await ValidateRoomsExistAsync(request.RoomIds, request.HotelId, cancellationToken);
                 ValidateBookingDates(request.CheckInDate, request.CheckOutDate);
-                var createdBooking = await CreateBookingInTransactionAsync(request, rooms, existingHotel, existingUser, cancellationToken);
-                var roomNumbers = rooms.Select(r => r.Number).ToList();
-                return Result<BookingCreationResponse>.Success(createdBooking.ToBookingCreationResponse(existingHotel, roomNumbers));
+                var bookingResponse = await CreateBookingInTransactionAsync(request, rooms, existingHotel, existingUser, cancellationToken);
+                return Result<BookingCreationResponse>.Success(bookingResponse);
             }
             catch (EntityNotFoundException ex)
             {
@@ -62,6 +64,10 @@ namespace TABP.Application.Bookings.Commands.Create
             catch (BookingCreationException)
             {
                 return Result<BookingCreationResponse>.Failure(BookingErrors.BookingCreationFailed);
+            }
+            catch (PaymentProcessingException)
+            {
+                return Result<BookingCreationResponse>.Failure(BookingErrors.PaymentProcessingFailed);
             }
             catch (Exception)
             {
@@ -104,7 +110,7 @@ namespace TABP.Application.Bookings.Commands.Create
                 throw new InvalidBookingDatesException(checkInDate, checkOutDate);
             }
         }
-        private async Task<Booking> CreateBookingInTransactionAsync(
+        private async Task<BookingCreationResponse> CreateBookingInTransactionAsync(
             CreateBookingCommand request,
             IEnumerable<Room> rooms,
             Hotel hotel,
@@ -112,6 +118,7 @@ namespace TABP.Application.Bookings.Commands.Create
             CancellationToken cancellationToken)
         {
             Booking createdBooking = null!;
+            PaymentInfo paymentInfo = null!;
             try
             {
                 await unitOfWork.ExecuteResilientTransactionAsync(async cancellationToken =>
@@ -129,7 +136,6 @@ namespace TABP.Application.Bookings.Commands.Create
                     var totalPrice = pricingService.CalculateTotalPrice(rooms, nights);
                     var booking = new Booking
                     {
-                        PaymentMethod = request.PaymentMethod,
                         CheckInDate = request.CheckInDate,
                         CheckOutDate = request.CheckOutDate,
                         GuestRemarks = request.GuestRemarks,
@@ -139,7 +145,7 @@ namespace TABP.Application.Bookings.Commands.Create
                         Status = BookingStatus.Pending,
                         Rooms = rooms.ToList(),
                         UserId = userContext.UserId,
-                        HotelId = request.HotelId,
+                        HotelId = request.HotelId
                     };
                     createdBooking = await bookingRepository.CreateAsync(booking, cancellationToken);
                     var invoice = new Invoice
@@ -151,8 +157,33 @@ namespace TABP.Application.Bookings.Commands.Create
                     };
                     booking.Invoice = invoice;
                     invoice.Booking = booking;
-                    await ProcessPostBookingOperationsAsync(createdBooking, hotel, user, cancellationToken);
+                    var paymentResult = await ProcessPaymentAsync(createdBooking, request, user, cancellationToken);
+                    if(paymentResult.IsSuccess)
+                    {
+                        createdBooking.Status = BookingStatus.Confirmed;
+                        invoice.Status = PaymentStatus.Succeeded;
+                        await ProcessPostBookingOperationsAsync(createdBooking, hotel, user, cancellationToken);
+                    }
+                    else if (paymentResult.RequiresAction)
+                    {
+                        createdBooking.Status = BookingStatus.Pending;
+                        invoice.Status = PaymentStatus.RequiresAction;
+                        paymentInfo = new PaymentInfo
+                        (
+                            PaymentIntentId : paymentResult.PaymentIntentId,
+                            Status : PaymentStatus.RequiresAction.ToString(),
+                            ClientSecret : paymentResult.ClientSecret
+                        );
+                    }
+                    else
+                    {
+                        throw new PaymentProcessingException(paymentResult.ErrorMessage ?? "Payment processing failed");
+                    }
                 }, cancellationToken);
+                var roomNumbers = rooms.Select(r => r.Number).ToList();
+                var bookingResponse = createdBooking.ToBookingCreationResponse(hotel,roomNumbers);
+                bookingResponse.PaymentInfo = paymentInfo;
+                return bookingResponse;
             }
             catch (BookingOverlapException)
             {
@@ -162,11 +193,52 @@ namespace TABP.Application.Bookings.Commands.Create
             {
                 throw;
             }
+            catch (PaymentProcessingException)
+            {
+                throw;
+            }
             catch (Exception ex)
             {
                 throw new BookingCreationException("Failed to create booking within transaction.", ex);
             }
-            return createdBooking;
+        }
+        private async Task<PaymentResult> ProcessPaymentAsync(
+           Booking booking,
+           CreateBookingCommand request,
+           User user,
+           CancellationToken cancellationToken)
+        {
+            try
+            {
+                var paymentRequest = new PaymentRequest(
+                BookingId: booking.Id,
+                    Amount: booking.TotalPrice,
+                    Currency: PriceCurrency.USD,
+                    PaymentMethodId: request.PaymentMethodId,
+                    CustomerEmail: user.Email,
+                    CustomerName: user.FirstName + " " + user.LastName
+                );
+                var paymentResult = await paymentService.ProcessPaymentAsync(paymentRequest);
+                var payment = new Payment
+                {
+                    PaymentIntentId = paymentResult.PaymentIntentId ?? string.Empty,
+                    PaymentMethodId = request.PaymentMethodId,
+                    Amount = booking.TotalPrice,
+                    Currency = PriceCurrency.USD,
+                    Status = paymentResult.Status,
+                    Provider = PaymentProvider.Stripe,
+                    ProcessedAt = paymentResult.IsSuccess ? DateTime.UtcNow : null,
+                    FailureReason = paymentResult.ErrorMessage,
+                    ClientSecret = paymentResult.ClientSecret,
+                    BookingId = booking.Id
+                };
+                await paymentRepository.CreateAsync(payment, cancellationToken);
+                return paymentResult;
+            }
+            catch (Exception ex)
+            {
+                throw new PaymentProcessingException("Payment processing failed", ex);
+            }
         }
         private static string GenerateInvoiceNumber()
         {

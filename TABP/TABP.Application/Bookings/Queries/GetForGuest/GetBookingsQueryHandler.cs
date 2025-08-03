@@ -5,7 +5,7 @@ using TABP.Application.Common;
 using TABP.Application.Users.Common.Errors;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
-using TABP.Domain.Models;
+using TABP.Domain.Models.Common;
 namespace TABP.Application.Bookings.Queries.GetById
 {
     public class GetBookingsQueryHandler(

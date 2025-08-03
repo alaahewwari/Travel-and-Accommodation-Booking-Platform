@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TABP.Domain.Interfaces.Services;
 using TABP.Domain.Models.Email;
+using TABP.Domain.Models.Payment;
 using TABP.Persistence.Context;
 namespace Application.IntegrationTests.Common
 {
@@ -51,6 +52,7 @@ namespace Application.IntegrationTests.Common
                 services.AddScoped<IEmailService, TestEmailService>();
                 services.AddScoped<IPdfService, TestPdfService>();
                 services.AddScoped<IUserContext, TestUserContext>();
+                services.AddScoped<IPaymentService, TestPaymentService>();
 
                 // Override the ApplicationDbContext to point at the test database
                 var dbDescriptor = services
@@ -110,6 +112,23 @@ namespace Application.IntegrationTests.Common
             {
                 UserId = 0;
                 Email = null;
+            }
+        }
+        public class TestPaymentService : IPaymentService
+        {
+            private PaymentResult? _paymentResult;
+            private bool _shouldThrow;
+            public void SetPaymentResult(PaymentResult result) => _paymentResult = result;
+            public void SetShouldThrow(bool shouldThrow) => _shouldThrow = shouldThrow;
+            public Task<PaymentResult> ProcessPaymentAsync(PaymentRequest request)
+            {
+                if (_shouldThrow) throw new Exception("Payment service failure");
+                return Task.FromResult(_paymentResult ?? PaymentResult.Success("pi_test_default"));
+            }
+            public Task<PaymentResult> ConfirmPaymentAsync(string paymentIntentId)
+            {
+                if (_shouldThrow) throw new Exception("Payment confirmation failure");
+                return Task.FromResult(PaymentResult.Success(paymentIntentId));
             }
         }
     }

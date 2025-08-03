@@ -1,6 +1,6 @@
 ﻿using Sieve.Models;
 using TABP.Domain.Entities;
-using TABP.Domain.Models;
+using TABP.Domain.Models.Common;
 namespace TABP.Domain.Interfaces.Repositories
 {
     /// <summary>
@@ -58,5 +58,11 @@ namespace TABP.Domain.Interfaces.Repositories
         /// True if there are overlapping bookings for any of the specified rooms in the given date range; false if all rooms are available.
         /// </returns>
         Task<bool> CheckBookingOverlapAsync(IEnumerable<long> roomIds, DateTime checkIn, DateTime checkOut, CancellationToken cancellationToken);
+        /// <summary>
+        /// Updates an existing booking entity in the repository.
+        /// </summary>
+        /// <param name="booking">The booking entity to update.</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation.</param>
+        Task UpdateBookingAsync(Booking booking, CancellationToken cancellationToken);
     }
 }

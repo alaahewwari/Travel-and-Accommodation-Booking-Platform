@@ -18,9 +18,6 @@ namespace TABP.Persistence.Configurations
                    .IsRequired();
             builder.Property(b => b.CheckOutDate)
                    .IsRequired();
-            builder.Property(b => b.PaymentMethod)
-                   .IsRequired()
-                   .HasConversion<int>();
             builder.Property(b => b.CreatedAt)
                    .IsRequired();
             builder.Property(b => b.UpdatedAt)

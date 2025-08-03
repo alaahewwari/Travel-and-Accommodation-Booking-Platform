@@ -1,5 +1,4 @@
-﻿using TABP.Domain.Enums;
-namespace TABP.API.Contracts.Bookings
+﻿namespace TABP.API.Contracts.Bookings
 {
     /// <summary>
     /// Request contract for creating a new hotel booking reservation.
@@ -9,14 +8,14 @@ namespace TABP.API.Contracts.Bookings
     /// <param name="HotelId">The identifier of the hotel where the reservation is being made.</param>
     /// <param name="CheckInDate">The date when guests will check into the hotel.</param>
     /// <param name="CheckOutDate">The date when guests will check out of the hotel.</param>
-    /// <param name="PaymentMethod">The payment method to be used for this booking (credit card, cash, etc.).</param>
+    /// <param name="PaymentMethodId">Identifier for the payment method used for this booking, such as a credit card or PayPal.</param>
     /// <param name="GuestRemarks">Optional special requests or remarks from the guest.</param>
     public record CreateBookingRequest(
         IList<long> RoomIds,
         long HotelId,
         DateTime CheckInDate,
         DateTime CheckOutDate,
-        PaymentMethod PaymentMethod,
+        string PaymentMethodId,
         string? GuestRemarks
         );
 }

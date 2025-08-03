@@ -1,4 +1,4 @@
-﻿namespace TABP.Domain.Models
+﻿namespace TABP.Domain.Models.Common
 {
     public class PagedResult<T>
     {

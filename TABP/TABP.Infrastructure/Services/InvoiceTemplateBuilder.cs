@@ -1,7 +1,7 @@
 ﻿using Scriban;
 using TABP.Domain.Entities;
-using TABP.Domain.Entities.Views;
 using TABP.Domain.Interfaces.Services;
+using TABP.Domain.Models.Common;
 namespace TABP.Infrastructure.Services
 {
     public class InvoiceTemplateBuilder : IInvoiceTemplateBuilder

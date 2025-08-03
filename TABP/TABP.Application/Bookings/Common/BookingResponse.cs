@@ -10,6 +10,5 @@ namespace TABP.Application.Bookings.Common
         public DateTime CheckOutDate { get; set; }
         public DateTime CreatedAt { get; set; }
         public IEnumerable<RoomResponse> Rooms { get; set; } = [];
-        public string PaymentMethod { get; set; } = null!;
     }
 }

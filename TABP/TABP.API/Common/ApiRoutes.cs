@@ -20,13 +20,13 @@
         /// <summary>
         /// Authentication and session management endpoints.
         /// </summary>
-        public static class Identity
+        public static class Authentication
         {
             /// <summary>
             /// Create authentication session (login).
             /// </summary>
             /// <example>POST api/auth/sessions</example>
-            public const string Login = Base + "/sessions";
+            public const string Login = Base + "/login";
         }
         /// <summary>
         /// User account management endpoints.
