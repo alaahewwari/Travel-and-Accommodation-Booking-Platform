@@ -1,4 +1,5 @@
-﻿using TABP.Application.Common.Errors;
+﻿using TABP.Application.Common;
+
 namespace TABP.Application.Cities.Common
 {
     public static class CityErrors

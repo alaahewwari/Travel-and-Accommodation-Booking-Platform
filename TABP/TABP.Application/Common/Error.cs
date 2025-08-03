@@ -1,4 +1,4 @@
-﻿namespace TABP.Application.Common.Errors
+﻿namespace TABP.Application.Common
 {
     public sealed record Error(string Code, string Description)
     {

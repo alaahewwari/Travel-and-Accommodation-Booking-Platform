@@ -1,0 +1,34 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using TABP.Domain.Common;
+namespace TABP.Persistence.Interceptors
+{
+    public sealed class SoftDeleteInterceptor : SaveChangesInterceptor
+    {
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData,
+            InterceptionResult<int> result,
+            CancellationToken cancellationToken = default)
+        {
+            if (eventData.Context is null)
+            {
+                return base.SavingChangesAsync(
+                    eventData, result, cancellationToken); //skip and let EF do its normal job
+            }
+            IEnumerable<EntityEntry<SoftDeletable>> entries =
+                eventData
+                    .Context
+                    .ChangeTracker
+                    .Entries<SoftDeletable>()
+                    .Where(e => e.State == EntityState.Deleted);
+            foreach (EntityEntry<SoftDeletable> softDeletable in entries)
+            {
+                softDeletable.State = EntityState.Modified;
+                softDeletable.Entity.IsDeleted = true;
+                softDeletable.Entity.DeletedOn = DateTime.UtcNow;
+            }
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
+    }
+}
