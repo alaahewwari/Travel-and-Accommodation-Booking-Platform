@@ -29,11 +29,8 @@ namespace TABP.API.Extensions
         /// <param name="app">The web application to configure development middleware for.</param>
         public static void ConfigureDevelopmentMiddleware(this WebApplication app)
         {
-            if (app.Environment.IsDevelopment())
-            {
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
         }
     }
 }
