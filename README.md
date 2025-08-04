@@ -1,7 +1,10 @@
 # Travel and Accommodation Booking Platform API (TABP)
 
 [![Build and Test](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/test.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/test.yml)
-[![Build and deploy to Azure](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml)
+
+  [![codecov](https://codecov.io/gh/<your-org>/<your-repo>/branch/development/graph/badge.svg)](https://codecov.io/gh/<your-org>/<your-repo>)
+
+  [![Build and deploy to Azure](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml)
 ## 🏨 Project Overview
 
 This is a web API that helps manage hotel bookings, user accounts, payments, and more. It's made to support both guests and admins with all the tools needed for a hotel booking system.
