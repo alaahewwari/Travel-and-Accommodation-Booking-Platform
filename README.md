@@ -343,45 +343,44 @@ on:
 
 ## 💾 Database Schema
 
-**Database Name:** `TravelBookingDb`
+### Entity Relationship Diagram
 
-**Initialization Script:** See [`file.sql`](file.sql) for the full database creation script.
+![Database ERD](images/database-erd.png)
 
 ### Core Entities
 
-* **Users**: Authentication and user management
-* **Roles**: User roles and permissions
-* **Owners**: Hotel owner profiles
-* **Cities**: Geographic locations and destinations
-* **Hotels**: Accommodation properties
-* **RoomClasses**: Definitions of room types (e.g., Deluxe, Suite)
-* **Rooms**: Individual room instances with availability
-* **Amenities**: Features and services (e.g., Wi-Fi, Pool)
-* **Discounts**: Promotional pricing for room classes
-* **Bookings**: Reservation records
-* **Payments**: Payment transactions and receipts
-* **HotelImages**: Thumbnail images for hotels
-* **HotelGallery**: Gallery images for hotels
-* **RoomClassImages**: Gallery images for room classes
-* **RoomGallery**: Gallery images for rooms
-* **RoomClassAmenities**: Join table linking room classes to amenities
-* **RoomClassDiscounts**: Join table linking room classes to discounts
+#### User Management
+* **User**: Customer profiles for authentication and booking management. Contains personal information, credentials (hashed password + salt), and role assignments.
+* **Role**: Permission-based access control defining user capabilities (Guest, Admin, SuperAdmin).
+* **Owner**: Hotel proprietor profiles managing property portfolios with contact information.
 
-### Key Relationships
+#### Location & Property Management
+* **City**: Geographic destinations with country and postal information for location-based searches and trending analysis.
+* **Hotel**: Accommodation properties with detailed information including location coordinates, star ratings, and administrative details.
+* **RoomClass**: Room type templates defining categories (Single, Double, Suite) with pricing, capacity specifications, and amenity associations.
+* **Room**: Individual physical room instances with unique identifiers, linked to room classes for availability management.
 
-* **Users → Bookings** (One-to-Many)
-* **Users ↔ Roles** (Many-to-Many via `UserRoles`)
-* **Owners → Hotels** (One-to-Many)
-* **Cities → Hotels** (One-to-Many)
-* **Hotels → Rooms** (One-to-Many)
-* **RoomClasses → Rooms** (One-to-Many)
-* **RoomClasses ↔ Amenities** (Many-to-Many via `RoomClassAmenities`)
-* **RoomClasses ↔ Discounts** (One-to-Many via `RoomClassDiscounts`)
-* **Bookings → Payments** (One-to-One)
-* **Hotels ↔ HotelImages** (One-to-Many)
-* **Hotels ↔ HotelGallery** (One-to-Many)
-* **Rooms ↔ RoomGallery** (One-to-Many)
-* **RoomClasses ↔ RoomClassImages** (One-to-Many)
+#### Booking & Financial Management
+* **Booking**: Customer reservations linking users to hotels and rooms with date ranges, pricing, and status tracking.
+* **Payment**: Secure payment transaction records with Stripe integration, supporting multiple payment methods and 3D Secure.
+* **Invoice**: Formal billing documents with unique invoice numbers for accounting and customer records.
+
+#### Content & Enhancement
+* **Review**: Customer feedback system with ratings and comments for hotels, enabling quality assessment and marketing.
+* **Amenity**: Reusable feature definitions (WiFi, Pool, Gym, Parking) applicable to both hotels and specific room classes.
+* **Discount**: Time-based promotional pricing rules with percentage reductions applicable to room classes.
+
+#### Media Management
+* **CityImage**: Destination marketing imagery with accessibility support (alt text) for city promotion.
+* **HotelImage**: Property visual content including exterior, interior, and facility photographs.
+* **RoomImage**: Room-specific imagery showcasing different room class types and layouts.
+
+###Key Features
+
+* **Soft Delete**: Entities are marked as deleted, not permanently removed
+* **Audit Trails**: All entities track creation and update timestamps
+* **Multi-Currency**: Payment support for different currencies
+* **Image Management**: Comprehensive photo galleries for cities, hotels, and rooms
 
 
 ### Authentication Flow
