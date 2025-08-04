@@ -1,4 +1,5 @@
 ﻿using Application.IntegrationTests.Common;
+using Application.IntegrationTests.Common.TestInfrastructure;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,7 +13,6 @@ using TABP.Domain.Enums;
 using TABP.Domain.Interfaces.Services;
 using TABP.Domain.Models.Payment;
 using TABP.Persistence.Context;
-using static Application.IntegrationTests.Common.IntegrationTestWebAppFactory;
 namespace Application.IntegrationTests.Features.BookingTests
 {
     public class CreateBookingTests : BaseIntegrationTest
@@ -23,7 +23,6 @@ namespace Application.IntegrationTests.Features.BookingTests
         private readonly TestEmailService _emailService;
         private readonly TestPdfService _pdfService;
         private readonly TestPaymentService _paymentService;
-
         public CreateBookingTests(IntegrationTestWebAppFactory factory)
           : base(factory)
         {
@@ -34,7 +33,6 @@ namespace Application.IntegrationTests.Features.BookingTests
             _pdfService = (TestPdfService)_scope.ServiceProvider.GetRequiredService<IPdfService>();
             _paymentService = (TestPaymentService)_scope.ServiceProvider.GetRequiredService<IPaymentService>();
         }
-
         [Fact]
         public async Task CreateBooking_ShouldSucceed_WithSingleRoomAndSuccessfulPayment()
         {
@@ -84,7 +82,6 @@ namespace Application.IntegrationTests.Features.BookingTests
             await VerifyBookingAsync(result.Value.Id, user.Id, 3, BookingStatus.Confirmed);
             await VerifyPaymentAsync(result.Value.Id, PaymentStatus.Succeeded);
         }
-
         [Fact]
         public async Task CreateBooking_ShouldCreateInvoiceAndPayment()
         {
@@ -366,7 +363,6 @@ namespace Application.IntegrationTests.Features.BookingTests
                 result.IsFailure.Should().BeTrue();
             }
         }
-
         [Fact]
         public async Task CreateBooking_ShouldCalculateCorrectTotalPrice()
         {
@@ -375,7 +371,6 @@ namespace Application.IntegrationTests.Features.BookingTests
             var user = await _seeder.SeedUserAsync();
             _testUserContext.SetUser(user.Id, user.Email);
             _paymentService.SetPaymentResult(PaymentResult.Success("pi_test_success"));
-
             var checkInDate = DateTime.Today.AddDays(1);
             var checkOutDate = DateTime.Today.AddDays(4); // 3 nights
             var command = new CreateBookingCommand(
