@@ -1,6 +1,5 @@
 ﻿using Riok.Mapperly.Abstractions;
 using Sieve.Models;
-using TABP.Application.Cities.Commands.SetThumbnail;
 using TABP.Application.Hotels.Commands.AddToGallery;
 using TABP.Application.Hotels.Commands.Create;
 using TABP.Application.Hotels.Commands.SetThumbnail;

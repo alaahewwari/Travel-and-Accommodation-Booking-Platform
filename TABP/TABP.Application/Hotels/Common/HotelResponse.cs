@@ -1,11 +1,12 @@
-﻿namespace TABP.Application.Hotels.Common
+﻿using TABP.Application.Reviews.Common;
+namespace TABP.Application.Hotels.Common
 {
     public record HotelResponse(
         long Id,
         string Name,
-        int starRating,
+        byte StarRating,
         string? Description,
-        string BriefDescription
-        //List<ReviewResponse>? Review
+        string BriefDescription,
+        IEnumerable<ReviewResponse> Reviews
         );
 }
