@@ -1,3 +1,6 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
 name: Build and deploy ASP.Net Core app to Azure Web App - TABP-App
 
 on:
@@ -6,70 +9,47 @@ on:
       - development
   workflow_dispatch:
 
-env:
-  DOTNET_VERSION: '9.0.x'
-  PACKAGE_PATH: './publish'
-
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: windows-latest
     permissions:
-      contents: read
-    
+      contents: read #This is required for actions/checkout
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
-      
-      - name: Restore dependencies
-        run: dotnet restore TABP/TABP.sln
-      
-      - name: Build
-        run: dotnet build TABP/TABP.sln --configuration Release --no-restore
-      
-      - name: Test
-        run: dotnet test TABP/TABP.sln --no-build --configuration Release
-        continue-on-error: true
-      
-      - name: Publish
-        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{ env.PACKAGE_PATH }} --no-build
-      
-      - name: List published files
-        run: |
-          echo "📁 Published files:"
-          ls -la ${{ env.PACKAGE_PATH }}
-          echo "📊 Total size:"
-          du -sh ${{ env.PACKAGE_PATH }}
-      
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+          dotnet-version: '9.x'
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
         with:
-          # Direct credentials (works immediately but less secure)
-          server: waws-prod-hk1-063.ftp.azurewebsites.windows.net
-          username: 'TABP-App\$TABP-App'
-          password: 'LZGR5NY4gsW3qZKlCf89bpGQ0SFzZvbj3Jj5m7GmwS8PwtfWqbfodza636nj'
-          
-          # Use FTP protocol
-          protocol: ftp
-          
-          # Local directory to upload
-          local-dir: ${{ env.PACKAGE_PATH }}/
-          
-          # Remote directory
-          server-dir: /site/wwwroot/
-          
-          # Files to exclude
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            **/.DS_Store
-            **/Thumbs.db
-          
-          # Additional options for reliability
-          timeout: 300000
-          log-level: verbose
-          security: loose
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+      
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'TABP-App'
+          slot-name: 'Production'
+          package: .
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_69ECBB0114F04B6C958F73728CC43BD5 }}
