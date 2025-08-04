@@ -20,7 +20,7 @@ jobs:
           dotnet-version: '9.x'
           
       - name: Restore dependencies
-        run: dotnet restore TABP.sln
+        run: dotnet restore TABP/TABP.sln
         
       - name: Build solution
         run: dotnet build TABP/TABP.sln --configuration Release --no-restore
@@ -55,4 +55,5 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_86457EF29E9048CD8560C91D51A1BD43 }}
+
 
