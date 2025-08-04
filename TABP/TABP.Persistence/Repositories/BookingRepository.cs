@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sieve.Models;
 using Sieve.Services;
+using TABP.Domain.Common;
 using TABP.Domain.Entities;
 using TABP.Domain.Enums;
 using TABP.Domain.Interfaces.Repositories;
@@ -35,6 +36,7 @@ namespace TABP.Persistence.Repositories
         /// <inheritdoc />
         public async Task<PagedResult<Booking>> GetBookingsAsync(long userId, SieveModel sieveModel, CancellationToken cancellationToken)
         {
+            sieveModel.EnsureDefaults();
             var query = context.Bookings
                 .Where(b => b.UserId == userId)
                 .Include(b => b.Hotel);
@@ -44,13 +46,13 @@ namespace TABP.Persistence.Repositories
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
             var totalCount = await filteredQuery.CountAsync(cancellationToken);
-            var totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.GetValueOrDefault(10));
+            var totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.Value);
             var metadata = new PaginationMetadata
             (
                 totalCount,
                 totalPages,
-                sieveModel.Page.GetValueOrDefault(1),
-                sieveModel.PageSize.GetValueOrDefault(10)
+                sieveModel.Page.Value,
+                sieveModel.PageSize.Value
             );
             return new PagedResult<Booking>
             {
