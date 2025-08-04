@@ -75,7 +75,36 @@ jobs:
       run: |
         echo "Downloaded files:"
         dir "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" /s
+        echo "Checking for main DLL:"
+        dir "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\*.dll"
+        echo "Looking for TABP.API.dll specifically:"
+        if exist "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\TABP.API.dll" (
+          echo "TABP.API.dll found - GOOD!"
+        ) else (
+          echo "TABP.API.dll NOT found - checking other DLLs:"
+          dir "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\TABP*.dll"
+        )
       shell: cmd
+    
+    - name: Create web.config for .NET 9
+      run: |
+        $webConfig = @"
+        <?xml version="1.0" encoding="utf-8"?>
+        <configuration>
+          <location path="." inheritInChildApplications="false">
+            <system.webServer>
+              <handlers>
+                <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModuleV2" resourceType="Unspecified" />
+              </handlers>
+              <aspNetCore processPath="dotnet" arguments=".\TABP.API.dll" stdoutLogEnabled="true" stdoutLogFile=".\logs\stdout" hostingModel="inprocess" />
+            </system.webServer>
+          </location>
+        </configuration>
+        "@
+        $webConfig | Out-File -FilePath "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\web.config" -Encoding UTF8
+        Write-Host "Created web.config:"
+        Get-Content "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\web.config"
+      shell: powershell
     
     - name: Deploy to Azure WebApp
       uses: azure/webapps-deploy@v3
