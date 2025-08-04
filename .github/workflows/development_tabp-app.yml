@@ -1,4 +1,4 @@
-name: Build and deploy ASP.Net Core app to Azure Web App - TABP-App (FTP)
+name: Build and deploy ASP.Net Core app to Azure Web App - TABP-App
 
 on:
   push:
@@ -37,32 +37,39 @@ jobs:
       - name: Publish
         run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{ env.PACKAGE_PATH }} --no-build
       
-      - name: Extract FTP credentials from publish profile
-        id: extract-ftp
+      - name: List published files
         run: |
-          PUBLISH_PROFILE='${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC6FF4270B744819BF8C6E9B49267054 }}'
-          
-          # Extract FTP details
-          FTP_HOST=$(echo "$PUBLISH_PROFILE" | grep -oP 'publishUrl="\K[^"]*' | grep 'ftp://' | sed 's|ftp://||' | head -1)
-          FTP_USERNAME=$(echo "$PUBLISH_PROFILE" | grep -oP 'userName="\K[^"]*' | head -1)
-          FTP_PASSWORD=$(echo "$PUBLISH_PROFILE" | grep -oP 'userPWD="\K[^"]*' | head -1)
-          
-          echo "FTP Host: $FTP_HOST"
-          echo "FTP User: $FTP_USERNAME"
-          
-          echo "ftp_host=$FTP_HOST" >> $GITHUB_OUTPUT
-          echo "ftp_username=$FTP_USERNAME" >> $GITHUB_OUTPUT
-          echo "ftp_password=$FTP_PASSWORD" >> $GITHUB_OUTPUT
+          echo "📁 Published files:"
+          ls -la ${{ env.PACKAGE_PATH }}
+          echo "📊 Total size:"
+          du -sh ${{ env.PACKAGE_PATH }}
       
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          server: ${{ steps.extract-ftp.outputs.ftp_host }}
-          username: ${{ steps.extract-ftp.outputs.ftp_username }}
-          password: ${{ steps.extract-ftp.outputs.ftp_password }}
+          # Using secrets (recommended)
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          
+          # Use FTP (not FTPS) initially to avoid SSL issues
+          protocol: ftp
+          
+          # Local directory to upload
           local-dir: ${{ env.PACKAGE_PATH }}/
+          
+          # Remote directory
           server-dir: /site/wwwroot/
+          
+          # Files to exclude
           exclude: |
             **/.git*
             **/.git*/**
             **/node_modules/**
+            **/.DS_Store
+            **/Thumbs.db
+          
+          # Additional options for reliability
+          timeout: 300000
+          log-level: verbose
+          security: loose
