@@ -345,7 +345,7 @@ on:
 
 ### Entity Relationship Diagram
 
-![Database ERD](images/ERD.png)
+![Database ERD](Images/ERD.png)
 
 ### Core Entities
 
