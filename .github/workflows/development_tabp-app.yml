@@ -1,6 +1,5 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy ASP.Net Core app to Azure Web App - TABP-App
 
 on:
@@ -14,21 +13,43 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: read #This is required for actions/checkout
-
+    
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.x'
-
+      
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('TABP/**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+      
+      - name: Restore dependencies
+        run: dotnet restore TABP/TABP.sln
+        
       - name: Build with dotnet
-        run: dotnet build --configuration Release
-
+        run: dotnet build TABP/TABP.sln --configuration Release --no-restore
+      
+      - name: Run tests
+        run: dotnet test TABP/TABP.sln --configuration Release --no-build --verbosity normal --logger trx --results-directory TestResults
+      
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: .NET Tests
+          path: TestResults/*.trx
+          reporter: dotnet-trx
+      
       - name: dotnet publish
-        run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
-
+        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o "${{env.DOTNET_ROOT}}/myapp" --no-build
+      
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -38,6 +59,7 @@ jobs:
   deploy:
     runs-on: windows-latest
     needs: build
+    environment: production
     
     steps:
       - name: Download artifact from build job
@@ -53,3 +75,15 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_69ECBB0114F04B6C958F73728CC43BD5 }}
+      
+      - name: Verify deployment
+        run: |
+          Start-Sleep -Seconds 30
+          try {
+            $response = Invoke-WebRequest -Uri "https://tabp-app.azurewebsites.net" -Method GET -TimeoutSec 30
+            Write-Output "Deployment verification successful. Status code: $($response.StatusCode)"
+          }
+          catch {
+            Write-Error "Deployment verification failed: $($_.Exception.Message)"
+            exit 1
+          }
