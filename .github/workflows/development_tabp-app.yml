@@ -35,7 +35,7 @@ jobs:
       continue-on-error: true  # Don't fail deployment if tests fail
     
     - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}/TABP.API/TABP.API.csproj" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" --self-contained true --runtime win-x64
+      run: dotnet publish "${{ env.WORKING_DIRECTORY }}/TABP.API/TABP.API.csproj" --configuration ${{ env.CONFIGURATION }} --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" --self-contained false
     
     - name: List published files (debug)
       run: |
