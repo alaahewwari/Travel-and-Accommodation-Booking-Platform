@@ -218,8 +218,14 @@ Development: https://localhost:7120
   "paymentMethodId": "pm_card_visa"
 }
 ```
+### 📝 Reviews Management Endpoints
 
----
+| Method   | Endpoint              | Description              | Auth Required  |
+| -------- | --------------------- | ------------------------ | -------------- |
+| `POST`   | `/api/reviews`        | Create new review        | ✅ Guest        |
+| `GET`    | `/api/reviews/{id}`   | Get review details by ID | ❌              |
+| `PUT`    | `/api/reviews/{id}`   | Update existing review   | ✅ Guest        |
+| `DELETE` | `/api/reviews/{id}`   | Delete review            | ✅ Guest, Admin |
 
 ### 🛏️ Room Class & Room Endpoints
 
