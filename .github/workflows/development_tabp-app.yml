@@ -1,115 +1,62 @@
-name: Build and deploy .NET Core application to Web App TABP-App
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy ASP.Net Core app to Azure Web App - TABP-App
 
 on:
   push:
     branches:
-    - development
+      - development
   workflow_dispatch:
-
-env:
-  AZURE_WEBAPP_NAME: TABP-App
-  AZURE_WEBAPP_PACKAGE_PATH: TABP/published
-  CONFIGURATION: Release
-  DOTNET_CORE_VERSION: 9.0.x
-  WORKING_DIRECTORY: TABP
 
 jobs:
   build:
     runs-on: windows-latest
+    permissions:
+      contents: read #This is required for actions/checkout
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-    
-    - name: Restore
-      run: dotnet restore "${{ env.WORKING_DIRECTORY }}/TABP.sln"
-    
-    - name: Build
-      run: dotnet build "${{ env.WORKING_DIRECTORY }}/TABP.sln" --configuration ${{ env.CONFIGURATION }} --no-restore
-    
-    - name: Test
-      run: dotnet test "${{ env.WORKING_DIRECTORY }}/TABP.sln" --no-build --configuration ${{ env.CONFIGURATION }}
-      continue-on-error: true  # Don't fail deployment if tests fail
-    
-    - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}/TABP.API/TABP.API.csproj" --configuration ${{ env.CONFIGURATION }} --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" --self-contained false
-    
-    - name: List published files (debug)
-      run: |
-        echo "Published files:"
-        dir "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" /s
-      shell: cmd
-    
-    - name: Publish Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: webapp
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        run: dotnet restore TABP/TABP.sln
+
+      - name: Build with dotnet
+        run: dotnet build TABP/TABP.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test TABP/TABP.sln --no-build --configuration Release
+        continue-on-error: true
+
+      - name: dotnet publish
+        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} --no-build
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
   deploy:
     runs-on: windows-latest
     needs: build
-    environment: production  # Add environment protection
     
     steps:
-    - name: Download artifact from build job
-      uses: actions/download-artifact@v4
-      with:
-        name: webapp
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-    
-    - name: Create deployment script for .NET 9
-      run: |
-        echo '@echo off' > deploy.cmd
-        echo 'echo Installing .NET 9 if needed...' >> deploy.cmd
-        echo 'if not exist "D:\Program Files\dotnet\dotnet.exe" (' >> deploy.cmd
-        echo '  echo .NET runtime not found, using self-contained deployment' >> deploy.cmd
-        echo ')' >> deploy.cmd
-        echo 'echo Deployment completed' >> deploy.cmd
-      shell: cmd
-    
-    - name: List downloaded files (debug)
-      run: |
-        echo "Downloaded files:"
-        dir "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" /s
-        echo "Checking for main DLL:"
-        dir "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\*.dll"
-        echo "Looking for TABP.API.dll specifically:"
-        if exist "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\TABP.API.dll" (
-          echo "TABP.API.dll found - GOOD!"
-        ) else (
-          echo "TABP.API.dll NOT found - checking other DLLs:"
-          dir "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\TABP*.dll"
-        )
-      shell: cmd
-    
-    - name: Create web.config for .NET 9
-      run: |
-        $webConfig = @"
-        <?xml version="1.0" encoding="utf-8"?>
-        <configuration>
-          <location path="." inheritInChildApplications="false">
-            <system.webServer>
-              <handlers>
-                <add name="aspNetCore" path="*" verb="*" modules="AspNetCoreModuleV2" resourceType="Unspecified" />
-              </handlers>
-              <aspNetCore processPath="dotnet" arguments=".\TABP.API.dll" stdoutLogEnabled="true" stdoutLogFile=".\logs\stdout" hostingModel="inprocess" />
-            </system.webServer>
-          </location>
-        </configuration>
-        "@
-        $webConfig | Out-File -FilePath "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\web.config" -Encoding UTF8
-        Write-Host "Created web.config:"
-        Get-Content "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}\web.config"
-      shell: powershell
-    
-    - name: Deploy to Azure WebApp
-      uses: azure/webapps-deploy@v3
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        slot-name: 'Production'
-        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC6FF4270B744819BF8C6E9B49267054 }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+      
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'TABP-App'
+          slot-name: 'Production'
+          package: .
+          publish-profile: ${{ secrets.__publishingprofilesecretname__ }}
