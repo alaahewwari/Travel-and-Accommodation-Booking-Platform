@@ -35,7 +35,6 @@ namespace TABP.API.Validators.Images
                 .LessThanOrEqualTo(MaxFileSizeBytes)
                 .WithMessage($"File size must be less than {MaxFileSizeBytes / 1024 / 1024}MB");
         }
-
         /// <summary>
         /// Validates that the uploaded file has an allowed image extension.
         /// </summary>
@@ -46,7 +45,6 @@ namespace TABP.API.Validators.Images
             var extension = Path.GetExtension(fileName).ToLowerInvariant();
             return extension is ".jpg" or ".jpeg" or ".png";
         }
-
         /// <summary>
         /// Validates that the uploaded file has an allowed MIME content type.
         /// </summary>
