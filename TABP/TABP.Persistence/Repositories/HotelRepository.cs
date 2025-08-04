@@ -1,14 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sieve.Models;
 using Sieve.Services;
+using TABP.Domain.Common;
 using TABP.Domain.Entities;
 using TABP.Domain.Enums;
 using TABP.Domain.Interfaces.Repositories;
-using TABP.Domain.Models;
 using TABP.Domain.Models.Common;
 using TABP.Domain.Models.Hotel;
 using TABP.Persistence.Context;
-
 namespace TABP.Persistence.Repositories
 {
     /// <summary>
@@ -87,6 +86,7 @@ namespace TABP.Persistence.Repositories
         /// <inheritdoc />
         public async Task<PagedResult<HotelSearchResultResponse>> SearchAsync(HotelSearchParameters parameters, SieveModel sieveModel, CancellationToken cancellationToken)
         {
+            sieveModel.EnsureDefaults();
             var query = context.Hotels.AsQueryable();
             query = query
                 .Where(h =>
@@ -110,18 +110,18 @@ namespace TABP.Persistence.Repositories
                 ))
                 .ToListAsync(cancellationToken);
             var totalCount = await pagedQuery.CountAsync();
-            var totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.GetValueOrDefault(10));
-            if (sieveModel.Page.GetValueOrDefault() <= 1)
+            var totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.Value);
+            if (sieveModel.Page.Value <= 1)
             {
                 totalCount = await filteredQuery.CountAsync(cancellationToken);
-                totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.GetValueOrDefault(10));
+                totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.Value);
             }
             var metadata = new PaginationMetadata
             (
                     totalCount,
                     totalPages,
-                    sieveModel.Page.GetValueOrDefault(1),
-                    sieveModel.PageSize.GetValueOrDefault(10)
+                    sieveModel.Page.Value,
+                    sieveModel.PageSize.Value
             );
             return new PagedResult<HotelSearchResultResponse>
             {

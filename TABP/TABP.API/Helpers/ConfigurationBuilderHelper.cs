@@ -11,11 +11,13 @@
         /// Sets the base path to the current directory and loads configuration from the standard appsettings file.
         /// </summary>
         /// <returns>The built configuration object containing all application settings.</returns>
-        public static IConfiguration BuildConfiguration()
+        public static IConfiguration BuildConfiguration(IHostEnvironment environment)
         {
             return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{environment.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables()
                 .Build();
         }
     }

@@ -12,6 +12,15 @@ namespace TABP.Infrastructure.Sieve
             mapper.Property<Hotel>(p => p.Name)
                   .CanFilter()
                   .CanSort();
+            mapper.Property<Hotel>(p => p.StarRating)
+                  .CanFilter()
+                  .CanSort();
+            mapper.Property<Hotel>(p => p.Name)
+                  .CanFilter()
+                  .CanSort();
+            mapper.Property<Hotel>(h => h.City.Name)
+                  .CanFilter()
+                  .CanSort();
             return mapper;
         }
     }
