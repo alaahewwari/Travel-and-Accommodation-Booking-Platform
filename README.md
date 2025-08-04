@@ -2,7 +2,7 @@
 
 [![Build and Test](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/test.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/test.yml)
 
-  [![codecov](https://codecov.io/gh/<your-org>/<your-repo>/branch/development/graph/badge.svg)](https://codecov.io/gh/<your-org>/<your-repo>)
+  [![codecov](https://codecov.io/gh/alaahewwari/Travel-and-Accommodation-Booking-Platform/branch/development/graph/badge.svg)](https://codecov.io/gh/alaahewwari/Travel-and-Accommodation-Booking-Platform)
 
   [![Build and deploy to Azure](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml)
 ## 🏨 Project Overview
