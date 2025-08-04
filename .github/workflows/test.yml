@@ -12,6 +12,11 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
 
+    services:
+      docker:
+        image: docker:24.0.5
+        options: --privileged
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -29,4 +34,25 @@ jobs:
 
       - name: Run unit tests
         run: |
-          dotnet test TABP/TABP.Application.Tests/TABP.Application.Tests.csproj --no-build --configuration Release --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+          dotnet test TABP/TABP.Application.Tests/TABP.Application.Tests.csproj \
+            --no-build --configuration Release --verbosity normal \
+            --logger trx --collect:"XPlat Code Coverage"
+
+      - name: Run integration tests
+        run: |
+          dotnet test TABP/Application.IntegrationTests/Application.IntegrationTests.csproj \
+            --no-build --configuration Release --verbosity normal \
+            --logger trx --collect:"XPlat Code Coverage"
+            
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+            files: '**/coverage.cobertura.xml'
+            token: ${{ secrets.CODECOV_TOKEN }}
+            
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Test Results
+          path: '**/TestResults/*.trx'
