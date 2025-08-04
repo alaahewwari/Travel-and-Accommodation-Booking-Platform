@@ -2,9 +2,10 @@
 
 [![Build and Test](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/test.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/test.yml)
 
-  [![codecov](https://codecov.io/gh/alaahewwari/Travel-and-Accommodation-Booking-Platform/branch/development/graph/badge.svg)](https://codecov.io/gh/alaahewwari/Travel-and-Accommodation-Booking-Platform)
+[![Build and deploy to Azure](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml)
 
-  [![Build and deploy to Azure](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml)
+[![codecov](https://codecov.io/gh/alaahewwari/Travel-and-Accommodation-Booking-Platform/branch/development/graph/badge.svg)](https://codecov.io/gh/alaahewwari/Travel-and-Accommodation-Booking-Platform)
+
 ## 🏨 Project Overview
 
 This is a web API that helps manage hotel bookings, user accounts, payments, and more. It's made to support both guests and admins with all the tools needed for a hotel booking system.
