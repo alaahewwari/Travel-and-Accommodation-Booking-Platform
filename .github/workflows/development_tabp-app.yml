@@ -1,6 +1,4 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
+# Alternative Method 1: Direct Azure CLI Deployment
 name: Build and deploy ASP.Net Core app to Azure Web App - TABP-App
 
 on:
@@ -10,60 +8,286 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: TABP-App
-  AZURE_WEBAPP_PACKAGE_PATH: './publish'
   DOTNET_VERSION: '9.0.x'
+  AZURE_WEBAPP_NAME: 'TABP-App'
+  AZURE_RESOURCE_GROUP: 'your-resource-group-name'  # Update this
+  PACKAGE_PATH: './publish'
 
 jobs:
-  build:
-    runs-on: windows-latest
+  build-and-deploy:
+    runs-on: ubuntu-latest
     permissions:
       contents: read
-
+    
     steps:
       - uses: actions/checkout@v4
-
+      
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-
+      
       - name: Restore dependencies
         run: dotnet restore TABP/TABP.sln
-
-      - name: Build with dotnet
+      
+      - name: Build
         run: dotnet build TABP/TABP.sln --configuration Release --no-restore
-
+      
       - name: Test
         run: dotnet test TABP/TABP.sln --no-build --configuration Release
         continue-on-error: true
-
-      - name: dotnet publish
-        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }} --no-build
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
+      
+      - name: Publish
+        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{ env.PACKAGE_PATH }} --no-build
+      
+      - name: Create deployment package
+        run: |
+          cd ${{ env.PACKAGE_PATH }}
+          zip -r ../deploy.zip .
+          cd ..
+          ls -la deploy.zip
+      
+      - name: Login to Azure
+        uses: azure/login@v1
         with:
-          name: .net-app
-          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy to Azure Web App via CLI
+        run: |
+          az webapp deploy \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --src-path deploy.zip \
+            --type zip \
+            --timeout 300
+      
+      - name: Restart App Service
+        run: |
+          az webapp restart \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_WEBAPP_NAME }}
 
-  deploy:
-    runs-on: windows-latest
-    needs: build
-    environment: production
+---
+
+# Alternative Method 2: Direct REST API Deployment
+name: Build and deploy ASP.Net Core app to Azure Web App - TABP-App (REST API)
+
+on:
+  push:
+    branches:
+      - development
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  AZURE_WEBAPP_NAME: 'TABP-App'
+  PACKAGE_PATH: './publish'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
         with:
-          name: .net-app
-          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Restore dependencies
+        run: dotnet restore TABP/TABP.sln
+      
+      - name: Build
+        run: dotnet build TABP/TABP.sln --configuration Release --no-restore
+      
+      - name: Test
+        run: dotnet test TABP/TABP.sln --no-build --configuration Release
+        continue-on-error: true
+      
+      - name: Publish
+        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{ env.PACKAGE_PATH }} --no-build
+      
+      - name: Create deployment package
+        run: |
+          cd ${{ env.PACKAGE_PATH }}
+          zip -r ../deploy.zip .
+          cd ..
+          echo "Package size: $(du -h deploy.zip)"
+      
+      - name: Extract credentials from publish profile
+        id: extract-creds
+        run: |
+          PUBLISH_PROFILE='${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC6FF4270B744819BF8C6E9B49267054 }}'
+          USERNAME=$(echo "$PUBLISH_PROFILE" | grep -oP 'userName="\K[^"]*')
+          PASSWORD=$(echo "$PUBLISH_PROFILE" | grep -oP 'userPWD="\K[^"]*')
+          SITE_URL=$(echo "$PUBLISH_PROFILE" | grep -oP 'publishUrl="\K[^"]*' | head -1)
+          
+          echo "username=$USERNAME" >> $GITHUB_OUTPUT
+          echo "password=$PASSWORD" >> $GITHUB_OUTPUT
+          echo "site_url=$SITE_URL" >> $GITHUB_OUTPUT
+      
+      - name: Deploy via Kudu ZIP API
+        run: |
+          curl -X POST \
+            -u "${{ steps.extract-creds.outputs.username }}:${{ steps.extract-creds.outputs.password }}" \
+            -H "Content-Type: application/zip" \
+            --data-binary @deploy.zip \
+            "https://${{ env.AZURE_WEBAPP_NAME }}.scm.azurewebsites.net/api/zipdeploy" \
+            --max-time 600 \
+            --retry 3 \
+            --retry-delay 30
+      
+      - name: Verify deployment
+        run: |
+          sleep 30
+          curl -f "https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net" || echo "Site might still be starting up"
+
+---
+
+# Alternative Method 3: Container-based Deployment
+name: Build and deploy ASP.Net Core app to Azure Web App - TABP-App (Container)
+
+on:
+  push:
+    branches:
+      - development
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  AZURE_WEBAPP_NAME: 'TABP-App'
+  REGISTRY: 'your-registry.azurecr.io'  # Update this
+  IMAGE_NAME: 'tabp-app'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      
+      - name: Create Dockerfile
+        run: |
+          cat > Dockerfile << 'EOF'
+          FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+          WORKDIR /app
+          EXPOSE 8080
+          
+          FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+          WORKDIR /src
+          COPY ["TABP/TABP.API/TABP.API.csproj", "TABP/TABP.API/"]
+          COPY ["TABP/", "TABP/"]
+          RUN dotnet restore "TABP/TABP.API/TABP.API.csproj"
+          COPY . .
+          WORKDIR "/src/TABP/TABP.API"
+          RUN dotnet build "TABP.API.csproj" -c Release -o /app/build
+          
+          FROM build AS publish
+          RUN dotnet publish "TABP.API.csproj" -c Release -o /app/publish
+          
+          FROM base AS final
+          WORKDIR /app
+          COPY --from=publish /app/publish .
+          ENTRYPOINT ["dotnet", "TABP.API.dll"]
+          EOF
+      
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+      
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
       
       - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v2
+        run: |
+          az webapp config container set \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --resource-group your-resource-group \
+            --docker-custom-image-name ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+---
+
+# Alternative Method 4: FTP Deployment
+name: Build and deploy ASP.Net Core app to Azure Web App - TABP-App (FTP)
+
+on:
+  push:
+    branches:
+      - development
+  workflow_dispatch:
+
+env:
+  DOTNET_VERSION: '9.0.x'
+  PACKAGE_PATH: './publish'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          slot-name: 'Production'
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC6FF4270B744819BF8C6E9B49267054 }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      
+      - name: Restore dependencies
+        run: dotnet restore TABP/TABP.sln
+      
+      - name: Build
+        run: dotnet build TABP/TABP.sln --configuration Release --no-restore
+      
+      - name: Test
+        run: dotnet test TABP/TABP.sln --no-build --configuration Release
+        continue-on-error: true
+      
+      - name: Publish
+        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{ env.PACKAGE_PATH }} --no-build
+      
+      - name: Extract FTP credentials from publish profile
+        id: extract-ftp
+        run: |
+          PUBLISH_PROFILE='${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC6FF4270B744819BF8C6E9B49267054 }}'
+          FTP_HOST=$(echo "$PUBLISH_PROFILE" | grep -oP 'publishUrl="\K[^"]*' | grep ftp | head -1)
+          FTP_USERNAME=$(echo "$PUBLISH_PROFILE" | grep -oP 'userName="\K[^"]*' | head -1)
+          FTP_PASSWORD=$(echo "$PUBLISH_PROFILE" | grep -oP 'userPWD="\K[^"]*' | head -1)
+          
+          echo "ftp_host=$FTP_HOST" >> $GITHUB_OUTPUT
+          echo "ftp_username=$FTP_USERNAME" >> $GITHUB_OUTPUT
+          echo "ftp_password=$FTP_PASSWORD" >> $GITHUB_OUTPUT
+      
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ steps.extract-ftp.outputs.ftp_host }}
+          username: ${{ steps.extract-ftp.outputs.ftp_username }}
+          password: ${{ steps.extract-ftp.outputs.ftp_password }}
+          local-dir: ${{ env.PACKAGE_PATH }}/
+          server-dir: /site/wwwroot/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
