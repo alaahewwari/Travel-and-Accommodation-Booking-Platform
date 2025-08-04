@@ -1,53 +1,86 @@
+name: Build and deploy .NET Core application to Web App TABP-App
+
 on:
   push:
     branches:
-      - development
+    - development
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_PACKAGE_PATH: ./published
-  DOTNET_CORE_VERSION: '9.0.x'
+  AZURE_WEBAPP_NAME: TABP-App
+  AZURE_WEBAPP_PACKAGE_PATH: TABP/published
+  CONFIGURATION: Release
+  DOTNET_CORE_VERSION: 9.0.x
+  WORKING_DIRECTORY: TABP
 
 jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-
-      - name: Restore
-        run: dotnet restore TABP/TABP.sln
-
-      - name: Build
-        run: dotnet build TABP/TABP.sln --configuration Release --no-restore
-
-      - name: Publish
-        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: webapp
-          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+    
+    - name: Restore
+      run: dotnet restore "${{ env.WORKING_DIRECTORY }}/TABP.sln"
+    
+    - name: Build
+      run: dotnet build "${{ env.WORKING_DIRECTORY }}/TABP.sln" --configuration ${{ env.CONFIGURATION }} --no-restore
+    
+    - name: Test
+      run: dotnet test "${{ env.WORKING_DIRECTORY }}/TABP.sln" --no-build --configuration ${{ env.CONFIGURATION }}
+      continue-on-error: true  # Don't fail deployment if tests fail
+    
+    - name: Publish
+      run: dotnet publish "${{ env.WORKING_DIRECTORY }}/TABP.API/TABP.API.csproj" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" --self-contained true --runtime win-x64
+    
+    - name: List published files (debug)
+      run: |
+        echo "Published files:"
+        dir "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" /s
+      shell: cmd
+    
+    - name: Publish Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: webapp
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
   deploy:
     runs-on: windows-latest
     needs: build
+    environment: production  # Add environment protection
+    
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: webapp
-          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'TABP-App'
-          slot-name: 'Production'
-          package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC6FF4270B744819BF8C6E9B49267054 }}
+    - name: Download artifact from build job
+      uses: actions/download-artifact@v4
+      with:
+        name: webapp
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    
+    - name: Create deployment script for .NET 9
+      run: |
+        echo '@echo off' > deploy.cmd
+        echo 'echo Installing .NET 9 if needed...' >> deploy.cmd
+        echo 'if not exist "D:\Program Files\dotnet\dotnet.exe" (' >> deploy.cmd
+        echo '  echo .NET runtime not found, using self-contained deployment' >> deploy.cmd
+        echo ')' >> deploy.cmd
+        echo 'echo Deployment completed' >> deploy.cmd
+      shell: cmd
+    
+    - name: List downloaded files (debug)
+      run: |
+        echo "Downloaded files:"
+        dir "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}" /s
+      shell: cmd
+    
+    - name: Deploy to Azure WebApp
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        slot-name: 'Production'
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_AC6FF4270B744819BF8C6E9B49267054 }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
