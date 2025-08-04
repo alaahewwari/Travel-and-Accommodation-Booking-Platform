@@ -27,6 +27,7 @@ namespace TABP.API.Controllers
         /// <response code="401">User is not authenticated.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpPost(ApiRoutes.Reviews.Create)]
+        [Authorize(Roles = UserRoles.Guest)]
         [ProducesResponseType(typeof(ReviewResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -50,7 +51,6 @@ namespace TABP.API.Controllers
         /// <response code="401">User is not authenticated.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpGet(ApiRoutes.Reviews.GetById)]
-        [Authorize]
         [ProducesResponseType(typeof(ReviewResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -77,7 +77,7 @@ namespace TABP.API.Controllers
         /// <response code="404">Review not found.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpPut(ApiRoutes.Reviews.Update)]
-        [Authorize]
+        [Authorize(Roles=UserRoles.Guest)]
         [ProducesResponseType(typeof(ReviewResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
