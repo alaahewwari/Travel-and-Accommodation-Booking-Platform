@@ -23,10 +23,10 @@ jobs:
         run: dotnet restore TABP.sln
         
       - name: Build solution
-        run: dotnet build TABP.sln --configuration Release --no-restore
+        run: dotnet build TABP/TABP.sln --configuration Release --no-restore
         
       - name: Publish API project
-        run: dotnet publish TABP.API/TABP.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp --no-build
+        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp --no-build
         
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -55,3 +55,4 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_86457EF29E9048CD8560C91D51A1BD43 }}
+
