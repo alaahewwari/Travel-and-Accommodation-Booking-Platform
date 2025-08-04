@@ -47,12 +47,12 @@ jobs:
       - name: Deploy via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          # Using secrets (recommended)
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
+          # Direct credentials (works immediately but less secure)
+          server: waws-prod-hk1-063.ftp.azurewebsites.windows.net
+          username: 'TABP-App\$TABP-App'
+          password: 'LZGR5NY4gsW3qZKlCf89bpGQ0SFzZvbj3Jj5m7GmwS8PwtfWqbfodza636nj'
           
-          # Use FTP (not FTPS) initially to avoid SSL issues
+          # Use FTP protocol
           protocol: ftp
           
           # Local directory to upload
