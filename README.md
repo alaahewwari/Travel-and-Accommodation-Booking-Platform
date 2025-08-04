@@ -4,7 +4,6 @@
 
 [![Build and deploy to Azure](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml)
 
-[![codecov](https://codecov.io/gh/alaahewwari/Travel-and-Accommodation-Booking-Platform/branch/development/graph/badge.svg)](https://codecov.io/gh/alaahewwari/Travel-and-Accommodation-Booking-Platform)
 
 ## 🏨 Project Overview
 
