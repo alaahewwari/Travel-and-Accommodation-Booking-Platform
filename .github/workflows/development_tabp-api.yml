@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: read #This is required for actions/checkout
     steps:
@@ -23,8 +23,10 @@ jobs:
       - name: Build solution
         run: dotnet build TABP/TABP.sln --configuration Release --no-restore
         
+      
       - name: Publish API project
-        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp --no-build
+        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ./published --no-build
+
         
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -53,6 +55,7 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{secrets.AZUREAPPSERVICE_PUBLISHPROFILE_046B0E844ACD452FA451187583714C6E}}
+
 
 
 
