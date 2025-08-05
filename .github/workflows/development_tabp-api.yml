@@ -33,7 +33,7 @@ jobs:
           path: ${{env.DOTNET_ROOT}}/myapp
           
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: build
     environment:
       name: 'Production'
@@ -52,7 +52,8 @@ jobs:
           app-name: 'tabp-api'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_046B0E844ACD452FA451187583714C6E }}
+          publish-profile: ${{secrets.AZUREAPPSERVICE_PUBLISHPROFILE_046B0E844ACD452FA451187583714C6E}}
+
 
 
 
