@@ -15,8 +15,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-  
-      - name: Set up .NET Core
+
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '9.x'
@@ -28,13 +28,13 @@ jobs:
         run: dotnet build TABP/TABP.sln --configuration Release --no-restore
 
       - name: Publish API project
-        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp --no-build
+        run: dotnet publish TABP/TABP.API/TABP.API.csproj -c Release -o ./published --no-build
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./published
 
   deploy:
     runs-on: windows-latest
@@ -48,6 +48,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+          path: ./published
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -55,6 +56,5 @@ jobs:
         with:
           app-name: 'tabp-api'  # ← Replace with your actual new app name if different
           slot-name: 'Production'
-          package: .
+          package: ./published
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_046B0E844ACD452FA451187583714C6E }}
-
