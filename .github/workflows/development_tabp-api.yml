@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     permissions:
       contents: read #This is required for actions/checkout
     steps:
@@ -53,6 +53,7 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{secrets.AZUREAPPSERVICE_PUBLISHPROFILE_046B0E844ACD452FA451187583714C6E}}
+
 
 
 
