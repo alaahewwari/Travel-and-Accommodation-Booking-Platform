@@ -32,7 +32,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ./published
           
   deploy:
     runs-on: windows-latest
@@ -53,8 +53,9 @@ jobs:
         with:
           app-name: 'tabp-api'
           slot-name: 'Production'
-          package: .
+          package: ./published
           publish-profile: ${{secrets.AZUREAPPSERVICE_PUBLISHPROFILE_046B0E844ACD452FA451187583714C6E}}
+
 
 
 
