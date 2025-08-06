@@ -36,12 +36,9 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-
             if (result.IsFailure)
                 return BadRequest(result.Error);
-
             return Ok(result.Value);
         }
     }
-
 }

@@ -14,11 +14,10 @@ namespace TABP.API.Controllers
     /// Amenities are used to describe features or services available in rooms or hotel facilities.
     /// </summary>
     [ApiController]
-    [Route(ApiRoutes.Base)]
     public class AmenitiesController(ISender mediator) : ControllerBase
     {
         /// <summary>
-        /// Creates a new amenity (Admin only).
+        /// Creates a new amenity.
         /// </summary>
         /// <param name="request">The amenity details including name and description.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
@@ -43,7 +42,6 @@ namespace TABP.API.Controllers
             var result = await mediator.Send(command, cancellationToken);
             if (result.IsFailure)
                 return BadRequest(result.Error);
-
             return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
         }
 
@@ -115,10 +113,8 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-
             if (result.IsFailure)
                 return BadRequest(result.Error);
-
             return Ok(result.Value);
         }
     }
