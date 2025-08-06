@@ -16,7 +16,8 @@ namespace TABP.Application.Amenities.Commands.Create
             {
                 return Result<AmenityResponse>.Failure(AmenityErrors.AmenityAlreadyExists);
             }
-            var createdAmenity = await repository.CreateAmenityAsync(existingAmenity, cancellationToken);
+            var amenity = request.ToAmenityDomain();
+            var createdAmenity = await repository.CreateAmenityAsync(amenity, cancellationToken);
             var response = createdAmenity.ToAmenityResponse();
             return Result<AmenityResponse>.Success(response);
         }

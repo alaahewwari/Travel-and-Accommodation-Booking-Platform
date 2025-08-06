@@ -2,7 +2,7 @@
 using TABP.Application.Bookings.Common;
 using TABP.Application.Bookings.Mapper;
 using TABP.Application.Common;
-using TABP.Application.Users.Common.Errors;
+using TABP.Application.Users.Common;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
 using TABP.Domain.Models.Common;

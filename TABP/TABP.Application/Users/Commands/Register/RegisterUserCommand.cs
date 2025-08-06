@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using TABP.Application.Common;
+using TABP.Application.Users.Common;
 namespace TABP.Application.Users.Commands.Register
 {
     public record RegisterUserCommand(
@@ -8,5 +9,5 @@ namespace TABP.Application.Users.Commands.Register
         string Email,
         string Password,
         string RoleName
-        ) : IRequest<Result>;
+        ) : IRequest<Result<UserResponse>>;
 }

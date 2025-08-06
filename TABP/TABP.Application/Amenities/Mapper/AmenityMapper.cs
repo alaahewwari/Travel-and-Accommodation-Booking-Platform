@@ -9,7 +9,21 @@ namespace TABP.Application.Amenities.Mapper
     public static partial class AmenityMapper
     {
         public static partial AmenityResponse ToAmenityResponse(this Amenity amenity);
-        public static partial Amenity ToAmenityDomain(this CreateAmenityCommand command);
-        public static partial Amenity ToAmenityDomain(this UpdateAmenityCommand command);
+        public static Amenity ToAmenityDomain(this CreateAmenityCommand command)
+        {
+            var amenity = ToAmenityDomainInternal(command);
+            amenity.CreatedAt = DateTime.UtcNow;
+            amenity.UpdatedAt = DateTime.UtcNow;
+            return amenity;
+        }
+        //internal 
+        private static partial Amenity ToAmenityDomainInternal(CreateAmenityCommand command);
+        public static Amenity ToAmenityDomain(this UpdateAmenityCommand command)
+        {
+            var amenity = ToAmenityDomainInternal(command);
+            amenity.UpdatedAt = DateTime.UtcNow;
+            return amenity;
+        }
+        private static partial Amenity ToAmenityDomainInternal(UpdateAmenityCommand command);
     }
 }
