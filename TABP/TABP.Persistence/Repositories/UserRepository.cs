@@ -32,6 +32,8 @@ namespace TABP.Persistence.Repositories
         public async Task<User?> GetUserByUsernameAsync(string username, CancellationToken cancellationToken)
         {
             var user = await context.Users
+                .Include(u => u.Role)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Username == username, cancellationToken);
             return user;
         }

@@ -38,13 +38,13 @@ namespace TABP.Persistence.Repositories
         {
             return await context.Amenities
                 .AsNoTracking()
-                .FirstOrDefaultAsync(a => a.Name == name && !a.IsDeleted, cancellationToken);
+                .FirstOrDefaultAsync(a => a.Name == name, cancellationToken);
         }
         /// <inheritdoc />
         public async Task<Amenity?> UpdateAmenityAsync(Amenity amenity, CancellationToken cancellationToken)
         {
             var updatedCount = await context.Amenities
-                .Where(a => a.Id == amenity.Id && !a.IsDeleted)
+                .Where(a => a.Id == amenity.Id)
                 .ExecuteUpdateAsync(setters => setters
                     .SetProperty(a => a.Name, amenity.Name)
                     .SetProperty(a => a.Description, amenity.Description)
