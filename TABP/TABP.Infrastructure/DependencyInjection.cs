@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Sieve.Services;
 using System.Text;
 using TABP.Domain.Interfaces.Services;
+using TABP.Domain.Models;
 using TABP.Infrastructure.Configurations;
 using TABP.Infrastructure.Services;
 using TABP.Infrastructure.Services.Email;
@@ -67,7 +68,13 @@ namespace TABP.Infrastructure
                     IssuerSigningKey = new SymmetricSecurityKey(key)
                 };
             });
-            services.AddAuthorization();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy =>
+                    policy.RequireRole(UserRoles.Admin));
+                options.AddPolicy("GuestPolicy", policy =>
+                    policy.RequireRole(UserRoles.Guest));
+            });
         }
         private static void AddPdfServices(IServiceCollection services, IConfiguration configuration)
         {
