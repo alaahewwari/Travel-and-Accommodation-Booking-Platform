@@ -4,7 +4,7 @@ using Moq;
 using TABP.Application.Common;
 using TABP.Application.Roles.Common;
 using TABP.Application.Users.Commands.Register;
-using TABP.Application.Users.Common.Errors;
+using TABP.Application.Users.Common;
 using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
