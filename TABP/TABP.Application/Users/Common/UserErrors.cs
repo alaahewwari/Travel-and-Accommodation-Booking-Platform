@@ -1,5 +1,5 @@
 ﻿using TABP.Application.Common;
-namespace TABP.Application.Users.Common.Errors
+namespace TABP.Application.Users.Common
 {
     public static class UserErrors
     {

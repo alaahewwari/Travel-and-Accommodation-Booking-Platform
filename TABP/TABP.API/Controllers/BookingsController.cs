@@ -15,7 +15,6 @@ namespace TABP.API.Controllers
     /// invoice generation, and retrieval.
     /// </summary>
     [ApiController]
-    [Route("api/bookings")]
     [Authorize]
     public class BookingsController(ISender mediator) : ControllerBase
     {
@@ -41,7 +40,6 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error);
             return CreatedAtAction(nameof(Create), new { id = result.Value.Id }, result.Value);
         }
-
         /// <summary>
         /// Cancels an existing booking identified by its ID. Only the owner of the booking is allowed to cancel.
         /// </summary>
@@ -64,7 +62,6 @@ namespace TABP.API.Controllers
                 return NotFound(result.Error);
             return NoContent();
         }
-
         /// <summary>
         /// Retrieves the invoice associated with a specific booking in PDF format.
         /// </summary>
@@ -87,7 +84,6 @@ namespace TABP.API.Controllers
                 return NotFound(result.Error);
             return File(result.Value, "application/pdf", $"Invoice-{id}.pdf");
         }
-
         /// <summary>
         /// Retrieves detailed information for a specific booking by ID.
         /// </summary>
@@ -110,7 +106,6 @@ namespace TABP.API.Controllers
                 return NotFound(result.Error);
             return Ok(result.Value);
         }
-
         /// <summary>
         /// Retrieves a paginated list of all bookings made by the authenticated guest.
         /// </summary>
@@ -130,7 +125,6 @@ namespace TABP.API.Controllers
             Response.Headers.Append("X-Pagination", result.Value.PaginationMetadata.Build());
             return Ok(result.Value.Items);
         }
-
         /// <summary>
         /// Confirms a pending Stripe payment for a booking. Typically triggered after a redirect from a 3D Secure flow.
         /// </summary>

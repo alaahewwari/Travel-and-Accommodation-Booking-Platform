@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using TABP.Application.Common;
 using TABP.Application.Users.Common;
-using TABP.Application.Users.Common.Errors;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
 namespace TABP.Application.Users.Commands.Login

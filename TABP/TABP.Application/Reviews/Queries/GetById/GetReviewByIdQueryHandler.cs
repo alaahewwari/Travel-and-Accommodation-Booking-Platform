@@ -2,7 +2,7 @@
 using TABP.Application.Common;
 using TABP.Application.Reviews.Common;
 using TABP.Application.Reviews.Mappers;
-using TABP.Application.Users.Common.Errors;
+using TABP.Application.Users.Common;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
 namespace TABP.Application.Reviews.Queries.GetById

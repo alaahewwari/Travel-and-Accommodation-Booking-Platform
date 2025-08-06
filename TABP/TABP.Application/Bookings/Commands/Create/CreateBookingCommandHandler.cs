@@ -6,7 +6,7 @@ using TABP.Application.Bookings.Mapper;
 using TABP.Application.Common;
 using TABP.Application.Hotels.Common;
 using TABP.Application.Rooms.Common;
-using TABP.Application.Users.Common.Errors;
+using TABP.Application.Users.Common;
 using TABP.Domain.Entities;
 using TABP.Domain.Enums;
 using TABP.Domain.Exceptions;

@@ -2,7 +2,7 @@
 using TABP.Application.Common;
 using TABP.Application.Hotels.Common;
 using TABP.Application.Hotels.Mapper;
-using TABP.Application.Users.Common.Errors;
+using TABP.Application.Users.Common;
 using TABP.Domain.Interfaces.Repositories;
 namespace TABP.Application.Hotels.Queries.GetRecentlyVisited
 {

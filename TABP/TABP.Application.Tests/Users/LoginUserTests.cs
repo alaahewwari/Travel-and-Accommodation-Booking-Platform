@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Moq;
 using TABP.Application.Users.Commands.Login;
-using TABP.Application.Users.Common.Errors;
+using TABP.Application.Users.Common;
 using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;

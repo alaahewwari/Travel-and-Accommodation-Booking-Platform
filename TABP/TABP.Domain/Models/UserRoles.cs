@@ -1,4 +1,4 @@
-﻿namespace TABP.API.Common
+﻿namespace TABP.Domain.Models
 {
     public static class UserRoles
     {

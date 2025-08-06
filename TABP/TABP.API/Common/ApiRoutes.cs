@@ -40,6 +40,11 @@
             /// </summary>
             /// <example>POST api/users</example>
             public const string Register = Base;
+            /// <summary>
+            /// Retrieve a specific user by their unique identifier.
+            /// </summary>
+            /// <example>GET api/users/{id}</example>
+            public const string GetById = Base + "/{id}";
         }
 
         /// <summary>

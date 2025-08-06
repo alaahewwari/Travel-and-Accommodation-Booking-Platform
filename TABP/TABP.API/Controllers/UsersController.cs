@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using TABP.API.Common;
 using TABP.API.Contracts.Users;
 using TABP.API.Mappers;
+using TABP.Application.Users.Common;
+using TABP.Application.Users.Queries.GetById;
 namespace TABP.API.Controllers
 {
     /// <summary>
@@ -24,18 +26,41 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Register(
+        public async Task<ActionResult<UserResponse>> Register(
             [FromBody] RegisterUserRequest request,
             CancellationToken cancellationToken)
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-
             if (result.IsFailure)
                 return BadRequest(result.Error);
+            return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+        }
+        /// <summary>
+        /// Retrieves a user by their unique identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the user to retrieve.</param>
+        /// <param name="cancellationToken">Cancellation token for the request.</param>
+        /// <returns>HTTP 200 OK with user details if found; otherwise, HTTP 404 Not Found.</returns>
+        /// <response code="200">User retrieved successfully.</response>
+        /// <response code="404">User not found.</response>
+        /// <response code="500">Internal server error occurred during retrieval.</response>
+        [HttpGet(ApiRoutes.Users.GetById)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<UserResponse>> GetById(
+            [FromRoute] long id,
+            CancellationToken cancellationToken)
+        {
+            var query = new GetUserByIdQuery(id);
+            var result = await mediator.Send(query, cancellationToken);
 
-            return Created();
+            if (result.IsFailure)
+            {
+                return BadRequest(result.Error);
+            }
+            return Ok(result.Value);
         }
     }
-
 }
