@@ -127,6 +127,7 @@ This is a web API that helps manage hotel bookings, user accounts, payments, and
 
 ```
 Development: https://localhost:7120
+Production: https://tabp-api.azurewebsites.net
 ```
 
 (Note: all endpoints are prefixed with `/api`)
@@ -384,7 +385,7 @@ on:
 * **HotelImage**: Property visual content including exterior, interior, and facility photographs.
 * **RoomImage**: Room-specific imagery showcasing different room class types and layouts.
 
-###Key Features
+### Key Features
 
 * **Soft Delete**: Entities are marked as deleted, not permanently removed
 * **Audit Trails**: All entities track creation and update timestamps
