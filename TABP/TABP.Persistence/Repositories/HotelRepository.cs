@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sieve.Models;
 using Sieve.Services;
+using TABP.Application.Owners.Mapper;
 using TABP.Domain.Common;
 using TABP.Domain.Entities;
 using TABP.Domain.Enums;
@@ -42,7 +43,7 @@ namespace TABP.Persistence.Repositories
                     h.Id,
                     h.Name,
                     h.StarRating,
-                    h.Owner,
+                    h.Owner.ToOwnerForManagement(),
                     h.RoomClasses.SelectMany(rc => rc.Rooms).Count(),
                     h.CreatedAt,
                     h.UpdatedAt
