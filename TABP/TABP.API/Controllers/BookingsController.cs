@@ -94,7 +94,7 @@ namespace TABP.API.Controllers
         /// <response code="404">Booking not found or not accessible by the user.</response>
         /// <response code="401">User is not authenticated.</response>
         [HttpGet(ApiRoutes.Bookings.GetById)]
-        [Authorize(Roles = UserRoles.Guest)]
+        [Authorize]
         [ProducesResponseType(typeof(BookingResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

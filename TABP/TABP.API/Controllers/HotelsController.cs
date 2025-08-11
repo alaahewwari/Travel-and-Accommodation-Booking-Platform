@@ -85,13 +85,15 @@ namespace TABP.API.Controllers
         /// <response code="403">User is not authorized.</response>
         /// <response code="500">Internal server error.</response>
         [HttpGet(ApiRoutes.Hotels.GetAll)]
-        [ProducesResponseType(typeof(IEnumerable<HotelResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<HotelForManagementResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<HotelResponse>>> GetAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<HotelForManagementResponse>>> GetAll([FromQuery] GetHotelsRequest request,
+            CancellationToken cancellationToken)
         {
-            var result = await mediator.Send(new GetAllHotelsQuery(), cancellationToken);
+            var query = request.ToQuery();
+            var result = await mediator.Send(query, cancellationToken);
             return Ok(result.Value);
         }
         /// <summary>

@@ -55,7 +55,6 @@ namespace TABP.API.Controllers
         {
             var query = new GetUserByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-
             if (result.IsFailure)
             {
                 return BadRequest(result.Error);
