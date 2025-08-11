@@ -39,7 +39,8 @@ namespace TABP.Persistence.Repositories
             sieveModel.EnsureDefaults();
             var query = context.Bookings
                 .Where(b => b.UserId == userId)
-                .Include(b => b.Hotel);
+                .Include(b => b.Hotel)
+                .Include(b => b.Rooms);
             var filteredQuery = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
             var pagedQuery = sieveProcessor.Apply(sieveModel, filteredQuery, applyPagination: true);
             var items = await pagedQuery
@@ -68,7 +69,6 @@ namespace TABP.Persistence.Repositories
                 .Include(b => b.Hotel)
                 .Include(b => b.User)
                 .Include(b => b.Invoice)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
         }
         /// <inheritdoc />
