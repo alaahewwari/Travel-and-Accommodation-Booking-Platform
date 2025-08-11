@@ -1,7 +1,8 @@
-﻿using TABP.Domain.Enums;
+﻿using TABP.Domain.Entities.Common;
+using TABP.Domain.Enums;
 namespace TABP.Domain.Entities
 {
-    public class Invoice
+    public class Invoice : SoftDeletable
     {
         public long Id { get; set; }
         public string InvoiceNumber { get; set; } = null!;

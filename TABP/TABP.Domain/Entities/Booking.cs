@@ -18,5 +18,6 @@ namespace TABP.Domain.Entities
         public User User { get; set; } = null!;
         public Invoice? Invoice { get; set; }
         public Hotel Hotel { get; set; } = null!;
+        public Payment? Payment { get; set; }
     }
 }

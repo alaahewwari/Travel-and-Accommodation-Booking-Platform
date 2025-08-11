@@ -29,12 +29,15 @@ namespace TABP.Domain.Interfaces.Repositories
         /// </returns>
         Task<Hotel?> GetHotelByIdAsync(long id, CancellationToken cancellationToken);
         /// <summary>
-        /// Retrieves all hotels in the system formatted for management and administrative purposes.
-        /// Returns hotels with essential management information including room counts, ratings, and ownership details.
+        /// Retrieves all hotels in the system with advanced filtering, sorting, and pagination capabilities using Sieve processing.
+        /// Returns a list of hotels formatted for management and administrative purposes, including room statistics, ratings, and ownership information.
         /// </summary>
+        /// <param name="sieveModel">Sieve model containing filters, sorts, and pagination parameters for dynamic query processing.</param>
         /// <param name="cancellationToken">Cancellation token for the async operation.</param>
-        /// <returns>A collection of hotels formatted for management operations with owner and room statistics.</returns>
-        Task<IEnumerable<HotelForManagement>> GetAllHotelsAsync(CancellationToken cancellationToken);
+        /// <returns>
+        /// A collection of hotels formatted for management operations, enriched with relevant metadata such as owner details, room counts, and performance metrics.
+        /// </returns>
+        Task<PagedResult<HotelForManagement>> GetAllHotelsAsync(SieveModel sieveModel, CancellationToken cancellationToken);
         /// <summary>
         /// Updates an existing hotel's information in the repository.
         /// Performs an efficient bulk update operation and returns the updated hotel with current data.
