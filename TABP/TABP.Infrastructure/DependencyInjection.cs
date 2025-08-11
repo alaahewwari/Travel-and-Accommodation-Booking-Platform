@@ -38,6 +38,7 @@ namespace TABP.Infrastructure
         {
             services.AddScoped<SieveProcessor>();
             services.AddScoped<SieveProcessor, HotelSieveProcessor>();
+            services.AddScoped<SieveProcessor, BookingSieveProcessor>();
         }
         private static void AddEmailServices(IServiceCollection services, IConfiguration configuration)
         {
