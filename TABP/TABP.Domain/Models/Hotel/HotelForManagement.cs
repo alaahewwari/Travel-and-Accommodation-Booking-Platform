@@ -1,11 +1,11 @@
-﻿using TABP.Domain.Entities;
+﻿using TABP.Domain.Models.Owner;
 namespace TABP.Domain.Models.Hotel
 {
     public record HotelForManagement(
        long Id,
        string Name,
        int StarRating,
-       Owner Owner,
+       OwnerForManagement Owner,
        int NumberOfRooms,
        DateTime CreatedAt,
        DateTime? ModifiedAt
