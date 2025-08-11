@@ -23,7 +23,6 @@ namespace TABP.Persistence.Repositories
         {
             return await context.Amenities
                 .AsNoTracking()
-                .Where(a => !a.IsDeleted)
                 .ToListAsync(cancellationToken);
         }
         /// <inheritdoc />

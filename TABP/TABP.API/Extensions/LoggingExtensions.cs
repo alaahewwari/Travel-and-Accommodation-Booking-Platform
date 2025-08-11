@@ -15,6 +15,7 @@ namespace TABP.API.Extensions
         /// <param name="builder">The web application builder to configure logging for.</param>
         public static void ConfigureLogging(this WebApplicationBuilder builder)
         {
+            builder.Logging.ClearProviders();
             builder.Host.UseSerilog((context, loggerConfig) =>
                 loggerConfig.ReadFrom.Configuration(context.Configuration));
         }

@@ -1,65 +1,87 @@
-﻿using Serilog;
-using System.Net;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-
 namespace TABP.API.Middlewares
 {
     /// <summary>
-    /// Middleware for handling unhandled exceptions throughout the API request pipeline.
-    /// Provides centralized exception logging and standardized error responses for improved debugging and user experience.
+    /// Global exception middleware for the HTTP API.
+    /// - Runs early in the pipeline to catch unhandled exceptions.
+    /// - Logs details via <see cref="ILogger{TCategoryName}"/> with a scoped ErrorId/TraceId/Path/Method.
+    /// - Produces a standardized RFC 7807 <see cref="ProblemDetails"/> JSON response.
+    /// - Keeps logging framework-agnostic (Serilog/NLog/etc. can be plugged in via the host's logging provider).
     /// </summary>
-    public class ExceptionHandlingMiddleware
+    public sealed class ExceptionHandlingMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
 
         /// <summary>
-        /// Initializes a new instance of the ExceptionHandlingMiddleware.
+        /// Initializes a new instance of the <see cref="ExceptionHandlingMiddleware"/>.
         /// </summary>
-        /// <param name="next">The next middleware delegate in the request pipeline.</param>
-        public ExceptionHandlingMiddleware(RequestDelegate next)
+        /// <param name="next">The next middleware in the request pipeline.</param>
+        /// <param name="logger">The logger used to record exception details.</param>
+        public ExceptionHandlingMiddleware(
+            RequestDelegate next,
+            ILogger<ExceptionHandlingMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
-
         /// <summary>
-        /// Processes HTTP requests and handles any unhandled exceptions that occur in the pipeline.
-        /// Logs detailed exception information with contextual data and returns a standardized error response to the client.
+        /// Processes the HTTP request and handles any unhandled exceptions by:
+        /// - Generating a unique ErrorId for correlation.
+        /// - Logging exception details with Path, Method, and TraceId in a logging scope.
+        /// - Returning a ProblemDetails JSON payload (application/problem+json) with HTTP 500.
         /// </summary>
-        /// <param name="context">The HTTP context containing request and response information.</param>
-        /// <returns>A task representing the asynchronous operation of processing the request or handling exceptions.</returns>
-        /// <remarks>
-        /// When an exception occurs, this method:
-        /// - Generates a unique error ID for tracking purposes
-        /// - Logs comprehensive exception details including request path, method, and trace ID
-        /// - Returns a standardized JSON error response with HTTP 500 status
-        /// - Includes the error ID and trace ID for correlation with logs
-        /// </remarks>
         public async Task Invoke(HttpContext context)
         {
             try
             {
                 await _next(context);
             }
+            catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+            {
+                // Request was aborted by the client; don't overwrite response.
+                _logger.LogWarning("Request aborted by client: {Method} {Path}", context.Request.Method, context.Request.Path);
+            }
             catch (Exception ex)
             {
-                var errorId = Guid.NewGuid();
-                var path = context.Request.Path;
-                Log.ForContext("ErrorId", errorId)
-                    .ForContext("Path", context.Request.Path)
-                    .ForContext("Method", context.Request.Method)
-                    .ForContext("TraceId", context.TraceIdentifier)
-                    .Error("Unhandled exception [{ExceptionType}] on {Method} {Path}: {ErrorMessage}",
-                    ex.GetType().Name, context.Request.Method, context.Request.Path, ex.Message);
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                context.Response.ContentType = "application/json";
-                var errorResponse = new
+                var errorId = Guid.NewGuid().ToString("n");
+
+                using (_logger.BeginScope(new Dictionary<string, object?>
                 {
-                    errorId,
-                    message = "An unexpected error occurred.",
-                    traceId = context.TraceIdentifier
-                };
-                var json = JsonSerializer.Serialize(errorResponse);
-                await context.Response.WriteAsync(json);
+                    ["ErrorId"] = errorId,
+                    ["TraceId"] = context.TraceIdentifier,
+                    ["Path"] = context.Request.Path.Value,
+                    ["Method"] = context.Request.Method
+                }))
+                {
+                    _logger.LogError(ex, "Unhandled exception");
+                }
+
+                if (!context.Response.HasStarted)
+                {
+                    context.Response.Clear();
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    context.Response.ContentType = "application/problem+json";
+
+                    var problem = new ProblemDetails
+                    {
+                        Title = "An unexpected error occurred.",
+                        Status = StatusCodes.Status500InternalServerError,
+                        Detail = "Contact support and provide the identifiers for correlation.",
+                        Instance = context.Request.Path
+                    };
+                    problem.Extensions["errorId"] = errorId;
+                    problem.Extensions["traceId"] = context.TraceIdentifier;
+
+                    // Use the same JSON settings as the app (optional)
+                    var json = JsonSerializer.Serialize(problem, new JsonSerializerOptions
+                    {
+                        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                        WriteIndented = false
+                    });
+                    await context.Response.WriteAsync(json);
+                }
             }
         }
     }

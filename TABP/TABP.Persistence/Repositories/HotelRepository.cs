@@ -33,9 +33,10 @@ namespace TABP.Persistence.Repositories
                 .FirstOrDefaultAsync(h => h.Id == id, cancellationToken);
         }
         /// <inheritdoc />
-        public async Task<IEnumerable<HotelForManagement>> GetAllHotelsAsync(CancellationToken cancellationToken)
+        public async Task<PagedResult<HotelForManagement>> GetAllHotelsAsync(SieveModel sieveModel, CancellationToken cancellationToken)
         {
-            var hotels = await context.Hotels
+            sieveModel.EnsureDefaults();
+            var query = context.Hotels
                 .Select(h => new HotelForManagement
                 (
                     h.Id,
@@ -45,8 +46,23 @@ namespace TABP.Persistence.Repositories
                     h.RoomClasses.SelectMany(rc => rc.Rooms).Count(),
                     h.CreatedAt,
                     h.UpdatedAt
-                )).ToListAsync(cancellationToken);
-            return hotels;
+                ));
+            var filteredQuery = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
+            var pagedQuery = sieveProcessor.Apply(sieveModel, filteredQuery, applyPagination: true);
+            var items = await pagedQuery.ToListAsync(cancellationToken);
+            var totalCount = await filteredQuery.CountAsync(cancellationToken);
+            var totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize!.Value);
+            var metadata = new PaginationMetadata(
+                totalCount,
+                totalPages,
+                sieveModel.Page!.Value,
+                sieveModel.PageSize.Value
+            );
+            return new PagedResult<HotelForManagement>
+            {
+                Items = items,
+                PaginationMetadata = metadata
+            };
         }
         /// <inheritdoc />
         public async Task<Hotel?> UpdateHotelAsync(Hotel hotel, CancellationToken cancellationToken)

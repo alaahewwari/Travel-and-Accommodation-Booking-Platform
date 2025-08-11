@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TABP.Persistence.Context;
 
@@ -11,16 +12,33 @@ using TABP.Persistence.Context;
 namespace TABP.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250809205833_Update_Datatype_for_Amenity_Model")]
+    partial class Update_Datatype_for_Amenity_Model
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("AmenityRoomClass", b =>
+                {
+                    b.Property<int>("AmenitiesId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("RoomClassesId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("AmenitiesId", "RoomClassesId");
+
+                    b.HasIndex("RoomClassesId");
+
+                    b.ToTable("RoomClassAmenities", (string)null);
+                });
 
             modelBuilder.Entity("BookingRoom", b =>
                 {
@@ -35,21 +53,6 @@ namespace TABP.Persistence.Migrations
                     b.HasIndex("RoomsId");
 
                     b.ToTable("BookingRoom");
-                });
-
-            modelBuilder.Entity("RoomClassAmenities", b =>
-                {
-                    b.Property<int>("AmenityId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("RoomClassId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("AmenityId", "RoomClassId");
-
-                    b.HasIndex("RoomClassId");
-
-                    b.ToTable("RoomClassAmenities");
                 });
 
             modelBuilder.Entity("TABP.Domain.Entities.Amenity", b =>
@@ -71,6 +74,9 @@ namespace TABP.Persistence.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<long?>("HotelId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -83,6 +89,8 @@ namespace TABP.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
 
                     b.ToTable("Amenities", (string)null);
                 });
@@ -547,15 +555,9 @@ namespace TABP.Persistence.Migrations
                     b.Property<long>("BookingId")
                         .HasColumnType("bigint");
 
-                    b.Property<DateTime>("DeletedOn")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("InvoiceNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("IssueDate")
                         .HasColumnType("datetime2");
@@ -564,8 +566,7 @@ namespace TABP.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(10,2)");
 
                     b.HasKey("Id");
 
@@ -662,15 +663,13 @@ namespace TABP.Persistence.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<long>("BookingId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("ClientSecret")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Currency")
                         .HasColumnType("int");
@@ -679,20 +678,17 @@ namespace TABP.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("FailureReason")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("PaymentIntentId")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaymentMethodId")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ProcessedAt")
                         .HasColumnType("datetime2");
@@ -705,8 +701,7 @@ namespace TABP.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookingId")
-                        .IsUnique();
+                    b.HasIndex("BookingId");
 
                     b.ToTable("Payments");
                 });
@@ -1176,6 +1171,21 @@ namespace TABP.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("AmenityRoomClass", b =>
+                {
+                    b.HasOne("TABP.Domain.Entities.Amenity", null)
+                        .WithMany()
+                        .HasForeignKey("AmenitiesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TABP.Domain.Entities.RoomClass", null)
+                        .WithMany()
+                        .HasForeignKey("RoomClassesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("BookingRoom", b =>
                 {
                     b.HasOne("TABP.Domain.Entities.Booking", null)
@@ -1191,19 +1201,11 @@ namespace TABP.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("RoomClassAmenities", b =>
+            modelBuilder.Entity("TABP.Domain.Entities.Amenity", b =>
                 {
-                    b.HasOne("TABP.Domain.Entities.Amenity", null)
-                        .WithMany()
-                        .HasForeignKey("AmenityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TABP.Domain.Entities.RoomClass", null)
-                        .WithMany()
-                        .HasForeignKey("RoomClassId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("TABP.Domain.Entities.Hotel", null)
+                        .WithMany("Amenities")
+                        .HasForeignKey("HotelId");
                 });
 
             modelBuilder.Entity("TABP.Domain.Entities.Booking", b =>
@@ -1280,8 +1282,8 @@ namespace TABP.Persistence.Migrations
             modelBuilder.Entity("TABP.Domain.Entities.Payment", b =>
                 {
                     b.HasOne("TABP.Domain.Entities.Booking", "Booking")
-                        .WithOne("Payment")
-                        .HasForeignKey("TABP.Domain.Entities.Payment", "BookingId")
+                        .WithMany()
+                        .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1369,8 +1371,6 @@ namespace TABP.Persistence.Migrations
             modelBuilder.Entity("TABP.Domain.Entities.Booking", b =>
                 {
                     b.Navigation("Invoice");
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("TABP.Domain.Entities.City", b =>
@@ -1387,6 +1387,8 @@ namespace TABP.Persistence.Migrations
 
             modelBuilder.Entity("TABP.Domain.Entities.Hotel", b =>
                 {
+                    b.Navigation("Amenities");
+
                     b.Navigation("Bookings");
 
                     b.Navigation("HotelImages");

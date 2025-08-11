@@ -74,10 +74,8 @@ namespace TABP.API.Controllers
         {
             var query = new GetRoleByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-
             if (result.IsFailure)
                 return NotFound(result.Error);
-
             return Ok(result.Value);
         }
         /// <summary>
@@ -159,10 +157,8 @@ namespace TABP.API.Controllers
         {
             var command = new DeleteRoleCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-
             if (result.IsFailure)
                 return NotFound(result.Error);
-
             return NoContent();
         }
     }

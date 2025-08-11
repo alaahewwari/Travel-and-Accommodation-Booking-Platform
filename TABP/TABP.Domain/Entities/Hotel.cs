@@ -19,7 +19,6 @@ namespace TABP.Domain.Entities
         public Owner Owner { get; set; } = null!;
         public ICollection<RoomClass> RoomClasses { get; set; } = [];
         public ICollection<HotelImage> HotelImages { get; set; } = [];
-        public ICollection<Amenity> Amenities { get; set; } = [];
         public ICollection<Review> Reviews { get; set; } = [];
         public ICollection<Room> Rooms { get; set; } = [];
         public ICollection<Booking> Bookings { get; set; } = [];

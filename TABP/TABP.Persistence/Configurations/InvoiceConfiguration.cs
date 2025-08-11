@@ -13,7 +13,7 @@ namespace TABP.Persistence.Configurations
             builder.Property(i => i.InvoiceNumber).IsRequired();
             builder.Property(i => i.IssueDate).IsRequired();
             builder.Property(i => i.TotalAmount)
-                   .HasColumnType("decimal(10,2)")
+                    .HasPrecision(18, 2)
                    .IsRequired();
             builder.Property(i => i.Status)
                    .HasConversion<int>()
@@ -23,6 +23,7 @@ namespace TABP.Persistence.Configurations
                    .HasForeignKey<Invoice>(i => i.BookingId);
             builder.HasIndex(i => i.BookingId)
                     .IsUnique();
+            builder.HasQueryFilter(p => !p.IsDeleted);
         }
     }
 }

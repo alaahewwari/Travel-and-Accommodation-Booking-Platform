@@ -13,9 +13,21 @@ namespace TABP.Persistence.Configurations
             builder.Property(a => a.Name).IsRequired().HasMaxLength(100);
             builder.Property(a => a.Description).IsRequired().HasMaxLength(500);
             builder.HasMany(a => a.RoomClasses)
-                   .WithMany(rc => rc.Amenities)
-                   .UsingEntity(j => j.ToTable(TableNames.RoomClassAmenities));
-            builder.HasQueryFilter(a => !a.IsDeleted);
+                .WithMany(rc => rc.Amenities)
+                .UsingEntity<Dictionary<string, object>>(
+                    TableNames.RoomClassAmenities,
+                    right => right
+                    .HasOne<RoomClass>()
+                    .WithMany()
+                    .HasForeignKey("RoomClassId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                    left => left
+                    .HasOne<Amenity>()
+                    .WithMany()
+                    .HasForeignKey("AmenityId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    );
+           builder.HasQueryFilter(a => !a.IsDeleted);
         }
     }
 }
