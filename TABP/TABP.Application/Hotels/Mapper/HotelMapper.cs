@@ -1,10 +1,12 @@
 ﻿using Riok.Mapperly.Abstractions;
 using Sieve.Models;
+using TABP.Application.Bookings.Queries.GetById;
 using TABP.Application.Hotels.Commands.AddToGallery;
 using TABP.Application.Hotels.Commands.Create;
 using TABP.Application.Hotels.Commands.SetThumbnail;
 using TABP.Application.Hotels.Commands.Update;
 using TABP.Application.Hotels.Common;
+using TABP.Application.Hotels.Queries.GetAll;
 using TABP.Application.Hotels.Queries.Search;
 using TABP.Domain.Application.Common;
 using TABP.Domain.Entities;
@@ -17,7 +19,7 @@ namespace TABP.Application.Hotels.Mapper
     public static partial class HotelMapper
     {
         public static partial HotelResponse ToHotelResponse(this Hotel hotel);
-        public static partial HotelForManagementResponse ToHotelForManagementResponse(this HotelForManagement hotel);
+        public static partial PagedResult<HotelForManagementResponse> ToHotelForManagementResponse(this PagedResult<HotelForManagement> hotel);
         public static Hotel ToHotelDomain(this CreateHotelCommand command)
         {
             var hotel = ToHotelDomainInternal(command);
@@ -56,5 +58,6 @@ namespace TABP.Application.Hotels.Mapper
             hotelImage.ImageType = type;
             return hotelImage;
         }
+        public static partial SieveModel ToSieveModel(this GetAllHotelsQuery query);
     }
 }
