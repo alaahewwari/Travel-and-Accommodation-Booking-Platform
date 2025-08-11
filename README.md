@@ -1,6 +1,6 @@
 # Travel and Accommodation Booking Platform API (TABP)
 
-[![Build and Test](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/ci-build-and-test.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/ci-build-and-test.yml)
+[![Build and Test](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/ci-build-and-test.yml/badge.svg?branch=development)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/ci-build-and-test.yml)
 
 [![Build and deploy to Azure](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml/badge.svg)](https://github.com/alaahewwari/Travel-and-Accommodation-Booking-Platform/actions/workflows/development_tabp-app.yml)
 
