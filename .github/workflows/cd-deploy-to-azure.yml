@@ -3,7 +3,7 @@ name: Build and deploy to Azure
 on:
   push:
     branches:
-      - development
+      - main
   workflow_dispatch:
 
 jobs:
@@ -58,3 +58,4 @@ jobs:
           slot-name: 'Production'
           package: ./published
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_046B0E844ACD452FA451187583714C6E }}
+
