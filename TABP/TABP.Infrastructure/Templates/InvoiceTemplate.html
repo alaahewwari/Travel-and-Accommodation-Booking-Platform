@@ -1,0 +1,333 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{ InvoiceNumber }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1.5rem;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .invoice-container {
+            background: #ffffff;
+            border-radius: 16px;
+            max-width: 800px;
+            margin: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .invoice-header {
+            background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+            .invoice-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+                animation: float 20s ease-in-out infinite;
+            }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .company-name {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .invoice-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+            opacity: 0.9;
+        }
+
+        .invoice-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffeb3b;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .invoice-body {
+            padding: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-section {
+            background: #f8faff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid #3f51b5;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .info-section:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(63, 81, 181, 0.15);
+            }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #3f51b5;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+            .section-title::before {
+                content: '';
+                width: 8px;
+                height: 8px;
+                background: #3f51b5;
+                border-radius: 50%;
+            }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e8ecf3;
+        }
+
+            .info-row:last-child {
+                border-bottom: none;
+            }
+
+        .label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .value {
+            color: #222;
+            font-weight: 500;
+            text-align: right;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-paid {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .status-unpaid {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #ff9800, #ffb74d);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #f8faff 0%, #e8f2ff 100%);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 2px solid rgba(63, 81, 181, 0.1);
+            text-align: center;
+        }
+
+        .total-label {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .total-amount {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #3f51b5;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .footer {
+            background: #f5f7fa;
+            text-align: center;
+            padding: 1.5rem;
+            border-top: 3px solid #3f51b5;
+        }
+
+        .footer-message {
+            font-size: 1rem;
+            color: #3f51b5;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-details {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+
+            .invoice-container {
+                box-shadow: none;
+                max-width: none;
+            }
+
+            .invoice-header::before {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .invoice-body {
+                padding: 1.5rem;
+            }
+
+            .total-amount {
+                font-size: 1.8rem;
+            }
+
+            .company-name {
+                font-size: 1.6rem;
+            }
+
+            .invoice-number {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <div class="header-content">
+                <div class="company-name">{{HotelName}}</div>
+                <div class="invoice-title">INVOICE</div>
+                <div class="invoice-number">#{{ InvoiceNumber }}</div>
+            </div>
+        </div>
+
+        <div class="invoice-body">
+            <div class="info-grid">
+                <div class="info-section">
+                    <div class="section-title">Invoice Details</div>
+                    <div class="info-row">
+                        <span class="label">Invoice Number:</span>
+                        <span class="value">{{ InvoiceNumber }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Issue Date:</span>
+                        <span class="value">{{ IssueDate }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Status:</span>
+                        <span class="value">
+                            <span class="status status-{{ Status | string.downcase }}">
+                                {{ Status }}
+                            </span>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="section-title">Customer Information</div>
+                    <div class="info-row">
+                        <span class="label">Guest Name:</span>
+                        <span class="value">{{ BookingCustomerName }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Check-In:</span>
+                        <span class="value">{{ CheckInDateFormatted }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Check-Out:</span>
+                        <span class="value">{{ CheckOutDateFormatted }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="total-section">
+                <div class="total-label">Total Amount</div>
+                <div class="total-amount">${{ TotalAmountFormatted }}</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-message">
+                🏨 Thank you for choosing our hotel!
+            </div>
+            <div class="footer-details">
+                We hope you had a wonderful stay with us.<br>
+                For any questions about this invoice, please contact our billing department.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

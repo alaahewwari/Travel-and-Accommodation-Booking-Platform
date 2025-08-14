@@ -1,0 +1,28 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using TABP.Domain.Entities;
+using TABP.Domain.Constants;
+namespace TABP.Persistence.Configurations
+{
+    public class RoomConfigurations : IEntityTypeConfiguration<Room>
+    {
+        public void Configure(EntityTypeBuilder<Room> builder)
+        {
+            builder.ToTable(TableNames.Rooms);
+            builder.HasKey(r => r.Id);
+            builder.Property(r => r.Number)
+                   .IsRequired()
+                   .HasMaxLength(20);
+            builder.Property(r => r.CreatedAt)
+                   .IsRequired();
+            builder.HasOne(r => r.RoomClass)
+               .WithMany(rc => rc.Rooms)
+               .HasForeignKey(r => r.RoomClassId)
+               .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(r => r.Hotel)
+               .WithMany(h => h.Rooms)
+               .HasForeignKey(r => r.HotelId);
+            builder.HasQueryFilter(r => !r.IsDeleted);
+        }
+    }
+}
