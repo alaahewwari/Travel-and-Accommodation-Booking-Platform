@@ -7,7 +7,7 @@ namespace TABP.Persistence.Repositories
     /// <summary>
     /// EF Core implementation of <see cref="IReviewRepository"/>, with best practices for data access.
     /// </summary>
-    internal class ReviewRepository(ApplicationDbContext context) : IReviewRepository
+    public class ReviewRepository(ApplicationDbContext context) : IReviewRepository
     {
         /// <inheritdoc/>
         public async Task<Review> CreateReviewAsync(Review review, CancellationToken cancellationToken)
@@ -53,6 +53,12 @@ namespace TABP.Persistence.Repositories
         {
             context.Reviews.Remove(review);
             await context.SaveChangesAsync(cancellationToken);
+        }
+        public async Task<double> GetAverageRatingAsync(long hotelId, CancellationToken cancellationToken)
+        {
+            return await context.Reviews
+                .Where(r => r.HotelId == hotelId)
+                .AverageAsync(r => r.Rating, cancellationToken);
         }
     }
 }

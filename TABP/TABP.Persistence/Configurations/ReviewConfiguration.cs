@@ -10,8 +10,9 @@ namespace TABP.Persistence.Configurations
         {
             builder.ToTable(TableNames.Reviews);
             builder.HasKey(r => r.Id);
-            builder.Property(r => r.Rating)
-                   .IsRequired();
+            builder.Property(h => h.Rating)
+                   .IsRequired()
+                   .HasDefaultValue(0);
             builder.Property(r => r.Comment)
                    .HasMaxLength(1000);
             builder.Property(r => r.CreatedAt)

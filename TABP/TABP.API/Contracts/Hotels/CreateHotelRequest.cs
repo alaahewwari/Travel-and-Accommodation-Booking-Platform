@@ -18,7 +18,6 @@
     string? Description,
     string BriefDescription,
     string Address,
-    byte StarRating,
     double LocationLatitude,
     double LocationLongitude,
     int CityId,

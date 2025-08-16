@@ -10,7 +10,8 @@ namespace TABP.Application.Hotels.Commands.Create
     public class CreateHotelCommandHandler(
         IHotelRepository hotelRepository,
         ICityRepository cityRepository,
-        IOwnerRepository ownerRepository
+        IOwnerRepository ownerRepository,
+        IReviewRepository reviewRepository
         ) : IRequestHandler<CreateHotelCommand, Result<HotelResponse>>
     {
         public async Task<Result<HotelResponse>> Handle(CreateHotelCommand request, CancellationToken cancellationToken)

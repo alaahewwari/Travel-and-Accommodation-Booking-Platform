@@ -4,6 +4,7 @@ using TABP.Application.Hotels.Common;
 using TABP.Application.Reviews.Common;
 using TABP.Application.Reviews.Mappers;
 using TABP.Application.Users.Common;
+using TABP.Domain.Entities;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Interfaces.Services;
 namespace TABP.Application.Reviews.Commands.Create
@@ -12,6 +13,7 @@ namespace TABP.Application.Reviews.Commands.Create
         IReviewRepository reviewRepository,
         IHotelRepository hotelRepository,
         IUserContext userContext,
+        IUnitOfWork unitOfWork,
         IUserRepository userRepository) : IRequestHandler<CreateReviewCommand, Result<ReviewResponse>>
     {
         public async Task<Result<ReviewResponse>> Handle(CreateReviewCommand request, CancellationToken cancellationToken)
@@ -29,8 +31,15 @@ namespace TABP.Application.Reviews.Commands.Create
             var review = request.ToDomain();
             review.UserId = existingUser.Id;
             review.HotelId = existingHotel.Id;
-            var createdReview = await reviewRepository.CreateReviewAsync(review, cancellationToken);
-            return Result<ReviewResponse>.Success(createdReview.ToReviewResponse());
+            Review createdReview = null!;
+            await unitOfWork.ExecuteResilientTransactionAsync(async cancellationToken =>
+            {
+                createdReview = await reviewRepository.CreateReviewAsync(review, cancellationToken);
+                var averageRating = await reviewRepository.GetAverageRatingAsync(request.HotelId, cancellationToken);
+                existingHotel.StarRating = (byte) Math.Round(averageRating);
+                await hotelRepository.UpdateHotelAsync(existingHotel, cancellationToken);
+            }, cancellationToken);
+            return Result<ReviewResponse>.Success(review.ToReviewResponse());
         }
     }
 }

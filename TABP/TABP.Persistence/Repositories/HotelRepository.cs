@@ -51,13 +51,26 @@ namespace TABP.Persistence.Repositories
             var filteredQuery = sieveProcessor.Apply(sieveModel, query, applyPagination: false);
             var pagedQuery = sieveProcessor.Apply(sieveModel, filteredQuery, applyPagination: true);
             var items = await pagedQuery.ToListAsync(cancellationToken);
-            var totalCount = await filteredQuery.CountAsync(cancellationToken);
-            var totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize!.Value);
-            var metadata = new PaginationMetadata(
-                totalCount,
-                totalPages,
-                sieveModel.Page!.Value,
-                sieveModel.PageSize.Value
+            int totalCount;
+            int totalPages;
+            // Only count all when first page (or invalid page 0)
+            if (sieveModel.Page.Value <= 1)
+            {
+                totalCount = await filteredQuery.CountAsync(cancellationToken);
+                totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.Value);
+            }
+            else
+            {
+                // For higher pages, we only know the count of current items
+                totalCount = items.Count;
+                totalPages = sieveModel.Page.Value;
+            }
+            var metadata = new PaginationMetadata
+            (
+                    totalCount,
+                    totalPages,
+                    sieveModel.Page.Value,
+                    sieveModel.PageSize.Value
             );
             return new PagedResult<HotelForManagement>
             {

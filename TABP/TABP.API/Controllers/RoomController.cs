@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Rooms;
 using TABP.API.Mappers;
@@ -15,6 +16,7 @@ namespace TABP.API.Controllers
     /// updates, and deletion. All modifying actions require admin privileges.
     /// </summary>
     [ApiController]
+    [OutputCache(Duration = 60)]
     public class RoomsController(ISender mediator) : ControllerBase
     {
         /// <summary>
@@ -74,10 +76,8 @@ namespace TABP.API.Controllers
         {
             var query = new GetRoomByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-
             if (result.IsFailure)
                 return NotFound(result.Error);
-
             return Ok(result.Value);
         }
         /// <summary>
@@ -127,10 +127,8 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-
             if (result.IsFailure)
                 return BadRequest(result.Error);
-
             return Ok(result.Value);
         }
         /// <summary>
@@ -157,10 +155,8 @@ namespace TABP.API.Controllers
         {
             var command = new DeleteRoomCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-
             if (result.IsFailure)
                 return NotFound(result.Error);
-
             return NoContent();
         }
     }

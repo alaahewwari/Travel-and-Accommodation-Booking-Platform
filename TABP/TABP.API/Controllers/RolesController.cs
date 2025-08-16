@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using System.Diagnostics;
 using TABP.API.Common;
 using TABP.API.Contracts.Rules;
@@ -16,6 +17,7 @@ namespace TABP.API.Controllers
     /// update, and deletion operations. Only accessible to administrators.
     /// </summary>
     [ApiController]
+    [OutputCache(Duration = 60)]
     public class RolesController(ISender mediator) : ControllerBase
     {
         /// <summary>
