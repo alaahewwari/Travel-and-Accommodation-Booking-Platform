@@ -6,6 +6,7 @@ using TABP.Domain.Entities;
 using TABP.Domain.Enums;
 using TABP.Domain.Interfaces.Repositories;
 using TABP.Domain.Models.Common;
+using TABP.Domain.Models.Hotel;
 using TABP.Persistence.Context;
 namespace TABP.Persistence.Repositories
 {
@@ -46,14 +47,19 @@ namespace TABP.Persistence.Repositories
             var items = await pagedQuery
                 .AsNoTracking()
                 .ToListAsync(cancellationToken);
-            var totalCount = await filteredQuery.CountAsync(cancellationToken);
+            var totalCount = await pagedQuery.CountAsync();
             var totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.Value);
+            if (sieveModel.Page.Value <= 1)
+            {
+                totalCount = await filteredQuery.CountAsync(cancellationToken);
+                totalPages = (int)Math.Ceiling((double)totalCount / sieveModel.PageSize.Value);
+            }
             var metadata = new PaginationMetadata
             (
-                totalCount,
-                totalPages,
-                sieveModel.Page.Value,
-                sieveModel.PageSize.Value
+                    totalCount,
+                    totalPages,
+                    sieveModel.Page.Value,
+                    sieveModel.PageSize.Value
             );
             return new PagedResult<Booking>
             {
