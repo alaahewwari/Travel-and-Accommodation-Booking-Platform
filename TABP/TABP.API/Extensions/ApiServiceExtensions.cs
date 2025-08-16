@@ -1,4 +1,5 @@
 ﻿using TABP.API.Configurations;
+using TABP.API.Filters;
 using TABP.API.Services;
 using TABP.Domain.Interfaces.Services;
 namespace TABP.API.Extensions
@@ -17,7 +18,10 @@ namespace TABP.API.Extensions
         public static void AddApiServices(this IServiceCollection services)
         {
             services.AddSwagger();
-            services.AddControllers();
+            services.AddControllers(o =>
+            {
+                o.Filters.Add(new PublicCacheHeaderFilter(60));
+            });
             services.AddApiValidation();
             services.AddOpenApi();
             services.AddEndpointsApiExplorer();

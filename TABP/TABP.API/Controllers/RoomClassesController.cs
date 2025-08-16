@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Amenities;
 using TABP.API.Contracts.Images;
@@ -20,7 +21,7 @@ namespace TABP.API.Controllers
     /// updates, deletion, image uploads, amenity assignment, and discount retrieval.
     /// </summary>
     [ApiController]
-    // [OutputCache(Duration = 60)] // Uncomment to enable response caching
+    [OutputCache(Duration = 60)]
     public class RoomClassesController(ISender mediator) : ControllerBase
     {
         /// <summary>

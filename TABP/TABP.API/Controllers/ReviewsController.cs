@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Reviews;
 using TABP.API.Mappers;
@@ -14,6 +15,7 @@ namespace TABP.API.Controllers
     /// approval, and rejection operations.
     /// </summary>
     [ApiController]
+    [OutputCache(Duration = 60)]
     public class ReviewsController(ISender mediator) : ControllerBase
     {
         /// <summary>

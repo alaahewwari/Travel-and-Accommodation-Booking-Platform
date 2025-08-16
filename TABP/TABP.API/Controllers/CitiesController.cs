@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Cities;
 using TABP.API.Contracts.Images;
@@ -17,7 +18,7 @@ namespace TABP.API.Controllers
     /// setting city thumbnails, and fetching trending cities.
     /// </summary>
     [ApiController]
-    // [OutputCache(Duration = 60)] // Enable if caching is needed
+    [OutputCache(Duration = 60)]
     public class CitiesController(ISender mediator) : ControllerBase
     {
         /// <summary>
@@ -46,7 +47,6 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error);
             return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
         }
-
         /// <summary>
         /// Retrieves a city by its unique identifier.
         /// </summary>
@@ -71,7 +71,6 @@ namespace TABP.API.Controllers
                 return NotFound(result.Error);
             return Ok(result.Value);
         }
-
         /// <summary>
         /// Retrieves a list of all available cities.
         /// </summary>
@@ -92,7 +91,6 @@ namespace TABP.API.Controllers
             var result = await mediator.Send(query, cancellationToken);
             return Ok(result.Value);
         }
-
         /// <summary>
         /// Updates an existing city. Only accessible by administrators.
         /// </summary>
@@ -122,7 +120,6 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error);
             return Ok(result.Value);
         }
-
         /// <summary>
         /// Deletes a city by its ID. Only accessible by administrators.
         /// </summary>
