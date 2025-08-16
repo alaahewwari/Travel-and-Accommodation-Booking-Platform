@@ -60,5 +60,13 @@ namespace TABP.Domain.Interfaces.Repositories
         /// True if the review was successfully deleted; false if no review was found.
         /// </returns>
         Task DeleteReviewAsync(Review review, CancellationToken cancellationToken);
+        /// <summary>
+        /// Calculates the average rating for all reviews of a specific hotel.
+        /// Returns 0 if the hotel has no reviews.
+        /// </summary>
+        /// <param name="hotelId">The unique identifier of the hotel.</param>
+        /// <param name="cancellationToken">Cancellation token for the async operation.</param>
+        /// <returns>The average rating as a double, or 0 if no reviews are found.</returns>
+        Task<double> GetAverageRatingAsync(long hotelId, CancellationToken cancellationToken);
     }
 }
