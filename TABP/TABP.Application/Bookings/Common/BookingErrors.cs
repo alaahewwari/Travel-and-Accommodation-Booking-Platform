@@ -55,5 +55,9 @@ namespace TABP.Application.Bookings.Common
             Code: "Booking.NotPending",
             Description: "Booking is not in a pending state and cannot be confirmed."
         );
+        public static readonly Error BookingUpdateFailed = new(
+            Code: "Booking.UpdateFailed",
+            Description: "An error occurred while updating the booking."
+        );
     }
 }
