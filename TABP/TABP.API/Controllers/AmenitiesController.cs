@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Amenities;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Amenities.Common;
 using TABP.Application.Amenities.Queries.GetAll;
@@ -36,15 +37,13 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create(
+        public async Task<ActionResult<AmenityResponse>> Create(
             [FromBody] CreateAmenityRequest request,
             CancellationToken cancellationToken)
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+            return result.ToCreatedResult(nameof(GetById), amenity => new { id = amenity.Id });
         }
         /// <summary>
         /// Retrieves a list of all amenities available in the system.
@@ -56,13 +55,12 @@ namespace TABP.API.Controllers
         [HttpGet(ApiRoutes.Amenities.GetAll)]
         [ProducesResponseType(typeof(IEnumerable<AmenityResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<AmenityResponse>>> GetAll(CancellationToken cancellationToken)
         {
             var query = new GetAllAmenitiesQuery();
             var result = await mediator.Send(query, cancellationToken);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
-
         /// <summary>
         /// Retrieves details of a specific amenity by its ID.
         /// </summary>
@@ -74,12 +72,10 @@ namespace TABP.API.Controllers
         [HttpGet(ApiRoutes.Amenities.GetById)]
         [ProducesResponseType(typeof(AmenityResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetById(long id, CancellationToken cancellationToken)
+        public async Task<ActionResult<AmenityResponse>> GetById(long id, CancellationToken cancellationToken)
         {
             var result = await mediator.Send(new GetAmenityByIdQuery(id), cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Updates an existing amenity (Admin only).
@@ -107,9 +103,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
     }
 }

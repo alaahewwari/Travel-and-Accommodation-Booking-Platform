@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Owners;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Owners.Commands.Delete;
 using TABP.Application.Owners.Common;
@@ -42,9 +43,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+            return result.ToCreatedResult(nameof(GetById), owner => new { id = owner.Id });
         }
         /// <summary>
         /// Retrieves a hotel owner by their ID.
@@ -69,9 +68,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetOwnerByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Updates the details of an existing hotel owner.
@@ -101,9 +98,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Deletes a hotel owner by ID.
@@ -123,15 +118,13 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Delete(
+        public async Task<ActionResult<object>> Delete(
             [FromRoute] int id,
             CancellationToken cancellationToken)
         {
             var command = new DeleteOwnerCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return NoContent();
+            return result.ToActionResult();
         }
     }
 }

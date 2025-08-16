@@ -409,6 +409,10 @@
             /// </summary>
             /// <example>GET api/bookings/{id}/invoice.pdf</example>
             public const string GetInvoicePdf = Base + "/{id}/invoice.pdf";
+            /// <summary>
+            /// Update booking details.
+            /// </summary>
+            public const string Update = Base + "/{id}";
         }
 
         /// <summary>

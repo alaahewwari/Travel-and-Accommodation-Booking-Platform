@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Discounts;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Discounts.Commands.Delete;
 using TABP.Application.Discounts.Common;
@@ -44,12 +45,8 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(roomClassId);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return Created(string.Empty, result.Value);
+            return result.ToCreatedResult("", new { });
         }
-
         /// <summary>
         /// Deletes a discount by its unique ID. Only accessible by administrators.
         /// </summary>
@@ -68,14 +65,11 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<object>> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
             var command = new DeleteDiscountCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-
-            return NoContent();
+            return result.ToActionResult();
         }
     }
 }

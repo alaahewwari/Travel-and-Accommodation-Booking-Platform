@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Users;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Users.Common;
 namespace TABP.API.Controllers
@@ -38,9 +39,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
     }
 }

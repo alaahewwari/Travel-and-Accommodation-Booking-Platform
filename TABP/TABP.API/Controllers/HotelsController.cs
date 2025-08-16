@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Hotels;
 using TABP.API.Contracts.Images;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Hotels.Commands.Delete;
 using TABP.Application.Hotels.Common;
@@ -41,14 +42,11 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create([FromBody] CreateHotelRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<HotelResponse>> Create([FromBody] CreateHotelRequest request, CancellationToken cancellationToken)
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+            return result.ToCreatedResult(nameof(GetById), hotel => new { id = hotel });
         }
         /// <summary>
         /// Retrieves a hotel by its unique ID.
@@ -71,9 +69,7 @@ namespace TABP.API.Controllers
         public async Task<ActionResult<HotelResponse>> GetById([FromRoute] long id, CancellationToken cancellationToken)
         {
             var result = await mediator.Send(new GetHotelByIdQuery(id), cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves all hotels.
@@ -120,9 +116,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Deletes a hotel by ID.
@@ -140,12 +134,10 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<object>> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
             var result = await mediator.Send(new DeleteHotelCommand(id), cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return NoContent();
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves featured hotel deals.
@@ -157,17 +149,15 @@ namespace TABP.API.Controllers
         /// <response code="400">Invalid request.</response>
         /// <response code="500">Internal server error.</response>
         [HttpGet(ApiRoutes.Hotels.GetFeaturedDeals)]
-        [ProducesResponseType(typeof(FeaturedDealsHotelsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<FeaturedDealsHotelsResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<FeaturedDealsHotelsResponse>> GetFeaturedDeals(
+        public async Task<ActionResult<IEnumerable<FeaturedDealsHotelsResponse>>> GetFeaturedDeals(
             [FromQuery] HotelFeaturedDealsRequest request,
             CancellationToken cancellationToken = default)
         {
             var result = await mediator.Send(new GetHotelFeaturedDealsQuery(request.Count), cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Searches for hotels based on filters, dates, guest count, and pagination.
@@ -190,7 +180,6 @@ namespace TABP.API.Controllers
             var result = await mediator.Send(query, cancellationToken);
             if (result.IsFailure)
                 return BadRequest(result.Error);
-
             Response.Headers.Append("X-Pagination", result.Value.PaginationMetadata.Build());
             return Ok(result.Value.Items);
         }
@@ -211,7 +200,7 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult> SetThumbnail(
+        public async Task<ActionResult<object>> SetThumbnail(
             [FromRoute] int id,
             [FromForm] SetImageRequest request,
             CancellationToken cancellationToken)
@@ -219,11 +208,7 @@ namespace TABP.API.Controllers
             using var stream = request.File.OpenReadStream();
             var command = request.ToHotelThumbnailCommand(id, stream, request.File.FileName);
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return Created();
+            return result.ToActionResult();
         }
         /// <summary>
         /// Adds an image to the hotel's image gallery.
@@ -242,7 +227,7 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult> AddToGallery(
+        public async Task<ActionResult<object>> AddToGallery(
             [FromRoute] int id,
             [FromForm] SetImageRequest request,
             CancellationToken cancellationToken)
@@ -250,11 +235,7 @@ namespace TABP.API.Controllers
             using var stream = request.File.OpenReadStream();
             var command = request.ToHotelGalleryCommand(id, stream, request.File.FileName);
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return Created();
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves all reviews for a specific hotel.
@@ -280,11 +261,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetReviewsByHotelQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
     }
 }
