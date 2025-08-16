@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Bookings;
 using TABP.API.Mappers;
@@ -16,6 +17,7 @@ namespace TABP.API.Controllers
     /// </summary>
     [ApiController]
     [Authorize]
+    [OutputCache(Duration = 60)]
     public class BookingsController(ISender mediator) : ControllerBase
     {
         /// <summary>

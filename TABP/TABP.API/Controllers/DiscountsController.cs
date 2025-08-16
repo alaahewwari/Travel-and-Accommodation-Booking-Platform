@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Discounts;
 using TABP.API.Mappers;
@@ -14,7 +15,7 @@ namespace TABP.API.Controllers
     /// Only users with admin privileges can access these endpoints.
     /// </summary>
     [ApiController]
-    // [OutputCache(Duration = 60)] // Optional caching for GET endpoints
+    [OutputCache(Duration = 60)]
     public class DiscountsController(ISender mediator) : ControllerBase
     {
         /// <summary>

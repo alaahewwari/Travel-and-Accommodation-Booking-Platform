@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Amenities;
 using TABP.API.Mappers;
@@ -14,6 +15,7 @@ namespace TABP.API.Controllers
     /// Amenities are used to describe features or services available in rooms or hotel facilities.
     /// </summary>
     [ApiController]
+    [OutputCache(Duration = 60)]
     public class AmenitiesController(ISender mediator) : ControllerBase
     {
         /// <summary>
@@ -44,7 +46,6 @@ namespace TABP.API.Controllers
                 return BadRequest(result.Error);
             return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
         }
-
         /// <summary>
         /// Retrieves a list of all amenities available in the system.
         /// </summary>
@@ -59,10 +60,6 @@ namespace TABP.API.Controllers
         {
             var query = new GetAllAmenitiesQuery();
             var result = await mediator.Send(query, cancellationToken);
-
-            if (result.IsFailure)
-                return StatusCode(StatusCodes.Status500InternalServerError, result.Error);
-
             return Ok(result.Value);
         }
 
@@ -80,13 +77,10 @@ namespace TABP.API.Controllers
         public async Task<IActionResult> GetById(long id, CancellationToken cancellationToken)
         {
             var result = await mediator.Send(new GetAmenityByIdQuery(id), cancellationToken);
-
             if (result.IsFailure)
                 return NotFound(result.Error);
-
             return Ok(result.Value);
         }
-
         /// <summary>
         /// Updates an existing amenity (Admin only).
         /// </summary>

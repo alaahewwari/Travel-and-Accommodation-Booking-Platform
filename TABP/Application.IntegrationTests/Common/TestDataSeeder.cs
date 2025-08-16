@@ -215,7 +215,7 @@ namespace Application.IntegrationTests.Common
             await _context.SaveChangesAsync();
             return invoice;
         }
-        public async Task<Review> SeedReviewAsync(long userId, long hotelId, int rating = 4)
+        public async Task<Review> SeedReviewAsync(long userId, long hotelId, byte rating = 1)
         {
             var review = new Review
             {

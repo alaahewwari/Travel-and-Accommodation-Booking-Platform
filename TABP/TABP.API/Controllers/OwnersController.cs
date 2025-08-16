@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Owners;
 using TABP.API.Mappers;
@@ -14,6 +15,7 @@ namespace TABP.API.Controllers
     /// updating, and deletion operations.
     /// </summary>
     [ApiController]
+    [OutputCache(Duration = 60)]
     public class OwnersController(ISender mediator) : ControllerBase
     {
         /// <summary>
@@ -40,10 +42,8 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-
             if (result.IsFailure)
                 return BadRequest(result.Error);
-
             return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
         }
         /// <summary>
@@ -69,10 +69,8 @@ namespace TABP.API.Controllers
         {
             var query = new GetOwnerByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-
             if (result.IsFailure)
                 return NotFound(result.Error);
-
             return Ok(result.Value);
         }
         /// <summary>

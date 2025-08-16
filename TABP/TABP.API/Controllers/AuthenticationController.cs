@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Users;
 using TABP.API.Mappers;
@@ -11,6 +12,7 @@ namespace TABP.API.Controllers
     /// Provides endpoints for obtaining JWT tokens upon successful authentication.
     /// </summary>
     [ApiController]
+    [OutputCache(Duration = 60)]
     public class AuthenticationController(ISender mediator) : ControllerBase
     {
         /// <summary>

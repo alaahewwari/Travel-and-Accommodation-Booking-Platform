@@ -1,13 +1,13 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Hotels;
 using TABP.API.Contracts.Images;
 using TABP.API.Mappers;
 using TABP.Application.Hotels.Commands.Delete;
 using TABP.Application.Hotels.Common;
-using TABP.Application.Hotels.Queries.GetAll;
 using TABP.Application.Hotels.Queries.GetById;
 using TABP.Application.Hotels.Queries.GetFeaturedDeals;
 using TABP.Application.Hotels.Queries.GetReviews;
@@ -20,7 +20,7 @@ namespace TABP.API.Controllers
     /// All endpoints require admin authorization unless otherwise noted.
     /// </summary>
     [ApiController]
-    // [OutputCache(Duration = 60)] // Optional: Enable to cache GET responses
+    [OutputCache(Duration = 60)]
     public class HotelsController(ISender mediator) : ControllerBase
     {
         /// <summary>
@@ -94,7 +94,8 @@ namespace TABP.API.Controllers
         {
             var query = request.ToQuery();
             var result = await mediator.Send(query, cancellationToken);
-            return Ok(result.Value);
+            Response.Headers.Append("X-Pagination", result.Value.PaginationMetadata.Build());
+            return Ok(result.Value.Items);
         }
         /// <summary>
         /// Updates an existing hotel.
@@ -121,7 +122,6 @@ namespace TABP.API.Controllers
             var result = await mediator.Send(command, cancellationToken);
             if (result.IsFailure)
                 return BadRequest(result.Error);
-
             return Ok(result.Value);
         }
         /// <summary>
