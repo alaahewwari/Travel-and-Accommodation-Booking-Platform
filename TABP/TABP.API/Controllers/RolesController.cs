@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using System.Diagnostics;
 using TABP.API.Common;
 using TABP.API.Contracts.Rules;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Roles.Common;
 using TABP.Application.Rules.Commands.Delete;
@@ -46,11 +47,7 @@ namespace TABP.API.Controllers
             var sw = Stopwatch.StartNew();
             var result = await mediator.Send(command, cancellationToken);
             sw.Stop();
-
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+            return result.ToCreatedResult(nameof(GetById), role => new { id = role.Id });
         }
         /// <summary>
         /// Retrieves a specific rule by its ID.
@@ -76,9 +73,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetRoleByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves all rules in the system.
@@ -99,7 +94,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetAllRolesQuery();
             var result = await mediator.Send(query, cancellationToken);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Updates an existing rule.
@@ -129,11 +124,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Deletes a rule by its ID.
@@ -153,15 +144,13 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Delete(
+        public async Task<ActionResult<object>> Delete(
             [FromRoute] int id,
             CancellationToken cancellationToken)
         {
             var command = new DeleteRoleCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return NoContent();
+            return result.ToActionResult();
         }
     }
 }

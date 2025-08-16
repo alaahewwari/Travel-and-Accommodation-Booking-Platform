@@ -9,6 +9,8 @@ namespace TABP.Application.Bookings.Common
         public DateTime CheckInDate { get; set; }
         public DateTime CheckOutDate { get; set; }
         public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public string? GuestRemarks { get; set; }
         public IEnumerable<RoomResponse> Rooms { get; set; } = [];
     }
 }

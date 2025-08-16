@@ -1,6 +1,7 @@
 ﻿using Riok.Mapperly.Abstractions;
 using Sieve.Models;
 using TABP.Application.Bookings.Commands.Create;
+using TABP.Application.Bookings.Commands.Update;
 using TABP.Application.Bookings.Common;
 using TABP.Application.Bookings.Queries.GetById;
 using TABP.Domain.Entities;
@@ -22,5 +23,6 @@ namespace TABP.Application.Bookings.Mapper
         public static partial BookingResponse ToBookingResponse(this Booking booking);
         public static partial SieveModel ToSieveModel(this GetBookingsQuery query);
         public static partial PagedResult<BookingResponse> ToBookingPaginationResult(this PagedResult<Booking> pagedResult);
+        public static partial Booking ToBookingDomain(this UpdateBookingCommand command);
     }
 }

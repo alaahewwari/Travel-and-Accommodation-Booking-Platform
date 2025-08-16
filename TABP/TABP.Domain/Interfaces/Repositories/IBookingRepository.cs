@@ -63,6 +63,6 @@ namespace TABP.Domain.Interfaces.Repositories
         /// </summary>
         /// <param name="booking">The booking entity to update.</param>
         /// <param name="cancellationToken">Cancellation token for the async operation.</param>
-        Task UpdateBookingAsync(Booking booking, CancellationToken cancellationToken);
+        Task<int> UpdateBookingAsync(Booking booking, CancellationToken cancellationToken);
     }
 }

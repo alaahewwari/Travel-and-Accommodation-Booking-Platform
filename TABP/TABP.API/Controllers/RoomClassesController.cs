@@ -6,6 +6,7 @@ using TABP.API.Common;
 using TABP.API.Contracts.Amenities;
 using TABP.API.Contracts.Images;
 using TABP.API.Contracts.RoomClasses;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Discounts.Common;
 using TABP.Application.RoomClasses.Commands.AddAmenityToRoomClass;
@@ -42,15 +43,11 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create([FromBody] CreateRoomClassRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<RoomClassResponse>> Create([FromBody] CreateRoomClassRequest request, CancellationToken cancellationToken)
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+            return result.ToCreatedResult(nameof(GetById), roomClass => new { id = roomClass });
         }
         /// <summary>
         /// Retrieves a room class by its ID.
@@ -68,11 +65,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetRoomClassByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-
-            if (result.IsFailure)
-                return NotFound(result.Error);
-
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves all available room classes.
@@ -88,7 +81,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetAllRoomClassesQuery();
             var result = await mediator.Send(query, cancellationToken);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Updates an existing room class.
@@ -109,11 +102,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Deletes a room class by ID.
@@ -128,15 +117,11 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete([FromRoute] long id, CancellationToken cancellationToken)
+        public async Task<ActionResult<object>> Delete([FromRoute] long id, CancellationToken cancellationToken)
         {
             var command = new DeleteRoomClassCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return NotFound(result.Error);
-
-            return NoContent();
+            return result.ToActionResult();
         }
         /// <summary>
         /// Uploads and sets the thumbnail image for a room class.
@@ -149,19 +134,14 @@ namespace TABP.API.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> SetThumbnail([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<object>> SetThumbnail([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
         {
             if (request.File is null || request.File.Length == 0)
                 return BadRequest("Image file is required.");
-
             using var stream = request.File.OpenReadStream();
             var command = request.ToRoomThumbnailCommand(id, stream, request.File.FileName);
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return Created();
+            return result.ToActionResult();
         }
         /// <summary>
         /// Adds an image to the room class gallery.
@@ -174,19 +154,14 @@ namespace TABP.API.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> AddToGallery([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<object>> AddToGallery([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
         {
             if (request.File is null || request.File.Length == 0)
                 return BadRequest("File is missing or empty.");
-
             using var stream = request.File.OpenReadStream();
             var command = request.ToRoomGalleryCommand(id, stream, request.File.FileName);
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return Created();
+            return result.ToActionResult();
         }
         /// <summary>
         /// Assigns an amenity to a room class.
@@ -199,18 +174,14 @@ namespace TABP.API.Controllers
         [Authorize(Roles = UserRoles.Admin)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> AddAmenity(
+        public async Task<ActionResult<object>> AddAmenity(
             [FromRoute] long id,
             [FromBody] AssignAmenityToRoomClassRequest request,
             CancellationToken cancellationToken)
         {
             var command = new AddAmenityToRoomClassCommand(id, request.AmenityId);
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return NotFound(result.Error);
-
-            return NoContent();
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves all active discounts assigned to a specific room class.
@@ -230,11 +201,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetDiscountByRoomClassQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-
-            if (result.IsFailure)
-                return NotFound(result.Error);
-
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
     }
 }
