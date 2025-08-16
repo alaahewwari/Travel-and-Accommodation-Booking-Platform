@@ -43,6 +43,7 @@ namespace TABP.Application.Bookings.Commands.Create
                 var bookingResponse = await CreateBookingInTransactionAsync(request, rooms, existingHotel, existingUser, cancellationToken);
                 return Result<BookingCreationResponse>.Success(bookingResponse);
             }
+            //TODO : Handle specific exceptions 
             catch (EntityNotFoundException ex)
             {
                 return ex.EntityType switch
@@ -170,7 +171,7 @@ namespace TABP.Application.Bookings.Commands.Create
                         invoice.Status = PaymentStatus.RequiresAction;
                         paymentInfo = new PaymentInfo
                         (
-                            PaymentIntentId : paymentResult.PaymentIntentId,
+                            PaymentIntentId : paymentResult.PaymentIntentId!,
                             Status : PaymentStatus.RequiresAction.ToString(),
                             ClientSecret : paymentResult.ClientSecret
                         );
