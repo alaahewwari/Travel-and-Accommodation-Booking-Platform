@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Morcatko.AspNetCore.JsonMergePatch;
 using TABP.API.Common;
 using TABP.API.Contracts.Bookings;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Bookings.Commands.Cancel;
 using TABP.Application.Bookings.Commands.ConfirmPayment;
@@ -38,9 +40,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return CreatedAtAction(nameof(Create), new { id = result.Value.Id }, result.Value);
+            return result.ToCreatedResult(nameof(Create), booking => new { id = booking.Id });
         }
         /// <summary>
         /// Cancels an existing booking identified by its ID. Only the owner of the booking is allowed to cancel.
@@ -51,18 +51,54 @@ namespace TABP.API.Controllers
         /// <response code="204">Booking cancelled successfully.</response>
         /// <response code="404">Booking not found or not owned by the user.</response>
         /// <response code="401">User is not authenticated.</response>
-        [HttpPatch(ApiRoutes.Bookings.Cancel)]
+        [HttpPut(ApiRoutes.Bookings.Cancel)]
         [Authorize(Roles = UserRoles.Guest)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Cancel([FromRoute] long id, CancellationToken cancellationToken)
+        public async Task<ActionResult<object>> Cancel([FromRoute] long id, CancellationToken cancellationToken)
         {
             var command = new CancelBookingCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return NoContent();
+            return result.ToActionResult();
+        }
+        /// <summary>
+        /// Updates an existing booking using JSON Merge Patch (RFC 7396).
+        /// Only the authenticated user who created the booking can update it.
+        /// Send a JSON object with only the fields you want to update.
+        /// </summary>
+        /// <param name="id">The ID of the booking to update.</param>
+        /// <param name="patchDocument">JSON Merge Patch document containing the fields to update.</param>
+        /// <param name="cancellationToken">Token for cancelling the operation.</param>
+        /// <returns>The updated booking details.</returns>
+        /// <response code="200">Booking updated successfully.</response>
+        /// <response code="400">Invalid patch document or business validation failed.</response>
+        /// <response code="401">User is not authenticated.</response>
+        /// <response code="403">User does not own this booking.</response>
+        /// <response code="404">Booking not found.</response>
+        [HttpPatch(ApiRoutes.Bookings.Update)]
+        [Authorize(Roles = UserRoles.Guest)]
+        [Consumes(JsonMergePatchDocument.ContentType)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<object>> Update(
+            [FromRoute] long id,
+            [FromBody] JsonMergePatchDocument<UpdateBookingRequest> patchDocument,
+            CancellationToken cancellationToken)
+        {
+            var getCurrentBookingQuery = new GetBookingByIdQuery(id);
+            var currentBookingResult = await mediator.Send(getCurrentBookingQuery, cancellationToken);
+            if (currentBookingResult.IsFailure)
+                return currentBookingResult.ToActionResult();
+            var bookingDto = currentBookingResult.Value.ToUpdateBookingRequest();
+            patchDocument.ApplyTo(bookingDto);
+            var command = bookingDto.ToCommand(id);
+            var result = await mediator.Send(command, cancellationToken);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves the invoice associated with a specific booking in PDF format.
@@ -104,9 +140,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetBookingByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves a paginated list of all bookings made by the authenticated guest.
@@ -140,13 +174,12 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult> ConfirmPayment([FromBody] ConfirmPaymentRequest request)
+        public async Task<ActionResult<object>> ConfirmPayment([FromBody] ConfirmPaymentRequest request)
         {
             var command = new ConfirmPaymentCommand(request.BookingId, request.PaymentIntentId);
             var result = await mediator.Send(command);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return Created();
+            return result.ToActionResult();
         }
+
     }
 }

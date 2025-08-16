@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Cities;
 using TABP.API.Contracts.Images;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Cities.Commands.Delete;
 using TABP.Application.Cities.Common;
@@ -43,9 +44,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value);
+            return result.ToCreatedResult(nameof(GetById), city => new { id = city.Id });
         }
         /// <summary>
         /// Retrieves a city by its unique identifier.
@@ -67,9 +66,7 @@ namespace TABP.API.Controllers
         public async Task<ActionResult<CityResponse>> GetById([FromRoute] int id, CancellationToken cancellationToken)
         {
             var result = await mediator.Send(new GetCityByIdQuery(id), cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves a list of all available cities.
@@ -81,15 +78,15 @@ namespace TABP.API.Controllers
         /// <response code="403">User lacks permission to access this resource.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpGet(ApiRoutes.Cities.GetAll)]
-        [ProducesResponseType(typeof(IEnumerable<CityResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<CityForManagementResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<CityResponse>>> GetAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<CityForManagementResponse>>> GetAll(CancellationToken cancellationToken)
         {
             var query = new GetAllCitiesQuery();
             var result = await mediator.Send(query, cancellationToken);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Updates an existing city. Only accessible by administrators.
@@ -116,9 +113,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Deletes a city by its ID. Only accessible by administrators.
@@ -138,15 +133,12 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<object>> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
             var command = new DeleteCityCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return NoContent();
+            return result.ToActionResult();
         }
-
         /// <summary>
         /// Retrieves a list of trending cities based on popularity or recent activity.
         /// </summary>
@@ -157,18 +149,15 @@ namespace TABP.API.Controllers
         /// <response code="400">Invalid count or query parameters.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpGet(ApiRoutes.Cities.GetTrending)]
-        [ProducesResponseType(typeof(IEnumerable<CityResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<TrendingCityResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<CityResponse>>> GetTrending([FromQuery] GetTrendingCitiesRequest request, CancellationToken cancellationToken = default)
+        public async Task<ActionResult<IEnumerable<TrendingCityResponse>>> GetTrending([FromQuery] GetTrendingCitiesRequest request, CancellationToken cancellationToken = default)
         {
             var query = new GetTrendingCitiesQuery(request.Count);
             var result = await mediator.Send(query, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
-
         /// <summary>
         /// Sets or updates the thumbnail image for a specific city.
         /// Only accessible by administrators.
@@ -191,16 +180,12 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> SetThumbnail([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
+        public async Task<ActionResult<object>> SetThumbnail([FromRoute] int id, [FromForm] SetImageRequest request, CancellationToken cancellationToken)
         {
             using var stream = request.File.OpenReadStream();
             var command = request.ToCityCommand(id, stream, request.File.FileName);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return Created();
+            return result.ToActionResult();
         }
     }
 }

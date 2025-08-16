@@ -95,10 +95,10 @@ namespace TABP.Persistence.Repositories
                 .AnyAsync(cancellationToken);
         }
         /// <inheritdoc />
-        public async Task UpdateBookingAsync(Booking booking, CancellationToken cancellationToken)
+        public async Task<int> UpdateBookingAsync(Booking booking, CancellationToken cancellationToken)
         {
             context.Bookings.Update(booking);
-            await context.SaveChangesAsync(cancellationToken);
+            return await context.SaveChangesAsync(cancellationToken);
         }
     }
 }

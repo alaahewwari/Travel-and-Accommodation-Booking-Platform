@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Rooms;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Rooms.Commands.Delete;
 using TABP.Application.Rooms.Common;
@@ -39,7 +40,7 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Create(
+        public async Task<ActionResult<RoomResponse>> Create(
             [FromRoute] long hotelId,
             [FromRoute] long roomClassId,
             [FromBody] CreateRoomRequest request,
@@ -47,11 +48,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(hotelId, roomClassId);
             var result = await mediator.Send(command, cancellationToken);
-
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-
-            return CreatedAtAction(nameof(GetById), new { id = result.Value }, result.Value);
+            return result.ToCreatedResult(nameof(GetById), room => new { id = room });
         }
         /// <summary>
         /// Retrieves a room by its unique ID.
@@ -76,9 +73,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetRoomByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Retrieves a list of all rooms in the system.
@@ -90,14 +85,14 @@ namespace TABP.API.Controllers
         /// <response code="403">Access forbidden.</response>
         /// <response code="500">Internal server error.</response>
         [HttpGet(ApiRoutes.Rooms.GetAll)]
-        [ProducesResponseType(typeof(IEnumerable<RoomResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(IEnumerable<RoomForManagementResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<RoomResponse>>> GetAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<RoomForManagementResponse>>> GetAll(CancellationToken cancellationToken)
         {
             var result = await mediator.Send(new GetAllRoomsQuery(), cancellationToken);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Updates the details of an existing room.
@@ -127,9 +122,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Deletes a room by its ID.
@@ -149,15 +142,13 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Delete(
+        public async Task<ActionResult<object>> Delete(
             [FromRoute] long id,
             CancellationToken cancellationToken)
         {
             var command = new DeleteRoomCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return NoContent();
+            return result.ToActionResult();
         }
     }
 }

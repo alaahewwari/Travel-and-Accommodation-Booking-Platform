@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using TABP.API.Common;
 using TABP.API.Contracts.Reviews;
+using TABP.API.Extensions;
 using TABP.API.Mappers;
 using TABP.Application.Reviews.Commands.Delete;
 using TABP.Application.Reviews.Common;
@@ -38,9 +39,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand();
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-                return BadRequest(result.Error);
-            return CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result);
+            return result.ToCreatedResult(nameof(GetById), review => new { id = review.Id });
         }
         /// <summary>
         /// Retrieves a review by its unique identifier.
@@ -61,9 +60,7 @@ namespace TABP.API.Controllers
         {
             var query = new GetReviewByIdQuery(id);
             var result = await mediator.Send(query, cancellationToken);
-            if (result.IsFailure)
-                return NotFound(result.Error);
-            return Ok(result.Value);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Updates an existing review. Only accessible by administrators or the review author.
@@ -79,7 +76,7 @@ namespace TABP.API.Controllers
         /// <response code="404">Review not found.</response>
         /// <response code="500">Unexpected server error.</response>
         [HttpPut(ApiRoutes.Reviews.Update)]
-        [Authorize(Roles=UserRoles.Guest)]
+        [Authorize(Roles = UserRoles.Guest)]
         [ProducesResponseType(typeof(ReviewResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -90,11 +87,7 @@ namespace TABP.API.Controllers
         {
             var command = request.ToCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return Ok(result);
+            return result.ToActionResult();
         }
         /// <summary>
         /// Deletes a review by its ID. Only accessible by administrators or the review author.
@@ -114,15 +107,11 @@ namespace TABP.API.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<object>> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
             var command = new DeleteReviewCommand(id);
             var result = await mediator.Send(command, cancellationToken);
-            if (result.IsFailure)
-            {
-                return BadRequest(result.Error);
-            }
-            return NoContent();
-        } 
+            return result.ToActionResult();
+        }
     }
 }

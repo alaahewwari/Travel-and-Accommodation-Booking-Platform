@@ -1,4 +1,7 @@
-﻿using TABP.API.Configurations;
+﻿using Microsoft.AspNetCore.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using TABP.API.Configurations;
 using TABP.API.Filters;
 using TABP.API.Services;
 using TABP.Domain.Interfaces.Services;
@@ -21,7 +24,8 @@ namespace TABP.API.Extensions
             services.AddControllers(o =>
             {
                 o.Filters.Add(new PublicCacheHeaderFilter(60));
-            });
+            })
+                .AddNewtonsoftJson();
             services.AddApiValidation();
             services.AddOpenApi();
             services.AddEndpointsApiExplorer();
@@ -33,6 +37,12 @@ namespace TABP.API.Extensions
                 options.LowercaseQueryStrings = true;
             });
             services.AddScoped<IUserContext, UserContext>();
+            services.Configure<JsonOptions>(options =>
+            {
+                options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                options.SerializerOptions.PropertyNameCaseInsensitive = true;
+            });
         }
     }
 }
