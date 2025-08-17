@@ -2,6 +2,7 @@
 using TABP.Application.Bookings.Common;
 using TABP.Application.Bookings.Mapper;
 using TABP.Application.Common;
+using TABP.Domain.Entities;
 using TABP.Domain.Enums;
 using TABP.Domain.Exceptions;
 using TABP.Domain.Interfaces.Repositories;
@@ -29,9 +30,11 @@ namespace TABP.Application.Bookings.Commands.Update
             {
                 return Result.Failure(BookingErrors.BookingNotPending);
             }
-            var updatedBooking = request.ToBookingDomain();
-            updatedBooking.UpdatedAt = DateTime.UtcNow;
-            var result = await bookingRepository.UpdateBookingAsync(updatedBooking, cancellationToken);
+            existingBooking.CheckInDate = request.CheckInDate;
+            existingBooking.CheckOutDate = request.CheckOutDate;
+            existingBooking.GuestRemarks = request.GuestRemarks;
+            existingBooking.UpdatedAt = DateTime.UtcNow;
+            var result = await bookingRepository.UpdateBookingAsync(existingBooking, cancellationToken);
             if (result == 0)
             {
                 return Result.Failure(BookingErrors.BookingUpdateFailed);
