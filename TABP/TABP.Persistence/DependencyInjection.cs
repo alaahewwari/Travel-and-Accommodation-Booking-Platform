@@ -12,11 +12,15 @@ namespace TABP.Persistence
     {
         public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddScoped<SoftDeleteInterceptor>();
+            var connString = configuration.GetConnectionString("DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+            services.AddDbContext<ApplicationDbContext>((sp, options) =>
             {
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
-                    optionsBuilder => optionsBuilder.EnableRetryOnFailure(3))
-                    .AddInterceptors(new SoftDeleteInterceptor());
+            var interceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
+            options.UseSqlServer(connString,
+                sqlOptions => sqlOptions.EnableRetryOnFailure(3))
+                .AddInterceptors(interceptor);
             });
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICityRepository, CityRepository>();
